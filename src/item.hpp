@@ -5,6 +5,8 @@
 #ifndef ITEM_HPP
 #define ITEM_HPP
 
+#include "data_structures.hpp"
+
 // TODO verificare ItemType mancanti
 enum class ItemName{
     EMPTY,
@@ -63,15 +65,6 @@ enum class ItemName{
     COLOR_29,
     COLOR_30,
     COLOR_31
-};
-
-struct Block{
-    int left;
-    int right;
-    int top;
-    int bottom;
-    int front;
-    int back;
 };
 
 template <ItemName I>
