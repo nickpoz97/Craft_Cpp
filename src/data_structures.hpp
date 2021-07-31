@@ -12,6 +12,11 @@ struct Vec<T,3>{
     T x;
     T y;
     T z;
+
+    friend Vec<T,3> operator+(const Vec<T,3>& a, const Vec<T,3>& b);
+
+    template<typename P>
+    friend Vec<T,3> operator*(P a, const Vec<T,3>& b);
 };
 
 template <typename T>
