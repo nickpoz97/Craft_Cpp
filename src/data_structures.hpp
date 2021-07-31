@@ -20,23 +20,31 @@ struct Vec<T,2>{
     T y;
 };
 
-template <>
-struct Vec<float,4>{
-    float vertex1;
-    float vertex2;
-    float vertex3;
-    float vertex4;
+// v stands for vertex
+// Quad is a face of a cube
+template <typename T>
+struct Vec<T,4>{
+    T v1;
+    T v2;
+    T v3;
+    T v4;
+
+    T operator[](int i);
 };
 using Quad = Vec<float,4>;
+using Face = Vec<Vec<int,3>, 4>;
 
-template <>
-struct Vec<int, 6>{
-    int left;
-    int right;
-    int top;
-    int bottom;
-    int front;
-    int back;
+// specialization for cube faces
+template <typename T>
+struct Vec<T, 6>{
+    T left;
+    T right;
+    T top;
+    T bottom;
+    T front;
+    T back;
+
+    T operator[](int i);
 };
 using Block = Vec<int, 6>;
 
