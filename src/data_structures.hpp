@@ -4,20 +4,11 @@
 
 #ifndef CPP_DATA_STRUCTURES_HPP
 #define CPP_DATA_STRUCTURES_HPP
+
+#include "cube.hpp"
+
 template <typename T, int n_components>
 struct Vec;
-
-template <typename T>
-struct Vec<T,3>{
-    T x;
-    T y;
-    T z;
-
-    friend Vec<T,3> operator+(const Vec<T,3>& a, const Vec<T,3>& b);
-
-    template<typename P>
-    friend Vec<T,3> operator*(P a, const Vec<T,3>& b);
-};
 
 template <typename T>
 struct Vec<T,2>{
@@ -25,32 +16,46 @@ struct Vec<T,2>{
     T y;
 };
 
-// v stands for vertex
-// Quad is a face of a cube
-template <typename T>
-struct Vec<T,4>{
-    T v1;
-    T v2;
-    T v3;
-    T v4;
+template <>
+struct Vec<float,3>{
+    float x;
+    float y;
+    float z;
 
-    T operator[](int i);
+    friend Vec<float,3> operator+(const Vec<float,3>& a, const Vec<float,3>& b);
+    friend Vec<float,3> operator*(float a, const Vec<float,3>& b);
 };
-using Quad = Vec<float,4>;
-using Face = Vec<Vec<int,3>, 4>;
 
-// specialization for cube faces
-template <typename T>
-struct Vec<T, 6>{
-    T left;
-    T right;
-    T top;
-    T bottom;
-    T front;
-    T back;
+/*class Face{
+private:
+    int indexes[6];
+    Vec<float,3> normals[6];
+    int tile;
+public:
+    int operator[](int i);
+};*/
 
-    T operator[](int i);
+struct TileBlock{
+    int leftFace;
+    int rightFace;
+    int topFace;
+    int bottomFace;
+    int frontFace;
+    int backFace;
+
+    int operator[](int i) const;
 };
-using Block = Vec<int, 6>;
+
+enum class Face{LEFT, RIGHT, TOP, BOTTOM, FRONT, BACK};
+
+class IndexedVertex{
+private:
+    int world_position_index;
+    int index;
+    Face face;
+    Vec<float,2> uv;
+
+    friend class Cube;
+};
 
 #endif //CPP_DATA_STRUCTURES_HPP

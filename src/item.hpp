@@ -70,7 +70,7 @@ enum class ItemName{
 template <ItemName I>
 class Item{
 private:
-    static constexpr Block blockTypes[]{
+    static constexpr TileBlock blockTypes[]{
             {0, 0, 0, 0, 0, 0}, // 0 - empty
             {16, 16, 32, 0, 16, 16}, // 1 - grass
             {1, 1, 1, 1, 1, 1}, // 2 - sand

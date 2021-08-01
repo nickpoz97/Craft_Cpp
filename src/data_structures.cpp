@@ -3,32 +3,37 @@
 //
 #include "data_structures.hpp"
 
-template <typename T>
-T Vec<T,6>::operator[](int i) {
-    int* address = &(this->left) + i;
+int TileBlock::operator[](int i) const{
+    const int* address = &(this->leftFace) + i;
     return *address;
 }
 
-template <typename T>
-T Vec<T,4>::operator[](int i) {
-    T* address = &(this->v1) + i;
+Vec<float,3> Vec<Vec<float,3>,4>::operator[](int i) {
+    Vec<float,3>* address = &(this->v1) + i;
     return *address;
 }
 
-template<typename T, typename P>
-Vec<T,3> operator+(const Vec<T,3>& a, const Vec<P,3>& b){
+Vec<float, 3> operator+(const Vec<float, 3> &a, const Vec<float, 3> &b) {
     return {
-        a.x + b.x,
-        a.y + b.y,
-        a.z + b.z
+            a.x + b.x,
+            a.y + b.y,
+            a.z + b.z
     };
 }
 
-template<typename T, typename P>
-Vec<T,3> operator*(P c, const Vec<T,3>& b){
+Vec<float, 3> operator*(float a, const Vec<float, 3> &b) {
     return {
-        c * b.x,
-        c * b.y,
-        c * b.z
+            a * b.x,
+            a * b.y,
+            a * b.z
     };
+}
+
+Vec<float, 3> IndexedVertex::getNormal() {
+    int faceIndex = static_cast<int>(face);
+
+}
+
+void IndexedVertex::setValues(int world_position_index, int face_index, Face face) {
+
 }
