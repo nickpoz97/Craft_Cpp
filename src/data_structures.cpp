@@ -8,11 +8,6 @@ int TileBlock::operator[](int i) const{
     return *address;
 }
 
-Vec<float,3> Vec<Vec<float,3>,4>::operator[](int i) {
-    Vec<float,3>* address = &(this->v1) + i;
-    return *address;
-}
-
 Vec<float, 3> operator+(const Vec<float, 3> &a, const Vec<float, 3> &b) {
     return {
             a.x + b.x,
@@ -27,13 +22,4 @@ Vec<float, 3> operator*(float a, const Vec<float, 3> &b) {
             a * b.y,
             a * b.z
     };
-}
-
-Vec<float, 3> IndexedVertex::getNormal() {
-    int faceIndex = static_cast<int>(face);
-
-}
-
-void IndexedVertex::setValues(int world_position_index, int face_index, Face face) {
-
 }

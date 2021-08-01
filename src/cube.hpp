@@ -11,15 +11,13 @@
 #include "data_structures.hpp"
 
 class Cube{
-    static constexpr Vec<float, 3> local_vertex_positions[8]{
-            {-1, -1, -1},
-            {-1, -1, +1},
-            {-1, +1, -1},
-            {-1, +1, +1},
-            {+1, -1, -1},
-            {+1, -1, +1},
-            {+1, +1, -1},
-            {+1, +1, +1}
+    static constexpr Vec<float, 3> local_vertex_positions[6][4]{
+            {{-1, -1, -1}, {-1, -1, +1}, {-1, +1, -1}, {-1, +1, +1}},
+            {{+1, -1, -1}, {+1, -1, +1}, {+1, +1, -1}, {+1, +1, +1}},
+            {{-1, +1, -1}, {-1, +1, +1}, {+1, +1, -1}, {+1, +1, +1}},
+            {{-1, -1, -1}, {-1, -1, +1}, {+1, -1, -1}, {+1, -1, +1}},
+            {{-1, -1, -1}, {-1, +1, -1}, {+1, -1, -1}, {+1, +1, -1}},
+            {{-1, -1, +1}, {-1, +1, +1}, {+1, -1, +1}, {+1, +1, +1}}
     };
 
     static constexpr Vec<float,3> normals[6]{
@@ -31,42 +29,43 @@ class Cube{
             {0, 0, +1}
     };
 
-    static constexpr Vec<bool, 2> uvs[8]{
-            {0, 0},
-            {1, 0},
-            {0, 1},
-            {1, 1},
-            {1, 0},
-            {0, 0},
-            {1, 1},
-            {0, 1}
+    static constexpr Vec<bool, 2> uvs[6][4]{
+            {{0, 0}, {1, 0}, {0, 1}, {1, 1}},
+            {{1, 0}, {0, 0}, {1, 1}, {0, 1}},
+            {{0, 1}, {0, 0}, {1, 1}, {1, 0}},
+            {{0, 0}, {0, 1}, {1, 0}, {1, 1}},
+            {{0, 0}, {0, 1}, {1, 0}, {1, 1}},
+            {{1, 0}, {1, 1}, {0, 0}, {0, 1}}
     };
 
     static constexpr int indices[6][6]{
-            {0,3,2,0,1,3},
-            {4,7,5,4,6,7},
-            {2,7,6,2,3,7},
-            {0,5,1,0,4,5},
-            {0,6,4,0,2,6},
-            {1,7,3,1,5,7}
+            {0, 3, 2, 0, 1, 3},
+            {0, 3, 1, 0, 2, 3},
+            {0, 3, 2, 0, 1, 3},
+            {0, 3, 1, 0, 2, 3},
+            {0, 3, 2, 0, 1, 3},
+            {0, 3, 1, 0, 2, 3}
+    };
+
+    static constexpr int flipped[6][6] = {
+            {0, 1, 2, 1, 3, 2},
+            {0, 2, 1, 2, 3, 1},
+            {0, 1, 2, 1, 3, 2},
+            {0, 2, 1, 2, 3, 1},
+            {0, 1, 2, 1, 3, 2},
+            {0, 2, 1, 2, 3, 1}
     };
 
     static constexpr float n = 0.5;                 // distance from center
     static constexpr float s = 0.0625;              // TODO check semantic
     static constexpr float a = 0.0 + 1 / 2048.0;    // TODO check semantic
     static constexpr float b = s - 1 / 2048.0;      // TODO check semantic
-    static constexpr int n_cube_vertices = 8;
-    static constexpr int n_indexed_vertices = 36;
+    static constexpr int n_faces = 6;
+    static constexpr int n_vertices_face = 6;
 
-    std::array<Vec<float,3>, n_cube_vertices> world_vertex_positions;
-    std::array<Vec<float,2>, n_cube_vertices> vertex_uvs;
-    std::array<IndexedVertex, n_indexed_vertices> indexed_vertices;
+    std::array<std::array<Vertex, n_vertices_face>, n_faces> vertices;
 
-    Cube(const Vec<float, 3>& center_position, const TileBlock& tiles);
-
-    void setVertexProperties(const Vec<float, 3> &center_position, const TileBlock &tiles);
-
-    void setGeometryProperties();
+    Cube(const Vec<float, 3> &center_position, const TileBlock &tiles, float ao[6][4], float light[6][4]);
 };
 
 

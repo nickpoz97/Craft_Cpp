@@ -5,8 +5,6 @@
 #ifndef CPP_DATA_STRUCTURES_HPP
 #define CPP_DATA_STRUCTURES_HPP
 
-#include "cube.hpp"
-
 template <typename T, int n_components>
 struct Vec;
 
@@ -26,15 +24,6 @@ struct Vec<float,3>{
     friend Vec<float,3> operator*(float a, const Vec<float,3>& b);
 };
 
-/*class Face{
-private:
-    int indexes[6];
-    Vec<float,3> normals[6];
-    int tile;
-public:
-    int operator[](int i);
-};*/
-
 struct TileBlock{
     int leftFace;
     int rightFace;
@@ -48,12 +37,14 @@ struct TileBlock{
 
 enum class Face{LEFT, RIGHT, TOP, BOTTOM, FRONT, BACK};
 
-class IndexedVertex{
+class Vertex{
 private:
-    int world_position_index;
+    Vec<float, 3> position;
     int index;
     Face face;
     Vec<float,2> uv;
+    float ao[6][4];
+    float light[6][4];
 
     friend class Cube;
 };
