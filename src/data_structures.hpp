@@ -22,8 +22,27 @@ struct Vec<float,3>{
     float y;
     float z;
 
+    void normalize();
+    [[nodiscard]] float norm() const;
+
     friend Vec<float,3> operator+(const Vec<float,3>& a, const Vec<float,3>& b);
+    friend float operator*(const Vec<float,3>& a, const Vec<float,3>& b);
     friend Vec<float,3> operator*(float a, const Vec<float,3>& b);
+    Vec<float,3>& operator/=(float a);
+};
+
+template <>
+struct Vec<float, 4>{
+    float x, y, z, w;
+
+    Vec(float x, float y, float z, float w);
+    explicit Vec(const float (&ar)[4]);
+
+    void normalize();
+    [[nodiscard]] float norm() const;
+
+    friend Vec<float,4> operator+(const Vec<float,4>& a, const Vec<float,4>& b);
+    friend float operator*(const Vec<float,4>& a, const Vec<float,4>& b);
 };
 
 struct TileBlock{
@@ -61,12 +80,13 @@ private:
             {0,0,0,1}
     };
 
-    void operator*(Vec<float,3> v);
-    void operator*(Matrix m);
 public:
-    explicit Matrix();
-    void translate(Vec<float, 3> position);
-    void mat_rotate(Vec<float, 3> axis, float angle);
+    void traslation(Vec<float, 3> position);
+    void rotation(Vec<float, 3> axis, float angle); // general rotation
+    Matrix transpose() const;
+
+    Vec<float,4> operator*(Vec<float,4> v);
+    Matrix operator*(const Matrix& m) const;
 };
 
 #endif //CPP_DATA_STRUCTURES_HPP
