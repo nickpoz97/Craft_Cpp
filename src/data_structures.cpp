@@ -23,3 +23,11 @@ Vec<float, 3> operator*(float a, const Vec<float, 3> &b) {
             a * b.z
     };
 }
+
+Matrix::Matrix() {}
+
+void Matrix::translate(Vec<float, 3> position) {
+    elements[0][3] = position.x;
+    elements[1][3] = position.y;
+    elements[2][3] = position.z;
+}

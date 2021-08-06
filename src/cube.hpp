@@ -65,7 +65,7 @@ class Cube{
 
     std::array<std::array<Vertex, n_vertices_face>, n_faces> vertices;
 
-    Cube(const Vec<float, 3> &center_position, const TileBlock &tiles, float ao[6][4], float light[6][4]);
+    Cube(const Vec<float, 3> &center_position, int tileIndex, float ao[6][4], float light[6][4]);
 };
 
 

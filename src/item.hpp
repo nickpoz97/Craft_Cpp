@@ -69,8 +69,75 @@ enum class ItemName{
 
 template <ItemName I>
 class Item{
+public:
+    bool is_plant();
+    bool is_obstacle();
+    bool is_transparent();
+    bool is_destructable();
+};
+
+template <ItemName I>
+bool Item<I>::is_plant(){
+    switch (I) {
+        case ItemName::TALL_GRASS:
+        case ItemName::YELLOW_FLOWER:
+        case ItemName::RED_FLOWER:
+        case ItemName::PURPLE_FLOWER:
+        case ItemName::SUN_FLOWER:
+        case ItemName::WHITE_FLOWER:
+        case ItemName::BLUE_FLOWER:
+            return true;
+        default:
+            return false;
+    }
+}
+
+template <ItemName I>
+bool Item<I>::is_obstacle() {
+    if (is_plant()) {
+        return 1;
+    }
+    switch (I) {
+        case ItemName::EMPTY:
+        case ItemName::GLASS:
+        case ItemName::LEAVES:
+            return 1;
+        default:
+            return 0;
+    }
+}
+
+template <ItemName I>
+bool Item<I>::is_transparent() {
+    if (is_plant()) {
+        return 1;
+    }
+    switch (I) {
+        case ItemName::EMPTY:
+        case ItemName::GLASS:
+        case ItemName::LEAVES:
+            return 1;
+        default:
+            return 0;
+    }
+
+
+}
+
+template<ItemName I>
+bool Item<I>::is_destructable() {
+    switch (I) {
+        case ItemName::EMPTY:
+        case ItemName::CLOUD:
+            return 0;
+        default:
+            return 1;
+    }
+}
+
+class Block{
 private:
-    static constexpr TileBlock tiles[]{
+    static constexpr TileBlock cubeTiles[]{
             {0, 0, 0, 0, 0, 0}, // 0 - empty
             {16, 16, 32, 0, 16, 16}, // 1 - grass
             {1, 1, 1, 1, 1, 1}, // 2 - sand
@@ -137,76 +204,34 @@ private:
             {207, 207, 207, 207, 207, 207}, // 63
     };
 
-    const int blockTypeIndex;
-public:
-    Item();
+    static constexpr int plantTiles[]{
+            // w => tile
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0 - 16
+            48, // 17 - tall grass
+            49, // 18 - yellow flower
+            50, // 19 - red flower
+            51, // 20 - purple flower
+            52, // 21 - sun flower
+            53, // 22 - white flower
+            54, // 23 - blue flower
+    };
 
-    bool is_plant();
-    bool is_obstacle();
-    bool is_transparent();
-    bool is_destructable();
+    const int index;
+public:
+    explicit Block(int index);
+    const TileBlock& getBlock();
+    int operator[] (int faceIndex) const;
 };
 
-template <ItemName I>
-Item<I>::Item() : blockTypeIndex{static_cast<int>(I)} {}
+Block::Block(int index) : index{index} {}
 
-template <ItemName I>
-bool Item<I>::is_plant(){
-    switch (I) {
-        case ItemName::TALL_GRASS:
-        case ItemName::YELLOW_FLOWER:
-        case ItemName::RED_FLOWER:
-        case ItemName::PURPLE_FLOWER:
-        case ItemName::SUN_FLOWER:
-        case ItemName::WHITE_FLOWER:
-        case ItemName::BLUE_FLOWER:
-            return true;
-        default:
-            return false;
-    }
+const TileBlock &Block::getBlock() {
+    return cubeTiles[index];
 }
 
-template <ItemName I>
-bool Item<I>::is_obstacle() {
-    if (is_plant()) {
-        return 1;
-    }
-    switch (I) {
-        case ItemName::EMPTY:
-        case ItemName::GLASS:
-        case ItemName::LEAVES:
-            return 1;
-        default:
-            return 0;
-    }
+int Block::operator[] (int faceIndex) const {
+    return cubeTiles[index][faceIndex];
 }
 
-template <ItemName I>
-bool Item<I>::is_transparent() {
-    if (is_plant()) {
-        return 1;
-    }
-    switch (I) {
-        case ItemName::EMPTY:
-        case ItemName::GLASS:
-        case ItemName::LEAVES:
-            return 1;
-        default:
-            return 0;
-    }
-
-
-}
-
-template<ItemName I>
-bool Item<I>::is_destructable() {
-    switch (I) {
-        case ItemName::EMPTY:
-        case ItemName::CLOUD:
-            return 0;
-        default:
-            return 1;
-    }
-}
 
 #endif

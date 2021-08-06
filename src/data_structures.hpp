@@ -5,6 +5,8 @@
 #ifndef CPP_DATA_STRUCTURES_HPP
 #define CPP_DATA_STRUCTURES_HPP
 
+#include <array>
+
 template <typename T, int n_components>
 struct Vec;
 
@@ -43,10 +45,28 @@ private:
     int index;
     Face face;
     Vec<float,2> uv;
-    float ao[6][4];
-    float light[6][4];
+    float ao;
+    float light;
 
     friend class Cube;
+    friend class Plant;
+};
+
+class Matrix{
+private:
+    float elements[4][4] {
+            {1,0,0,0},
+            {0,1,0,0},
+            {0,0,1,0},
+            {0,0,0,1}
+    };
+
+    void operator*(Vec<float,3> v);
+    void operator*(Matrix m);
+public:
+    explicit Matrix();
+    void translate(Vec<float, 3> position);
+    void mat_rotate(Vec<float, 3> axis, float angle);
 };
 
 #endif //CPP_DATA_STRUCTURES_HPP
