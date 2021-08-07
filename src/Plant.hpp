@@ -6,11 +6,13 @@
 #define CPP_PLANT_HPP
 
 #include <array>
+#include <vector>
 
 #include "data_structures.hpp"
 #include "item.hpp"
+#include "GameObject.hpp"
 
-class Plant {
+class Plant : public GameObject{
 private:
     static const Vec<float, 3> local_vertex_positions[4][4];
     static const Vec<float,3> normals[4];
@@ -24,7 +26,6 @@ private:
 
     static constexpr int n_faces = 4;
     static constexpr int n_vertices_face = 6;
-    std::array<std::array<Vertex, n_vertices_face>, n_faces> vertices;
 public:
     Plant(const Vec<float, 3>& center_position, int tileIndex, float ao, float light);
 };

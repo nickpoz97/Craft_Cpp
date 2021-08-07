@@ -35,8 +35,10 @@ template <>
 struct Vec<float, 4>{
     float x, y, z, w;
 
+    Vec() = default;
     Vec(float x, float y, float z, float w);
-    explicit Vec(const float (&ar)[4]);
+    Vec(const float (&ar)[4]);
+    Vec(Vec<float,3> v, float w);
 
     void normalize();
     [[nodiscard]] float norm() const;
@@ -60,33 +62,16 @@ enum class Face{LEFT, RIGHT, TOP, BOTTOM, FRONT, BACK};
 
 class Vertex{
 private:
-    Vec<float, 3> position;
+    Vec<float, 4> position;
     int index;
     Face face;
     Vec<float,2> uv;
     float ao;
     float light;
 
+    friend class GameObject;
     friend class Cube;
     friend class Plant;
-};
-
-class Matrix{
-private:
-    float elements[4][4] {
-            {1,0,0,0},
-            {0,1,0,0},
-            {0,0,1,0},
-            {0,0,0,1}
-    };
-
-public:
-    void traslation(Vec<float, 3> position);
-    void rotation(Vec<float, 3> axis, float angle); // general rotation
-    Matrix transpose() const;
-
-    Vec<float,4> operator*(Vec<float,4> v);
-    Matrix operator*(const Matrix& m) const;
 };
 
 #endif //CPP_DATA_STRUCTURES_HPP
