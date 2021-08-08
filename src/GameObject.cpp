@@ -14,13 +14,14 @@ Vec<float,3> GameObject::normals[6]{
     {0, 0, +1}
 };
 
-GameObject::GameObject(int n_faces, int n_vertices_face) : vertices(n_faces, std::vector<Vertex>(n_vertices_face))
-{}
+GameObject::GameObject(int n_faces, int n_vertices_face) : vertices(n_faces, std::vector<CubeVertex>(n_vertices_face)){
+
+}
 
 void GameObject::apply_transform(const Matrix &transform) {
-    for(auto face : vertices){
-        for(auto v : face){
-            v.position = transform * v.position;
+    for(auto& face : vertices){
+        for(auto& v : face){
+            v.setPosition(transform * v.getPosition());
         }
     }
 }

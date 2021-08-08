@@ -3,5 +3,5 @@ project(cpp)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(app src/cube.cpp src/main.cpp src/data_structures.cpp src/data_structures.hpp src/item.hpp src/cube.hpp src/Plant.cpp src/Plant.hpp src/Block.cpp src/Block.hpp src/Matrix.cpp src/Matrix.hpp src/GameObject.cpp src/GameObject.hpp)
+add_executable(app src/cube.cpp src/main.cpp src/data_structures.cpp src/data_structures.hpp src/item.hpp src/cube.hpp src/Plant.cpp src/Plant.hpp src/Block.cpp src/Block.hpp src/Matrix.cpp src/Matrix.hpp src/GameObject.cpp src/GameObject.hpp src/Player.cpp src/Player.hpp src/Sphere.cpp src/Sphere.hpp src/Vertex.cpp src/Vertex.hpp)
 #add_executable(src/Cube.cpp)

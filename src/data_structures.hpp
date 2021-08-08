@@ -58,20 +58,4 @@ struct TileBlock{
     int operator[](int i) const;
 };
 
-enum class Face{LEFT, RIGHT, TOP, BOTTOM, FRONT, BACK};
-
-class Vertex{
-private:
-    Vec<float, 4> position;
-    int index;
-    Face face;
-    Vec<float,2> uv;
-    float ao;
-    float light;
-
-    friend class GameObject;
-    friend class Cube;
-    friend class Plant;
-};
-
 #endif //CPP_DATA_STRUCTURES_HPP

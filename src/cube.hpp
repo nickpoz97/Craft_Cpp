@@ -10,6 +10,7 @@
 #include "item.hpp"
 #include "data_structures.hpp"
 #include "GameObject.hpp"
+#include "Block.hpp"
 
 class Cube : public GameObject{
 private:
@@ -23,11 +24,11 @@ private:
     static constexpr float a = 0.0 + 1 / 2048.0;    // TODO check semantic
     static constexpr float b = s - 1 / 2048.0;      // TODO check semantic
 
-    static constexpr int n_faces = 6;
-    static constexpr int n_vertices_face = 6;
+    static constexpr int N_FACES = 6;
+    static constexpr int N_VERTICES_FACE = 6;
 
 public:
-    Cube(const Vec<float, 3> &center_position, int tileIndex, float ao[6][4], float light[6][4]);
+    Cube(const Vec<float, 3> &center_position, TileBlock tiles, float ao[6][4], float light[6][4]);
 };
 
 
