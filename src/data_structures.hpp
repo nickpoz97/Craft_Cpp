@@ -16,19 +16,21 @@ struct Vec<T,2>{
     T y;
 };
 
-template <>
-struct Vec<float,3>{
-    float x;
-    float y;
-    float z;
+template <typename T>
+struct Vec<T,3>{
+    T x;
+    T y;
+    T z;
 
-    Vec<float, 3> normalize();
-    [[nodiscard]] float norm() const;
+    Vec<T, 3> normalize();
+    [[nodiscard]] T norm() const;
 
-    friend Vec<float,3> operator+(const Vec<float,3>& a, const Vec<float,3>& b);
-    friend float operator*(const Vec<float,3>& a, const Vec<float,3>& b);
-    friend Vec<float,3> operator*(float a, const Vec<float,3>& b);
-    Vec<float,3>& operator/=(float a);
+    friend Vec<T,3> operator+(const Vec<T,3>& a, const Vec<T,3>& b);
+    friend Vec<T,3> operator-(const Vec<T,3>& a, const Vec<T,3>& b);
+    friend T operator*(const Vec<T,3>& a, const Vec<T,3>& b);
+    friend Vec<T,3> operator*(T a, const Vec<T,3>& b);
+    Vec<T,3>& operator/=(T a);
+    bool operator==(const Vec<T,3>& other) const;
 };
 
 template <>

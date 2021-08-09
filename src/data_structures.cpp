@@ -9,7 +9,8 @@ int TileBlock::operator[](int i) const{
     return *address;
 }
 
-Vec<float, 3> operator+(const Vec<float, 3> &a, const Vec<float, 3> &b) {
+template<typename T>
+Vec<T, 3> operator+(const Vec<T, 3> &a, const Vec<T, 3> &b) {
     return {
             a.x + b.x,
             a.y + b.y,
@@ -17,7 +18,8 @@ Vec<float, 3> operator+(const Vec<float, 3> &a, const Vec<float, 3> &b) {
     };
 }
 
-Vec<float, 3> operator*(float a, const Vec<float, 3> &b) {
+template<typename T>
+Vec<T, 3> operator*(T a, const Vec<T, 3> &b) {
     return {
             a * b.x,
             a * b.y,
@@ -25,7 +27,8 @@ Vec<float, 3> operator*(float a, const Vec<float, 3> &b) {
     };
 }
 
-Vec<float, 3>& Vec<float, 3>::operator/=(float a) {
+template<typename T>
+Vec<T, 3>& Vec<T, 3>::operator/=(T a) {
     x /= a;
     y /= a;
     z /= a;
@@ -33,12 +36,14 @@ Vec<float, 3>& Vec<float, 3>::operator/=(float a) {
     return *this;
 }
 
-Vec<float, 3> Vec<float, 3>::normalize() {
+template<typename T>
+Vec<T, 3> Vec<T, 3>::normalize() {
     *this /= norm();
     return *this;
 }
 
-float Vec<float, 3>::norm() const {
+template<typename T>
+T Vec<T, 3>::norm() const {
     return std::sqrt(
         x*x + y*y + z*z
     );
@@ -77,4 +82,20 @@ float Vec<float, 4>::norm() const {
 
 float operator*(const Vec<float, 3> &a, const Vec<float, 3> &b) {
     return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+template<typename T>
+bool Vec<T, 3>::operator==(const Vec<T, 3> &other) const{
+    return x == other.x &&
+        y == other.y &&
+        z == other.z;
+}
+
+template<typename T>
+Vec<T, 3> operator-(const Vec<T, 3> &a, const Vec<T, 3> &b) {
+    return {
+        a.x - b.x,
+        a.y - b.y,
+        a.z - b.z
+    };
 }
