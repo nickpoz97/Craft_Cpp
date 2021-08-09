@@ -33,8 +33,9 @@ Vec<float, 3>& Vec<float, 3>::operator/=(float a) {
     return *this;
 }
 
-void Vec<float, 3>::normalize() {
+Vec<float, 3> Vec<float, 3>::normalize() {
     *this /= norm();
+    return *this;
 }
 
 float Vec<float, 3>::norm() const {
@@ -62,10 +63,12 @@ Vec<float, 4>::Vec(const float (&ar)[4]) : Vec{ar[0], ar[1], ar[2], ar[3]} {}
 
 Vec<float, 4>::Vec(Vec<float, 3> v, float w) : x{v.x}, y{v.y}, z{v.z}, w{w} {};
 
-void Vec<float,4>::normalize() {
+Vec<float, 4> Vec<float,4>::normalize() {
     x /= norm();
     y /= norm();
     z /= norm();
+
+    return *this;
 }
 
 float Vec<float, 4>::norm() const {

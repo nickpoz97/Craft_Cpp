@@ -11,7 +11,6 @@ enum class Face{LEFT, RIGHT, TOP, BOTTOM, FRONT, BACK};
 
 struct Vertex{
     Vec<float, 4> position;
-    int index;
     Vec<float,2> uv;
 };
 
@@ -28,6 +27,11 @@ private:
     float ao;
     float light;
     Face face;
+    int index;
+public:
+    int getIndex() const;
+
+    void setIndex(int index);
 };
 
 

@@ -22,7 +22,7 @@ struct Vec<float,3>{
     float y;
     float z;
 
-    void normalize();
+    Vec<float, 3> normalize();
     [[nodiscard]] float norm() const;
 
     friend Vec<float,3> operator+(const Vec<float,3>& a, const Vec<float,3>& b);
@@ -40,7 +40,7 @@ struct Vec<float, 4>{
     Vec(const float (&ar)[4]);
     Vec(Vec<float,3> v, float w);
 
-    void normalize();
+    Vec<float, 4> normalize();
     [[nodiscard]] float norm() const;
 
     friend Vec<float,4> operator+(const Vec<float,4>& a, const Vec<float,4>& b);

@@ -27,3 +27,11 @@ float CubeVertex::getLight() const {
 void CubeVertex::setLight(float light) {
     CubeVertex::light = light;
 }
+
+int CubeVertex::getIndex() const {
+    return index;
+}
+
+void CubeVertex::setIndex(int index) {
+    CubeVertex::index = index;
+}
