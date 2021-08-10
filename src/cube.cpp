@@ -4,7 +4,7 @@
 
 #include "cube.hpp"
 #include "Block.hpp"
-#include "data_structures.hpp"
+#include "Vec.hpp"
 
 Vec<float, 3> Cube::local_vertex_positions[6][4]{
     {{-1, -1, -1}, {-1, -1, +1}, {-1, +1, -1}, {-1, +1, +1}},

@@ -5,7 +5,7 @@
 #ifndef CPP_VERTEX_HPP
 #define CPP_VERTEX_HPP
 
-#include "data_structures.hpp"
+#include "Vec.hpp"
 
 enum class Face{LEFT, RIGHT, TOP, BOTTOM, FRONT, BACK};
 

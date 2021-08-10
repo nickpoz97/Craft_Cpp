@@ -5,7 +5,7 @@
 #ifndef CPP_MATRIX_HPP
 #define CPP_MATRIX_HPP
 
-#include "data_structures.hpp"
+#include "Vec.hpp"
 
 class Matrix{
 private:

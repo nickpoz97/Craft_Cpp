@@ -8,7 +8,7 @@
 #include <array>
 
 #include "item.hpp"
-#include "data_structures.hpp"
+#include "Vec.hpp"
 #include "GameObject.hpp"
 #include "Block.hpp"
 

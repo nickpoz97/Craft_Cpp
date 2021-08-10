@@ -5,7 +5,9 @@
 #ifndef CPP_PLAYER_HPP
 #define CPP_PLAYER_HPP
 
-#include "data_structures.hpp"
+#include <string_view>
+
+#include "Vec.hpp"
 #include "cube.hpp"
 
 class Player {
@@ -15,11 +17,17 @@ private:
     static TileBlock tiles;
 
     Cube playerCube;
+
     float rx;
     float ry;
+    Vec<float,3> position;
 
+    float t;
+
+    std::string_view name;
+    int id;
 public:
-    Player(Vec<float,3> position, float rx, float ry);
+    Player(Vec<float,3> position, float rx, float ry, std::string_view name, int id);
 };
 
 

@@ -5,16 +5,28 @@
 #ifndef CPP_BLOCK_HPP
 #define CPP_BLOCK_HPP
 
-#include "data_structures.hpp"
+#include "Vec.hpp"
+
+struct TileBlock{
+    int leftFace;
+    int rightFace;
+    int topFace;
+    int bottomFace;
+    int frontFace;
+    int backFace;
+
+    int operator[](int i) const;
+};
 
 class Block{
 private:
     static TileBlock cubeTiles[];
     static int plantTiles[];
 
-    const int index;
+    const int tile_index;
+    Vec<int, 3> position;
 public:
-    explicit Block(int index);
+    explicit Block(int tile_index, const Vec<int,3>& position);
     [[nodiscard]] const TileBlock& getBlock() const;
     int operator[] (int faceIndex) const;
 };

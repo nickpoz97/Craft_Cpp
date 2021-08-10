@@ -4,6 +4,11 @@
 
 #include "Block.hpp"
 
+int TileBlock::operator[](int i) const{
+    const int* address = &(this->leftFace) + i;
+    return *address;
+}
+
 int Block::plantTiles[]{
     // w => tile
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0 - 16
@@ -83,12 +88,12 @@ TileBlock Block::cubeTiles[]{
     {207, 207, 207, 207, 207, 207}, // 63
 };
 
-Block::Block(int index) : index{index} {}
+Block::Block(int tile_index, const Vec<int,3>& position) : tile_index{tile_index}, position{position} {}
 
 const TileBlock &Block::getBlock() const {
-    return cubeTiles[index];
+    return cubeTiles[tile_index];
 }
 
 int Block::operator[] (int faceIndex) const {
-    return cubeTiles[index][faceIndex];
+    return cubeTiles[tile_index][faceIndex];
 }

@@ -20,7 +20,12 @@ TileBlock Player::tiles{
     226, 224, 241, 209, 225, 227
 };
 
-Player::Player(Vec<float, 3> position, float rx, float ry) : rx{rx}, ry{ry} , playerCube{{0,0,0}, tiles, ao, light} {
+Player::Player(Vec<float, 3> position, float rx, float ry, std::string_view name, int id) : rx{rx}, ry{ry},
+    position{position},
+    playerCube{{0,0,0}, tiles, ao, light},
+    name{name},
+    id{id}
+    {
     Matrix rotation_asx;
     rotation_asx.generate_rotation_matrix({1,0,0}, rx);
 

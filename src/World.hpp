@@ -8,7 +8,6 @@
 
 class World {
     static constexpr int PAD = 1;
-    static constexpr int CHUNK_SIZE = 32;
 
     World(int p, int q);
 };
