@@ -5,23 +5,23 @@
 #ifndef CPP_BLOCKMAP_HPP
 #define CPP_BLOCKMAP_HPP
 
-#include "Vec.hpp"
+#include <vec3.hpp>
 
 template<>
-struct std::hash<Vec<int,3>>{
+struct std::hash<glm::ivec3>{
     static std::size_t hash_int(int key);
 
-    std::size_t operator()(Vec<int,3> v) const;
+    std::size_t operator()(const glm::ivec3& v) const;
 };
 
-using BaseMap = std::unordered_map<Vec<int,3>, int>;
+using BaseMap = std::unordered_map<glm::ivec3, int>;
 
 class BlockMap : public BaseMap{
-    Vec<int,3> delta;
+    glm::ivec3 delta;
 
 public:
-    BlockMap(const Vec<int, 3>& delta);
-    int& at(const Vec<int,3>& key);
+    BlockMap(const glm::ivec3& delta);
+    int& at(const glm::ivec3& key);
 };
 
 

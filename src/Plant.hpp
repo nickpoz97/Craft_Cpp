@@ -8,26 +8,24 @@
 #include <array>
 #include <vector>
 
-#include "Vec.hpp"
 #include "item.hpp"
-#include "GameObject.hpp"
+#include "CubicObject.hpp"
 
-class Plant : public GameObject{
+class Plant : public CubicObject{
 private:
-    static const Vec<float, 3> local_vertex_positions[4][4];
-    static const Vec<float,3> normals[4];
-    static const Vec<float,2> uvs[4][4];
+    static const glm::vec3 local_vertex_positions[4][4];
+    //static const glm::vec3 normals[4];
+    static const glm::vec2 uvs[4][4];
     static const float indices[4][6];
 
     static constexpr float s = 0.0625;
     static constexpr float a = 0;
     static constexpr float b = s;
-    static constexpr float n = 0.5;                 // distance from center
 
     static constexpr int n_faces = 4;
     static constexpr int n_vertices_face = 6;
 public:
-    Plant(const Vec<float, 3>& center_position, int tileIndex, float ao, float light);
+    Plant(const glm::vec3& center_position, int tileIndex, float ao, float light);
 };
 
 

@@ -1,6 +1,5 @@
 #include <iostream>
 #include "item.hpp"
-#include "Vec.hpp"
 
 int main() {
     Item<ItemName::GRASS> grass;

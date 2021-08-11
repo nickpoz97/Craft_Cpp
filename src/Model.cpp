@@ -42,3 +42,19 @@ int Model::get_scale_factor() const {
     result = std::min(2, result);
     return result;
 }
+
+bool Model::is_flying() const{
+    return flying;
+}
+
+int Model::getWidth() const {
+    return width;
+}
+
+int Model::getHeight() const {
+    return height;
+}
+
+int Model::getScale() const {
+    return scale;
+}

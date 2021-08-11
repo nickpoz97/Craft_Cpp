@@ -7,8 +7,9 @@
 
 #include <list>
 
-#include "GameObject.hpp"
+#include "CubicObject.hpp"
 
+//TODO update mathematics
 class Sphere{
 private:
     static constexpr int N_TRIANGLES = 8;

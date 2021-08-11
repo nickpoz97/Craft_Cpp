@@ -40,7 +40,7 @@ class Model {
 
     int observe1;
     int observe2;
-    int flying;
+    bool flying;
 
     int item_index;
     int scale;
@@ -62,6 +62,13 @@ public:
     float get_day_time() const;
     float get_daylight() const;
     int get_scale_factor() const;
+    bool is_flying() const;
+
+    int getWidth() const;
+
+    int getHeight() const;
+
+    int getScale() const;
 };
 
 

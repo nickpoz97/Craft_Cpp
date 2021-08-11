@@ -5,6 +5,7 @@
 #ifndef CPP_CHUNK_HPP
 #define CPP_CHUNK_HPP
 
+#include <vec2.hpp>
 
 #include "BlockMap.hpp"
 #include "list"
@@ -14,8 +15,8 @@ class Chunk {
 private:
     static constexpr int CHUNK_SIZE = 32;
 
-    Vec<int,2> coordinates;
-    Vec<int,2> min;
+    glm::ivec2 coordinates;
+    glm::ivec2 min;
 
     BlockMap map;
     BlockMap lights;

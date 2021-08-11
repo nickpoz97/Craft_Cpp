@@ -6,13 +6,13 @@
 
 #include "BlockMap.hpp"
 
-BlockMap::BlockMap(const Vec<int, 3>& delta) : BaseMap(), delta{delta}{}
+BlockMap::BlockMap(const glm::ivec3& delta) : BaseMap(), delta{delta}{}
 
-int &BlockMap::at(const Vec<int, 3> &key){
+int &BlockMap::at(const glm::ivec3 &key){
     return BaseMap::at(key - delta);
 }
 
-std::size_t std::hash<Vec<int,3>>::hash_int(int key) {
+std::size_t std::hash<glm::ivec3>::hash_int(int key) {
     key = ~key + (key << 15);
     key = key ^ (key >> 12);
     key = key + (key << 2);
@@ -22,6 +22,6 @@ std::size_t std::hash<Vec<int,3>>::hash_int(int key) {
     return key;
 }
 
-std::size_t std::hash<Vec<int,3>>::operator()(Vec<int, 3> v) const{
+std::size_t std::hash<glm::ivec3>::operator()(const glm::ivec3& v) const{
     return hash_int(v.x) ^ hash_int(v.y) ^ hash_int(v.z);
 }

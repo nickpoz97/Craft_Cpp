@@ -5,8 +5,6 @@
 #ifndef ITEM_HPP
 #define ITEM_HPP
 
-#include "Vec.hpp"
-
 // TODO verificare ItemType mancanti
 enum class ItemName{
     EMPTY,

@@ -5,13 +5,16 @@
 #ifndef CPP_WORKER_HPP
 #define CPP_WORKER_HPP
 
-#include "Vec.hpp"
+#include <vec2.hpp>
+#include <array>
+
 #include "BlockMap.hpp"
 
 class WorkerItem {
 private:
-    Vec<int,2> coordinates;
-    Vec<int,2> min;
+    glm::ivec2 coordinates;
+    int miny;
+    int maxy;
 
     int load;
     std::array<std::array<BlockMap,3>,3> block_maps;

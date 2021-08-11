@@ -6,11 +6,10 @@
 #define CPP_SIGN_HPP
 
 #include <string_view>
-
-#include "Vec.hpp"
+#include <vec3.hpp>
 
 class Sign {
-    Vec<int,3> coordinate;
+    glm::vec3 coordinate;
     int face;
     std::string_view text;
 };

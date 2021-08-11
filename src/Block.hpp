@@ -5,8 +5,6 @@
 #ifndef CPP_BLOCK_HPP
 #define CPP_BLOCK_HPP
 
-#include "Vec.hpp"
-
 struct TileBlock{
     int leftFace;
     int rightFace;
