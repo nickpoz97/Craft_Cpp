@@ -2,20 +2,23 @@
 // Created by ultimatenick on 08/08/21.
 //
 
-#ifndef CPP_VERTEX_HPP
-#define CPP_VERTEX_HPP
+#ifndef CPP_STANDARDVERTEX_HPP
+#define CPP_STANDARDVERTEX_HPP
 
 #include <vec4.hpp>
 #include <vec2.hpp>
 
 enum class Face{LEFT, RIGHT, TOP, BOTTOM, FRONT, BACK};
 
-struct Vertex{
+struct StandardVertex{
     glm::vec4 position;
-    glm::bvec2 uv;
 };
 
-class CubeVertex : public Vertex{
+struct SphereVertex : StandardVertex{
+    glm::vec2 uv;
+};
+
+class CubeVertex : public SphereVertex{
 public:
     float ao;
     float light;
@@ -25,4 +28,4 @@ public:
 
 
 
-#endif //CPP_VERTEX_HPP
+#endif //CPP_STANDARDVERTEX_HPP

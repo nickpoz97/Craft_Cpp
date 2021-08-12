@@ -5,8 +5,11 @@
 #include "OpenglBuffer.hpp"
 #include "glad/glad.h"
 
-OpenglBuffer::OpenglBuffer(GLsizei size, GLfloat *data) {
+OpenglBuffer::OpenglBuffer() {
     glGenBuffers(1, &id);
+}
+
+void OpenglBuffer::store_data(GLsizei size, const GLfloat *data) const {
     glBindBuffer(GL_ARRAY_BUFFER, id);
     glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind

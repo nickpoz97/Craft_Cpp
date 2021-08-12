@@ -9,4 +9,4 @@ include_directories(deps/glad/include/)
 include_directories(deps/glfw/include/)
 include_directories(deps/glm)
 
-add_executable(app ${SOURCE_FILES} src/OpenglBuffer.cpp src/OpenglBuffer.hpp src/CubeWireframe.cpp src/CubeWireframe.hpp)
+add_executable(app ${SOURCE_FILES} src/OpenglBuffer.cpp src/OpenglBuffer.hpp src/CubeWireframe.cpp src/CubeWireframe.hpp src/GameObject.hpp)
