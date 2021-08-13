@@ -9,7 +9,7 @@ OpenglBuffer::OpenglBuffer() {
     glGenBuffers(1, &id);
 }
 
-void OpenglBuffer::store_data(GLsizei size, const GLfloat *data) const {
+void OpenglBuffer::store_data(GLsizei size, const GLfloat* const data) const {
     glBindBuffer(GL_ARRAY_BUFFER, id);
     glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind

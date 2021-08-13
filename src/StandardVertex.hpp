@@ -14,11 +14,11 @@ struct StandardVertex{
     glm::vec4 position;
 };
 
-struct SphereVertex : StandardVertex{
+struct UvVertex : StandardVertex{
     glm::vec2 uv;
 };
 
-class CubeVertex : public SphereVertex{
+class CubeVertex : public UvVertex{
 public:
     float ao;
     float light;

@@ -7,7 +7,8 @@
 
 
 #include <vector>
-#include <vec3.hpp>
+#include "vec3.hpp"
+#include "mat4x4.hpp"
 #include "OpenglBuffer.hpp"
 #include "Block.hpp"
 
@@ -19,15 +20,23 @@ protected:
     std::vector<VertexType> vertices;
 public:
     GameObject();
-    void set_buffer_data(GLsizei size, const GLfloat *data) const;
+    void set_buffer_data() const;
+    void apply_transform(const glm::mat4 &transform);
 };
 
 template<typename VertexType, int n_vertices>
-GameObject<VertexType, n_vertices>::GameObject() : vertices(n_vertices), buffer(){}
+GameObject<VertexType, n_vertices>::GameObject() : vertices(n_vertices), buffer() {}
 
 template<typename VertexType, int n_vertices>
-void GameObject<VertexType, n_vertices>::set_buffer_data(GLsizei size, const GLfloat *data) const {
-    buffer.store_data(vertices.size() * sizeof(VertexType), reinterpret_cast<GLfloat*>(vertices.data()));
+void GameObject<VertexType, n_vertices>::set_buffer_data() const {
+    buffer.store_data(vertices.size() * sizeof(VertexType), reinterpret_cast<const GLfloat* const>(vertices.data()));
+}
+
+template<typename VertexType, int n_vertices>
+void GameObject<VertexType, n_vertices>::apply_transform(const glm::mat4 &transform) {
+    for(auto& v : this->vertices){
+        v.position = transform * v.position;
+    }
 }
 
 #endif //CPP_GAMEOBJECT_HPP

@@ -13,22 +13,23 @@
 #include "CubicObject.hpp"
 #include "Block.hpp"
 
-class Cube : public CubicObject{
+class Cube : public CubicObject<6, VERTICES_FACE_COUNT>{
 private:
-    static glm::vec3 local_vertex_positions[6][4];
-    static glm::bvec2 uvs[6][4];
-    static int indices[6][6];
-    static int flipped[6][6];
+    using SuperClass = CubicObject<6, VERTICES_FACE_COUNT>;
+
+    static PositionsMatrix local_vertex_positions;
+    static UvsMatrix uvs;
+    static IndicesMatrix indices;
+    static IndicesMatrix flipped;
+    static NormalMatrix normals;
 
     static constexpr float s = 0.0625;              // TODO check semantic
     static constexpr float a = 0.0 + 1 / 2048.0;    // TODO check semantic
     static constexpr float b = s - 1 / 2048.0;      // TODO check semantic
 
-    static constexpr int N_FACES = 6;
-    static constexpr int N_VERTICES_FACE = 6;
-
+    IndicesMatrix true_indices(const LightMatrix&  ao);
 public:
-    Cube(const glm::vec3 &center_position, TileBlock tiles, float ao[6][4], float light[6][4]);
+    Cube(const TileBlock& tiles, const LightMatrix&  ao, const LightMatrix&  light);
 };
 
 

@@ -5,8 +5,22 @@
 #include <vec3.hpp>
 #include "CubicObject.hpp"
 
+using CubeObject =  CubicObject<6,VERTICES_FACE_COUNT>;
+using PlantObject = CubicObject<4,VERTICES_FACE_COUNT>;
+
 template<int n_faces, int n_vertices_face>
-CubicObject<n_faces,n_vertices_face>::CubicObject(const TileBlock& tiles) : SuperClass() {
+CubicObject<n_faces,n_vertices_face>::CubicObject(
+            const TileBlock& tiles,
+            const LightMatrix& ao,
+            const LightMatrix& light,
+            const PositionsMatrix& local_vertex_positions,
+            const IndicesMatrix& indices,
+            const NormalMatrix& normals,
+            const UvsMatrix& uvs,
+            float s,
+            float a,
+            float b
+        ) : SuperClass() {
     auto v_it {(this->vertices).begin()};
     auto ind_face_it {indices.begin()};
     auto pos_face_it {local_vertex_positions.begin()};
@@ -30,35 +44,9 @@ CubicObject<n_faces,n_vertices_face>::CubicObject(const TileBlock& tiles) : Supe
                 static_cast<float>(tiles[face_index] / 16) * s + (*uvs_it.x ? b : a)
             };
             v_it->ao = ao_face_it[*ind_it];
-            v_it->light = ao_face_it[*ind_it];
+            v_it->light = light_face_it[*ind_it];
         }
     }
-}
 
-template<int n_faces, int n_vertices_face>
-void CubicObject<n_faces, n_vertices_face>::apply_transform(const glm::mat4 &transform) {
-    for(auto& v : this->vertices){
-        v.position = transform * v.position;
-    }
-}
-
-template<>
-std::array<int, VERTICES_FACE_COUNT> CubicObject<6, VERTICES_FACE_COUNT>::get_face_indices(int face_index,
-                                                                                         std::array<float, 4> ao_face) {
-    decltype(indices) flipped{{
-        {0, 1, 2, 1, 3, 2},
-        {0, 2, 1, 2, 3, 1},
-        {0, 1, 2, 1, 3, 2},
-        {0, 2, 1, 2, 3, 1},
-        {0, 1, 2, 1, 3, 2},
-        {0, 2, 1, 2, 3, 1}
-    }};
-
-    return (ao_face[0] + ao_face[3] > ao_face[1] + ao_face[2]) ? flipped[face_index] : indices[face_index];
-}
-
-template<>
-std::array<int, VERTICES_FACE_COUNT> CubicObject<4, VERTICES_FACE_COUNT>::get_face_indices(int face_index,
-                                                                                           std::array<float, 4> ao_face){
-    return indices[face_index];
+    this->set_buffer_data();
 }

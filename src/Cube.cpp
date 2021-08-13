@@ -6,59 +6,24 @@
 #include "Block.hpp"
 #include "vec4.hpp"
 
-glm::vec3 Cube::local_vertex_positions[6][4]{
-    {{-1, -1, -1}, {-1, -1, +1}, {-1, +1, -1}, {-1, +1, +1}},
-    {{+1, -1, -1}, {+1, -1, +1}, {+1, +1, -1}, {+1, +1, +1}},
-    {{-1, +1, -1}, {-1, +1, +1}, {+1, +1, -1}, {+1, +1, +1}},
-    {{-1, -1, -1}, {-1, -1, +1}, {+1, -1, -1}, {+1, -1, +1}},
-    {{-1, -1, -1}, {-1, +1, -1}, {+1, -1, -1}, {+1, +1, -1}},
-    {{-1, -1, +1}, {-1, +1, +1}, {+1, -1, +1}, {+1, +1, +1}}
-};
+#include "CubicObject.hpp"
 
-glm::bvec2 Cube::uvs[6][4]{
-    {{0, 0}, {1, 0}, {0, 1}, {1, 1}},
-    {{1, 0}, {0, 0}, {1, 1}, {0, 1}},
-    {{0, 1}, {0, 0}, {1, 1}, {1, 0}},
-    {{0, 0}, {0, 1}, {1, 0}, {1, 1}},
-    {{0, 0}, {0, 1}, {1, 0}, {1, 1}},
-    {{1, 0}, {1, 1}, {0, 0}, {0, 1}}
-};
+Cube::Cube(const TileBlock& tiles, const LightMatrix&  ao, const LightMatrix&  light) : SuperClass{tiles, ao, light, local_vertex_positions,
+                                                                                                   true_indices(ao), normals, uvs, s ,a, b} {
 
-int Cube::indices[6][6]{
-    {0, 3, 2, 0, 1, 3},
-    {0, 3, 1, 0, 2, 3},
-    {0, 3, 2, 0, 1, 3},
-    {0, 3, 1, 0, 2, 3},
-    {0, 3, 2, 0, 1, 3},
-    {0, 3, 1, 0, 2, 3}
-};
+}
 
-int Cube::flipped[6][6] = {
-        {0, 1, 2, 1, 3, 2},
-        {0, 2, 1, 2, 3, 1},
-        {0, 1, 2, 1, 3, 2},
-        {0, 2, 1, 2, 3, 1},
-        {0, 1, 2, 1, 3, 2},
-        {0, 2, 1, 2, 3, 1}
-};
+decltype(Cube::indices) Cube::true_indices(const CubicObject::LightMatrix &ao) {
+    decltype(indices) t_indices{};
 
-Cube::Cube(const glm::vec3 &center_position, TileBlock tiles, float ao[6][4], float light[6][4]) :
-        CubicObject(N_FACES, N_VERTICES_FACE){
+    auto ao_face {ao.begin()};
+    auto i_face {t_indices.begin()};
 
-    for (int i = 0; i < N_FACES; i++) {
-        for (int j = 0; j < N_VERTICES_FACE; j++) {
-            bool flip = ao[i][0] + ao[i][3] > ao[i][1] + ao[i][2];
-
-            auto &v = vertices[i][j];
-            v.position = glm::vec4 {center_position + (n * local_vertex_positions[i][j]), 1};
-
-            v.face = static_cast<Face>(i);
-            v.index = flip ? flipped[i][j] : indices[i][j];
-            v.uv = {static_cast<float>(tiles[i] % 16) * s + (uvs[i][j].x ? b : a),
-                    static_cast<float>(tiles[i] / 16) * s + (uvs[i][j].x ? b : a)
-            };
-            v.ao = ao[i][v.index];
-            v.light = light[i][v.index];
-        }
+    for(; ao_face != ao.end() ; ++ao_face, ++i_face){
+        int face_index = i_face - t_indices.begin();
+        bool cond = (*ao_face)[0] + (*ao_face)[3] > (*ao_face)[1] + (*ao_face)[2];
+        *i_face = cond ? flipped[face_index] : indices[face_index];
     }
+
+    return t_indices;
 }

@@ -9,13 +9,13 @@
 
 class OpenglBuffer {
 private:
-    GLuint id = 0;
+    GLuint id;
 
 public:
     OpenglBuffer();
     ~OpenglBuffer();
 
-    void store_data(GLsizei size, const GLfloat *data) const;
+    void store_data(GLsizei size, const GLfloat* const data) const;
 };
 
 
