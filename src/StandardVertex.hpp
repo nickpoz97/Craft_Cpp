@@ -18,7 +18,11 @@ struct UvVertex : StandardVertex{
     glm::vec2 uv;
 };
 
-class CubeVertex : public UvVertex{
+struct NormalVertex : UvVertex{
+    glm::vec3 normal;
+};
+
+class CubeVertex : public NormalVertex{
 public:
     float ao;
     float light;
