@@ -10,20 +10,21 @@
 #include "Cube.hpp"
 #include "costants.hpp"
 
-float Player::ao[6][4] = {0};
-float Player::light[6][4] = {
-        {0.8, 0.8, 0.8, 0.8},
-        {0.8, 0.8, 0.8, 0.8},
-        {0.8, 0.8, 0.8, 0.8},
-        {0.8, 0.8, 0.8, 0.8},
-        {0.8, 0.8, 0.8, 0.8},
-        {0.8, 0.8, 0.8, 0.8}
-};
+decltype(Player::ao) Player::ao = {};
+decltype(Player::light) Player::light = {{
+    {0.8, 0.8, 0.8, 0.8},
+    {0.8, 0.8, 0.8, 0.8},
+    {0.8, 0.8, 0.8, 0.8},
+    {0.8, 0.8, 0.8, 0.8},
+    {0.8, 0.8, 0.8, 0.8},
+    {0.8, 0.8, 0.8, 0.8}
+}};
 TileBlock Player::tiles{
     226, 224, 241, 209, 225, 227
 };
 
-Player::Player(const Model& model, const glm::vec3& position, const glm::vec2& rotation, std::string_view name, int id) :
+Player::Player(const Model &model, std::string_view name, int id, const glm::vec3 &position, const glm::vec2 &rotation)
+        :
     actual_status{position, rotation, glfwGetTime()},
     former_status1{actual_status},
     former_status2{actual_status},

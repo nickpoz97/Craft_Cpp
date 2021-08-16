@@ -6,13 +6,7 @@
 #define CPP_BLOCKMAP_HPP
 
 #include <vec3.hpp>
-
-template<>
-struct std::hash<glm::ivec3>{
-    static std::size_t hash_int(int key);
-
-    std::size_t operator()(const glm::ivec3& v) const;
-};
+#include "Hashes.hpp"
 
 // value is w
 using BaseMap = std::unordered_map<glm::ivec3, int>;

@@ -4,6 +4,7 @@
 
 #include <cmath>
 #include "Model.hpp"
+#include "Player.hpp"
 
 float Model::get_day_time() const {
     if (day_length <= 0) {
@@ -58,3 +59,16 @@ int Model::getHeight() const {
 int Model::getScale() const {
     return scale;
 }
+
+void Model::set_player(const glm::vec3& position, const glm::vec2& rotation, std::string_view name, int id) {
+    player.reset(new Player{*this, name, id, position, rotation});
+}
+
+void Model::delete_player() {
+    player.reset(nullptr);
+}
+
+Chunk &Model::get_chunk(const glm::ivec2& pq) {
+    return chunks.at(pq);
+}
+

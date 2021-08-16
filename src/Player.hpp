@@ -23,8 +23,8 @@ struct Status{
 
 class Player {
 private:
-    static float ao[6][4];
-    static float light[6][4];
+    static std::array<std::array<float,4>,6> ao;
+    static std::array<std::array<float,4>,6> light;
     static TileBlock tiles;
 
     Status actual_status;
@@ -40,14 +40,16 @@ private:
     std::string_view name;
     int id;
 public:
-    Player(const Model& model, const glm::vec3& position, const glm::vec2& rotation, std::string_view name, int id);
+    Player(const Model &model, std::string_view name, int id, const glm::vec3 &position, const glm::vec2 &rotation);
     glm::vec3 get_sight_vector();
     glm::vec3 get_motion_vector();
     void set_movement(int x, int z);
-    void update_player(const glm::vec3& new_position, const glm::vec2& new_rotation, bool interpolate);
+    void update_player(const glm::vec3& new_position, const glm::vec2& new_rotation={}, bool interpolate={});
     void update_player(const Status& new_status, bool interpolate);
     void interpolate_player();
     void draw();
+
+    Player(Model model, std::string_view view, int i);
 };
 
 
