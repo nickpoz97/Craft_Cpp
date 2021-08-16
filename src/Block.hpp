@@ -5,6 +5,8 @@
 #ifndef CPP_BLOCK_HPP
 #define CPP_BLOCK_HPP
 
+#include <vec3.hpp>
+
 struct TileBlock{
     int leftFace;
     int rightFace;
@@ -22,9 +24,9 @@ private:
     static int plantTiles[];
 
     const int tile_index;
-    Vec<int, 3> position;
+    glm::vec3 position;
 public:
-    explicit Block(int tile_index, const Vec<int,3>& position);
+    explicit Block(int tile_index, const glm::vec3& position);
     [[nodiscard]] const TileBlock& getBlock() const;
     int operator[] (int faceIndex) const;
 };

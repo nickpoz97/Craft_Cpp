@@ -22,8 +22,6 @@ struct Attrib {
     const GLuint extra2;
     const GLuint extra3;
     const GLuint extra4;
-
-    Attrib(const Shader& program);
 };
 
 #endif //CPP_ATTRIB_HPP

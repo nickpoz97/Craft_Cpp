@@ -34,7 +34,7 @@ Sphere::Sphere(float r, int detail) : vertices(8 * pow(4, detail) * 24), r{r}{
 
 void Sphere::rec_gen_sphere(int detail, const std::array<glm::vec3, 3> &actual_pos,
                             const std::array<glm::vec2, 3> &actual_uvs,
-                            std::vector<UvVertex>::iterator &&it) {
+                            std::vector<Uv3DVertex>::iterator &&it) {
     if(detail == 0){
         store_vertices(actual_pos, actual_uvs, it);
     }
@@ -55,15 +55,15 @@ void Sphere::rec_gen_sphere(int detail, const std::array<glm::vec3, 3> &actual_p
         auto uv_ac{glm::vec2{0, 1 - acosf(ac.y) / PI}};
         auto uv_bc{glm::vec2{0, 1 - acosf(bc.y) / PI}};
 
-        rec_gen_sphere(detail - 1, {a, ab, ac}, {uv_a, uv_ab, uv_ac}, std::vector<UvVertex>::iterator());
-        rec_gen_sphere(detail - 1, {b, bc, ab}, {uv_b, uv_bc, uv_ab}, std::vector<UvVertex>::iterator());
-        rec_gen_sphere(detail - 1, {c, ac, bc}, {uv_c, uv_ac, uv_bc}, std::vector<UvVertex>::iterator());
-        rec_gen_sphere(detail - 1, {ab, bc, ac}, {uv_ab, uv_bc, uv_ac}, std::vector<UvVertex>::iterator());
+        rec_gen_sphere(detail - 1, {a, ab, ac}, {uv_a, uv_ab, uv_ac}, std::vector<Uv3DVertex>::iterator());
+        rec_gen_sphere(detail - 1, {b, bc, ab}, {uv_b, uv_bc, uv_ab}, std::vector<Uv3DVertex>::iterator());
+        rec_gen_sphere(detail - 1, {c, ac, bc}, {uv_c, uv_ac, uv_bc}, std::vector<Uv3DVertex>::iterator());
+        rec_gen_sphere(detail - 1, {ab, bc, ac}, {uv_ab, uv_bc, uv_ac}, std::vector<Uv3DVertex>::iterator());
     }
 }
 
 void Sphere::store_vertices(const std::array<glm::vec3, 3> &actual_pos, const std::array<glm::vec2, 3> &actual_uvs,
-                            std::vector<UvVertex>::iterator &it) {
+                            std::vector<Uv3DVertex>::iterator &it) {
 
     auto pos_it {actual_pos.begin()};
     auto uvs_it {actual_uvs.begin()};

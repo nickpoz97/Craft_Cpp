@@ -10,13 +10,13 @@
 #include <mat4x4.hpp>
 #include <array>
 
-#include "StandardVertex.hpp"
+#include "Vertex.hpp"
 #include "GameObject.hpp"
 
 static constexpr int VERTICES_FACE_COUNT = 6;
 
 template<int n_faces, int n_vertices_face>
-class CubicObject : GameObject<CubeVertex, n_faces * n_vertices_face>{
+class CubicObject : public GameObject<CubeVertex, n_faces * n_vertices_face>{
 private:
     using SuperClass = GameObject<CubeVertex, n_faces * n_vertices_face>;
     const bool is_cube = (n_faces == 6);

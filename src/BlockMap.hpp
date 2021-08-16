@@ -14,6 +14,7 @@ struct std::hash<glm::ivec3>{
     std::size_t operator()(const glm::ivec3& v) const;
 };
 
+// value is w
 using BaseMap = std::unordered_map<glm::ivec3, int>;
 
 class BlockMap : public BaseMap{

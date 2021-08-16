@@ -3,3 +3,7 @@
 //
 
 #include "Chunk.hpp"
+
+void Chunk::draw() {
+    buffer.draw_triangles(attrib, faces * 6);
+}

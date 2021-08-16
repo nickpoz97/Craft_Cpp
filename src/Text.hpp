@@ -8,9 +8,15 @@
 
 #include <string_view>
 #include <vec2.hpp>
+#include <list>
+#include "Character.hpp"
 
 class Text {
+private:
+    std::vector<Character> chars;
+public:
     Text(const glm::vec2& position, int n, const std::string_view text);
+    void draw();
 };
 
 

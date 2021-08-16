@@ -8,6 +8,7 @@
 
 #include "Player.hpp"
 #include "Cube.hpp"
+#include "costants.hpp"
 
 float Player::ao[6][4] = {0};
 float Player::light[6][4] = {
@@ -22,10 +23,12 @@ TileBlock Player::tiles{
     226, 224, 241, 209, 225, 227
 };
 
-Player::Player(const Model& model, const glm::vec3& position, const glm::vec2& rotation, std::string_view name, int id) : rotation{rotation},
+Player::Player(const Model& model, const glm::vec3& position, const glm::vec2& rotation, std::string_view name, int id) :
+    actual_status{position, rotation, glfwGetTime()},
+    former_status1{actual_status},
+    former_status2{actual_status},
     model{model},
-    position{position},
-    playerCube{{0,0,0}, tiles, ao, light},
+    playerCube{tiles, ao, light},
     name{name},
     id{id}
     {
@@ -38,6 +41,8 @@ Player::Player(const Model& model, const glm::vec3& position, const glm::vec2& r
 }
 
 glm::vec3 Player::get_motion_vector() {
+    const glm::vec2& rotation = actual_status.rotation;
+
     if (!z_movement && !x_movement) {
         return {0,0,0};
     }
@@ -67,6 +72,8 @@ glm::vec3 Player::get_motion_vector() {
 }
 
 glm::vec3 Player::get_sight_vector() {
+    const glm::vec2& rotation = actual_status.rotation;
+
     float m = cosf(rotation.y);
     return {
         cosf(rotation.x - glm::radians(90.0f)) * m,
@@ -78,5 +85,66 @@ glm::vec3 Player::get_sight_vector() {
 void Player::set_movement(int x, int z) {
     x_movement = x;
     z_movement = z;
+}
+
+void Player::draw() {
+    playerCube.draw_triangles();
+}
+
+void Player::update_player(const glm::vec3 &new_position, const glm::vec2 &new_rotation, bool interpolate) {
+    if(interpolate){
+        former_status1 = former_status2;
+        former_status2 = {new_position, new_rotation, glfwGetTime()};
+
+        if (former_status2.rotation.x - former_status1.rotation.x > PI){
+            former_status1.rotation.x += 2*PI;
+        }
+
+        if (former_status1.rotation.x - former_status2.rotation.x > PI){
+            former_status1.rotation.x -= 2*PI;
+        }
+    }
+    else{
+        actual_status = {new_position, new_rotation, glfwGetTime()};
+    }
+}
+
+void Player::interpolate_player() {
+    double dt1 = former_status2.t - former_status1.t;
+    double dt2 = glfwGetTime() - former_status2.t;
+
+    dt1 = glm::min(dt1, 1.0);
+    dt1 = glm::max(dt1, 0.1);
+
+    auto p = static_cast<float>(glm::min(dt2/dt1, 1.0));
+    update_player(former_status1 + (former_status2 - former_status1) * p, 0);
+}
+
+void Player::update_player(const Status& new_status, bool interpolate) {
+    update_player(new_status.position, new_status.rotation, interpolate);
+}
+
+Status operator+(const Status &a, const Status &b) {
+    return {
+        a.position + b.position,
+        a.rotation + b.rotation,
+        0
+    };
+}
+
+Status operator-(const Status &a, const Status &b) {
+    return {
+        a.position - b.position,
+        a.rotation - b.rotation,
+        0
+    };
+}
+
+Status operator*(const Status &a, float p) {
+    return {
+        p * a.position,
+        p * a.rotation,
+        0
+    };
 }
 

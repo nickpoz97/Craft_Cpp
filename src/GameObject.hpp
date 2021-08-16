@@ -15,17 +15,22 @@
 template<typename VertexType, int n_vertices>
 class GameObject{
 private:
-    const OpenglBuffer buffer;
+    const OpenglBuffer<VertexType> buffer;
 protected:
     std::vector<VertexType> vertices;
+    const Shader& shader;
 public:
-    GameObject();
+    GameObject(const Shader& shader);
     void set_buffer_data() const;
     void apply_transform(const glm::mat4 &transform);
+    const OpenglBuffer<VertexType> &getBuffer() const;
+    void draw_triangles();
+    void draw_lines();
 };
 
+// TODO take ownership of vertices array that will be passed to constructor
 template<typename VertexType, int n_vertices>
-GameObject<VertexType, n_vertices>::GameObject() : vertices(n_vertices), buffer() {}
+GameObject<VertexType, n_vertices>::GameObject(const Shader& shader) : vertices(n_vertices), buffer(), shader(shader) {}
 
 template<typename VertexType, int n_vertices>
 void GameObject<VertexType, n_vertices>::set_buffer_data() const {
@@ -35,8 +40,23 @@ void GameObject<VertexType, n_vertices>::set_buffer_data() const {
 template<typename VertexType, int n_vertices>
 void GameObject<VertexType, n_vertices>::apply_transform(const glm::mat4 &transform) {
     for(auto& v : this->vertices){
-        v.position = transform * v.position;
+        v.position = transform * glm::vec4{v.position, 1.0f};
     }
+}
+
+template<typename VertexType, int n_vertices>
+const OpenglBuffer<VertexType> &GameObject<VertexType, n_vertices>::getBuffer() const {
+    return buffer;
+}
+
+template<typename VertexType, int n_vertices>
+void GameObject<VertexType, n_vertices>::draw_triangles() {
+    buffer.draw_triangles(shader.getAttrib(), vertices.size());
+}
+
+template<typename VertexType, int n_vertices>
+void GameObject<VertexType, n_vertices>::draw_lines() {
+    buffer.draw_lines(shader.getAttrib(), vertices.size());
 }
 
 #endif //CPP_GAMEOBJECT_HPP

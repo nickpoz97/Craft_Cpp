@@ -8,9 +8,9 @@
 #include<array>
 
 #include "GameObject.hpp"
-#include "StandardVertex.hpp"
+#include "Vertex.hpp"
 
-class Character : GameObject<UvVertex, 6>{
+class Character : public GameObject<Uv3DVertex, 6>{
     static constexpr float s = 0.0625;
     static constexpr float a = s;
     static constexpr float b = s * 2;
