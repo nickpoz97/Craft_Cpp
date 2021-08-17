@@ -8,6 +8,7 @@ static constexpr int MAX_CHUNKS = 8192;
 static constexpr int WORKERS = 8192;
 static constexpr int MAX_TEXT_LENGTH = 256;
 static constexpr int MAX_MESSAGES = 256;
+static constexpr int CHUNK_SIZE = 32;
 #define CPP_COSTANTS_HPP
 
 #endif //CPP_COSTANTS_HPP

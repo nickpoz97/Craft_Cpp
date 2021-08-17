@@ -39,17 +39,25 @@ private:
 
     std::string_view name;
     int id;
+
+    // TODO use Plane class
+    static std::array<glm::vec3, 6> get_planes_ortho(const glm::vec3& up, const glm::vec3& right, const glm::vec3& view_dir);
+    static std::array<glm::vec3, 6> get_planes_persp(const glm::vec3& up, const glm::vec3& right, const glm::vec3& view_dir, const Frustum& frustum,
+                                                     const glm::vec3& view_pos);
 public:
     Player(const Model &model, std::string_view name, int id, const glm::vec3 &position, const glm::vec2 &rotation);
-    glm::vec3 get_sight_vector();
+    glm::vec3 get_camera_direction_vector();
     glm::vec3 get_motion_vector();
+    glm::vec3 get_up_vector();
+    glm::vec3 get_right_vector();
+
     void set_movement(int x, int z);
     void update_player(const glm::vec3& new_position, const glm::vec2& new_rotation={}, bool interpolate={});
     void update_player(const Status& new_status, bool interpolate);
     void interpolate_player();
     void draw();
 
-    Player(Model model, std::string_view view, int i);
+    std::array<glm::vec3, 6> get_frustum_planes(bool ortho);
 };
 
 

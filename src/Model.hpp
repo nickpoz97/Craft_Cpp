@@ -15,10 +15,26 @@
 #include "costants.hpp"
 #include "Hashes.hpp"
 
+Struct Frustum{
+    GLfloat near_dist;
+    GLfloat far_dist;
+    GLfloat h_near;
+    GLfloat w_near;
+    GLfloat h_far;
+    GLfloat w_far;
+};
+
 class Model {
     GLFWwindow* window;
+    Frustum frustum;
+public:
+    const Frustum &getFrustum() const;
+
+private:
+
     std::array<Worker, WORKERS> workers;
     std::unordered_map<glm::ivec2, Chunk> chunks;
+    std::array<std::string_view, MAX_MESSAGES> messages;
 
     int chunk_count;
     int create_radius;
@@ -32,8 +48,6 @@ class Model {
     char typing_buffer[MAX_TEXT_LENGTH];
     int message_index;
 
-    std::array<std::string_view, MAX_MESSAGES> messages;
-
     int width;
     int height;
 
@@ -43,7 +57,7 @@ class Model {
 
     int item_index;
     int scale;
-    int ortho;
+    bool ortho;
 
     float fov;
     int suppress_char;
@@ -57,6 +71,10 @@ class Model {
     std::array<Block,2> blocks;
     std::array<Block,2> blocks_copies;
 
+    glm::mat4 model;
+    glm::mat4 view;
+    glm::mat4 proj;
+
 public:
     float get_day_time() const;
     float get_daylight() const;
@@ -68,6 +86,8 @@ public:
     void delete_player();
     void set_player(const glm::vec3& position, const glm::vec2& rotation, std::string_view name, int id);
     Chunk& get_chunk(const glm::ivec2& pq);
+    int chunk_distance(const glm::ivec2& pq_1, const glm::ivec2& pq_2);
+    bool chunk_visible(const glm::ivec2& pq)
 };
 
 

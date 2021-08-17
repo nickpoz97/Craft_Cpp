@@ -3,6 +3,7 @@
 //
 
 #include <cmath>
+
 #include "Model.hpp"
 #include "Player.hpp"
 
@@ -70,5 +71,35 @@ void Model::delete_player() {
 
 Chunk &Model::get_chunk(const glm::ivec2& pq) {
     return chunks.at(pq);
+}
+
+int Model::chunk_distance(const glm::ivec2 &pq_1, const glm::ivec2 &pq_2) {
+    return Chunk::get_distance(get_chunk(pq_1), get_chunk(pq_2));
+}
+
+const Frustum &Model::getFrustum() const {
+    return frustum;
+}
+
+bool Model::chunk_visible(const glm::ivec2 &pq) {
+    int x = pq.x * Chunk::getSize() - 1;
+    int z = pq.y * Chunk::getSize() - 1;
+    int d = Chunk::getSize() + 1;
+
+    int miny = Chunk::getMinY();
+    int maxy = Chunk::getMaxY();
+
+    std::array<glm::vec3, 8> points{{
+            {x + 0, miny, z + 0},
+            {x + d, miny, z + 0},
+            {x + 0, miny, z + d},
+            {x + d, miny, z + d},
+            {x + 0, maxy, z + 0},
+            {x + d, maxy, z + 0},
+            {x + 0, maxy, z + d},
+            {x + d, maxy, z + d}
+    }};
+
+
 }
 

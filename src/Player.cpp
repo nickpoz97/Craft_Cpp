@@ -72,15 +72,15 @@ glm::vec3 Player::get_motion_vector() {
     }
 }
 
-glm::vec3 Player::get_sight_vector() {
+glm::vec3 Player::get_camera_direction_vector() {
     const glm::vec2& rotation = actual_status.rotation;
 
     float m = cosf(rotation.y);
-    return {
+    return glm::normalize(glm::vec3{
         cosf(rotation.x - glm::radians(90.0f)) * m,
         sinf(rotation.y),
         sinf(rotation.x - glm::radians(90.0f)) * m
-    };
+    });
 }
 
 void Player::set_movement(int x, int z) {
@@ -123,6 +123,57 @@ void Player::interpolate_player() {
 
 void Player::update_player(const Status& new_status, bool interpolate) {
     update_player(new_status.position, new_status.rotation, interpolate);
+}
+
+// http://www.lighthouse3d.com/tutorials/view-frustum-culling/geometric-approach-extracting-the-planes/
+// normals point inside frustum
+std::array<glm::vec3, 6> Player::get_frustum_planes(bool ortho) {
+    const auto& up = get_up_vector();
+    const auto& right = get_right_vector();
+    const auto& view_dir = get_camera_direction_vector();
+
+    return (ortho) ?
+        get_planes_ortho(up,right,view_dir) :
+        get_planes_persp(up,right,view_dir,model.getFrustum(), actual_status.position);
+}
+
+glm::vec3 Player::get_right_vector() {
+    glm::vec3 asy{0.0f, 1.0f, 0.0f};
+    return glm::normalize(glm::cross(asy, get_camera_direction_vector()));
+}
+
+glm::vec3 Player::get_up_vector() {
+    return glm::cross(get_camera_direction_vector(), get_right_vector());
+}
+
+std::array<glm::vec3, 6> Player::get_planes_ortho(const glm::vec3& up, const glm::vec3& right, const glm::vec3& view_dir){
+    return {
+        view_dir,
+        -view_dir,
+        -right,
+        right,
+        -up,
+        up
+    };
+}
+
+std::array<glm::vec3, 6> Player::get_planes_persp(const glm::vec3& up, const glm::vec3& right, const glm::vec3& view_dir, const Frustum& frustum,
+                                                const glm::vec3& view_pos){
+    auto nc = view_pos + view_dir * frustum.near_dist;
+
+    auto r_par = glm::normalize(nc + right * (frustum.w_near/2) - view_pos);
+    auto l_par = glm::normalize(nc - right * (frustum.w_near/2) - view_pos);
+    auto t_par = glm::normalize(nc + up * (frustum.h_near/2) - view_pos);
+    auto b_par = glm::normalize(nc - up * (frustum.h_near/2) - view_pos);
+
+    return {
+        view_dir,                   // near
+        -view_dir,                  // far
+        glm::cross(r_par, up),      // right plane normal
+        glm::cross(up, l_par),      // left plane normal
+        glm::cross(t_par, right),   // top plane normal
+        glm::cross(right, b_par)    // bottom plane normal
+    };
 }
 
 Status operator+(const Status &a, const Status &b) {

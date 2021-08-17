@@ -13,13 +13,19 @@
 #include "Attrib.hpp"
 #include "OpenglBuffer.hpp"
 #include "Vertex.hpp"
+#include "costants.hpp"
 
 class Chunk {
 private:
-    static constexpr int CHUNK_SIZE = 32;
+    static constexpr int size = CHUNK_SIZE;
 
-    glm::ivec2 id;          //pq
-    glm::ivec2 min;
+private:
+
+    glm::ivec2 pq;
+    static int min_y;
+    static int max_y;
+
+private:
 
     BlockMap map;
     BlockMap lights;
@@ -33,6 +39,10 @@ private:
     const Attrib attrib;
 public:
     void draw();
+    static int get_distance(const Chunk& c1, const Chunk& c2);
+    static constexpr int getSize();
+    static int getMinY();
+    static int getMaxY();
 };
 
 
