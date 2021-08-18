@@ -41,7 +41,7 @@ Player::Player(const Model &model, std::string_view name, int id, const glm::vec
     playerCube.apply_transform(transform);
 }
 
-glm::vec3 Player::get_motion_vector() {
+glm::vec3 Player::get_motion_vector() const{
     const glm::vec2& rotation = actual_status.rotation;
 
     if (!z_movement && !x_movement) {
@@ -72,7 +72,7 @@ glm::vec3 Player::get_motion_vector() {
     }
 }
 
-glm::vec3 Player::get_camera_direction_vector() {
+glm::vec3 Player::get_camera_direction_vector() const {
     const glm::vec2& rotation = actual_status.rotation;
 
     float m = cosf(rotation.y);
@@ -137,12 +137,12 @@ std::array<glm::vec3, 6> Player::get_frustum_planes(bool ortho) {
         get_planes_persp(up,right,view_dir,model.getFrustum(), actual_status.position);
 }
 
-glm::vec3 Player::get_right_vector() {
+glm::vec3 Player::get_right_vector() const{
     glm::vec3 asy{0.0f, 1.0f, 0.0f};
     return glm::normalize(glm::cross(asy, get_camera_direction_vector()));
 }
 
-glm::vec3 Player::get_up_vector() {
+glm::vec3 Player::get_up_vector() const{
     return glm::cross(get_camera_direction_vector(), get_right_vector());
 }
 
@@ -166,6 +166,8 @@ std::array<glm::vec3, 6> Player::get_planes_persp(const glm::vec3& up, const glm
     auto t_par = glm::normalize(nc + up * (frustum.h_near/2) - view_pos);
     auto b_par = glm::normalize(nc - up * (frustum.h_near/2) - view_pos);
 
+
+
     return {
         view_dir,                   // near
         -view_dir,                  // far
@@ -174,6 +176,14 @@ std::array<glm::vec3, 6> Player::get_planes_persp(const glm::vec3& up, const glm
         glm::cross(t_par, right),   // top plane normal
         glm::cross(right, b_par)    // bottom plane normal
     };
+}
+
+const Status &Player::getActualStatus() const {
+    return actual_status;
+}
+
+const Frustum &Player::getFrustum() const {
+    return frustum;
 }
 
 Status operator+(const Status &a, const Status &b) {

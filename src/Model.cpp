@@ -77,10 +77,6 @@ int Model::chunk_distance(const glm::ivec2 &pq_1, const glm::ivec2 &pq_2) {
     return Chunk::get_distance(get_chunk(pq_1), get_chunk(pq_2));
 }
 
-const Frustum &Model::getFrustum() const {
-    return frustum;
-}
-
 bool Model::chunk_visible(const glm::ivec2 &pq) {
     int x = pq.x * Chunk::getSize() - 1;
     int z = pq.y * Chunk::getSize() - 1;
@@ -100,6 +96,11 @@ bool Model::chunk_visible(const glm::ivec2 &pq) {
             {x + d, maxy, z + d}
     }};
 
-
+    for(const auto& p : points){
+        if(player->getFrustum().is_inside(p)){
+            return true;
+        }
+    }
+    return false;
 }
 

@@ -15,22 +15,8 @@
 #include "costants.hpp"
 #include "Hashes.hpp"
 
-Struct Frustum{
-    GLfloat near_dist;
-    GLfloat far_dist;
-    GLfloat h_near;
-    GLfloat w_near;
-    GLfloat h_far;
-    GLfloat w_far;
-};
-
 class Model {
     GLFWwindow* window;
-    Frustum frustum;
-public:
-    const Frustum &getFrustum() const;
-
-private:
 
     std::array<Worker, WORKERS> workers;
     std::unordered_map<glm::ivec2, Chunk> chunks;
@@ -87,7 +73,7 @@ public:
     void set_player(const glm::vec3& position, const glm::vec2& rotation, std::string_view name, int id);
     Chunk& get_chunk(const glm::ivec2& pq);
     int chunk_distance(const glm::ivec2& pq_1, const glm::ivec2& pq_2);
-    bool chunk_visible(const glm::ivec2& pq)
+    bool chunk_visible(const glm::ivec2& pq);
 };
 
 
