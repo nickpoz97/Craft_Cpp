@@ -218,7 +218,7 @@ HitResult Player::hit_test_face() {
     return{{},{}, false};
 }
 
-bool Player::collide(int height) {
+std::pair<bool, glm::vec3> Player::collide(int height) {
     const glm::vec3& position{actual_status.position};
     glm::ivec2 pq{Model::chunked(position.x), Model::chunked(position.z)};
     const Chunk& c{model.getChunks().at(pq)};
@@ -251,7 +251,18 @@ bool Player::collide(int height) {
         collision_point.y = (enable.y) ? (result=1, int_pos.x) + signs.x * pad : collision_point.y;
         collision_point.z = (enable.z) ? int_pos.x + signs.x * pad : collision_point.z;
     }
-    return result;
+    return {result, collision_point};
+}
+
+bool Player::insersects_block(int height, const glm::ivec3& block_pos) {
+    const glm::ivec3 int_pos{glm::round(actual_status.position)};
+
+    for(int i = 0 ; i < height ; i++){
+        if(int_pos == (block_pos - glm::ivec3{0,i,0})){
+            return true;
+        }
+    }
+    return false;
 }
 
 Status operator+(const Status &a, const Status &b) {

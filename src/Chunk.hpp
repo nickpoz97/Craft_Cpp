@@ -22,8 +22,10 @@ private:
     const glm::ivec2 pq;
     static int min_y;
     static int max_y;
+
     BlockMap map;
     BlockMap lights;
+    std::list<Sign> sign_list;
 
     int faces;
     int sign_faces;

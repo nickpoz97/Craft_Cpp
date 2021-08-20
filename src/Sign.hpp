@@ -12,13 +12,12 @@
 #include "Character3D.hpp"
 
 class Sign {
-    const glm::vec3& coordinate;
+    const glm::ivec3& coordinate;
     Face face;
     std::string_view text;
-
     std::vector<Character3D> chars;
 public:
-    Sign(const glm::vec3& coordinate, Face face, const std::string_view text);
+    Sign(const glm::ivec3& coordinate, Face face, std::string_view text);
 };
 
 
