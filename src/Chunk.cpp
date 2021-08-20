@@ -36,3 +36,7 @@ Item Chunk::get_block(const glm::ivec3& block_pos) const{
     return map.at(block_pos);
 }
 
+bool Chunk::operator!() const {
+    return map.empty();
+}
+

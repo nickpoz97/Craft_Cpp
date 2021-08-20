@@ -218,6 +218,42 @@ HitResult Player::hit_test_face() {
     return{{},{}, false};
 }
 
+bool Player::collide(int height) {
+    const glm::vec3& position{actual_status.position};
+    glm::ivec2 pq{Model::chunked(position.x), Model::chunked(position.z)};
+    const Chunk& c{model.getChunks().at(pq)};
+    glm::vec3 collision_point{};
+    bool result{};
+
+    if(!c){
+        return false;
+    }
+    const glm::ivec3 int_pos{glm::round(position)};
+    const glm::vec3 decimal_dif_pos(position - static_cast<glm::vec3>(int_pos));
+    float pad = 0.25;
+
+    // TODO check (+1 -> value > pad) and (-1 -> value < pad)
+    glm::ivec3 signs{glm::step(pad, decimal_dif_pos) - glm::step(pad, -decimal_dif_pos)};
+    std::array<glm::vec3, 3> block_pos{{
+        {int_pos.x + (signs.x) * 1, int_pos.y, int_pos.z},
+        {int_pos.x, int_pos.y + (signs.y) * 1, int_pos.z},
+        {int_pos.x, int_pos.y, int_pos.z + (signs.z) * 1},
+    }};
+
+    for(int y_step = 0; y_step < height ; ++y_step){
+        glm::bvec3 enable{
+            c.get_block(block_pos[0] + glm::vec3{signs.x, 0, 0} * pad).is_obstacle(),
+            c.get_block(block_pos[1] + glm::vec3{0, signs.y, 0} * pad).is_obstacle(),
+            c.get_block(block_pos[2] + glm::vec3{0, 0, signs.z} * pad).is_obstacle()
+        };
+
+        collision_point.x = (enable.x) ? int_pos.x + signs.x * pad : collision_point.x;
+        collision_point.y = (enable.y) ? (result=1, int_pos.x) + signs.x * pad : collision_point.y;
+        collision_point.z = (enable.z) ? int_pos.x + signs.x * pad : collision_point.z;
+    }
+    return result;
+}
+
 Status operator+(const Status &a, const Status &b) {
     return {
         a.position + b.position,

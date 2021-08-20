@@ -40,6 +40,7 @@ public:
     Item getHighestBlock() const;
     const glm::ivec2 &getPq() const;
     Item get_block(const glm::ivec3& block_pos) const;
+    bool operator!() const;
 };
 
 

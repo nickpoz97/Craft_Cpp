@@ -68,7 +68,7 @@ public:
     std::pair<glm::vec3, Item> hit_test(bool previous);
     std::std::pair<glm::vec3, Item> ray_hit(const Chunk& c, bool previous, int max_distance, int step = 32);
     HitResult hit_test_face();
-
+    bool collide(int height);
 };
 
 
