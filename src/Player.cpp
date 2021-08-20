@@ -125,18 +125,6 @@ void Player::update_player(const Status& new_status, bool interpolate) {
     update_player(new_status.position, new_status.rotation, interpolate);
 }
 
-// http://www.lighthouse3d.com/tutorials/view-frustum-culling/geometric-approach-extracting-the-planes/
-// normals point inside frustum
-std::array<glm::vec3, 6> Player::get_frustum_planes(bool ortho) {
-    const auto& up = get_up_vector();
-    const auto& right = get_right_vector();
-    const auto& view_dir = get_camera_direction_vector();
-
-    return (ortho) ?
-        get_planes_ortho(up,right,view_dir) :
-        get_planes_persp(up,right,view_dir,model.getFrustum(), actual_status.position);
-}
-
 glm::vec3 Player::get_right_vector() const{
     glm::vec3 asy{0.0f, 1.0f, 0.0f};
     return glm::normalize(glm::cross(asy, get_camera_direction_vector()));
@@ -146,44 +134,88 @@ glm::vec3 Player::get_up_vector() const{
     return glm::cross(get_camera_direction_vector(), get_right_vector());
 }
 
-std::array<glm::vec3, 6> Player::get_planes_ortho(const glm::vec3& up, const glm::vec3& right, const glm::vec3& view_dir){
-    return {
-        view_dir,
-        -view_dir,
-        -right,
-        right,
-        -up,
-        up
-    };
-}
-
-std::array<glm::vec3, 6> Player::get_planes_persp(const glm::vec3& up, const glm::vec3& right, const glm::vec3& view_dir, const Frustum& frustum,
-                                                const glm::vec3& view_pos){
-    auto nc = view_pos + view_dir * frustum.near_dist;
-
-    auto r_par = glm::normalize(nc + right * (frustum.w_near/2) - view_pos);
-    auto l_par = glm::normalize(nc - right * (frustum.w_near/2) - view_pos);
-    auto t_par = glm::normalize(nc + up * (frustum.h_near/2) - view_pos);
-    auto b_par = glm::normalize(nc - up * (frustum.h_near/2) - view_pos);
-
-
-
-    return {
-        view_dir,                   // near
-        -view_dir,                  // far
-        glm::cross(r_par, up),      // right plane normal
-        glm::cross(up, l_par),      // left plane normal
-        glm::cross(t_par, right),   // top plane normal
-        glm::cross(right, b_par)    // bottom plane normal
-    };
-}
-
 const Status &Player::getActualStatus() const {
     return actual_status;
 }
 
 const Frustum &Player::getFrustum() const {
     return frustum;
+}
+
+std::pair<glm::vec3, Item> Player::hit_test(bool previous) {
+    const glm::ivec2& player_pq{Model::chunked({actual_status.position.x, actual_status.position.z})};
+    std::pair<glm::vec3, Item> result{};
+    float best{};
+
+    for(const auto& pair : model.getChunks()){
+        const Chunk& c = pair.second;
+        if(model.get_chunk_distance(player_pq, c.getPq()) > 1){
+            continue;
+        }
+        auto kv_pair = ray_hit(c, previous, 8);
+        if(kv_pair.second.is_obstacle()){
+            auto distance = glm::distance(actual_status.position, kv_pair.first);
+            if(best == 0 || distance < best){
+                best = distance;
+                result = kv_pair;
+            }
+        }
+    }
+    return result;
+}
+
+std::pair<glm::vec3, Item> Player::ray_hit(const Chunk& c, bool previous, int max_distance, int step){
+    using return_type = std::pair<glm::vec3, Item>;
+
+    const glm::vec3& ray{get_camera_direction_vector()};
+    glm::ivec3 test_pos{actual_status.position - ray}; // better for loop
+    glm::ivec3 test_pos_rounded{}; // better for loop
+    glm::ivec3 previous_pos{};
+
+    for(int i = 0 ; i < max_distance ; i++){
+        test_pos += ray;
+        test_pos_rounded = glm::round(test_pos);
+        if(previous_pos == test_pos_rounded){
+            continue;
+        }
+        const Item& material = c.get_block(test_pos_rounded);
+        if(material.is_obstacle()){
+            return (previous) ?
+                return_type{previous_pos, material} :
+                return_type{test_pos_rounded, material};
+        }
+        previous_pos = test_pos_rounded;
+    }
+
+    return {};
+}
+
+HitResult Player::hit_test_face() {
+    auto pair{hit_test(false)};
+    const Item& w = pair.second;
+    const glm::vec3& hit_pos = pair.first;
+
+    if (w.is_obstacle()){
+        const glm::vec3 d_hit = hit_test(true).first;
+        const glm::vec3 face_normal{d_hit - hit_pos};
+
+        for(auto it{Cube::normals.begin()}; it != Cube::normals.end(); ++it){
+            int normal_index = static_cast<int>(it - Cube::normals.begin());
+            if(*it == face_normal){
+                if(face_normal != glm::vec3{0,1,0}){
+                    return {static_cast<Face>(normal_index), hit_pos, true};
+                }
+                const glm::vec3& actual_pos = actual_status.position;
+                int degrees = glm::round(glm::degrees(glm::atan(actual_pos.x - d_hit.x, actual_pos.z - d_hit.z)));
+                if (degrees < 0) {
+                    degrees += 360;
+                }
+                int top = ((degrees + 45) / 90) % 4;
+                return{static_cast<Face>(4 + top), hit_pos, true};
+            }
+        }
+    }
+    return{{},{}, false};
 }
 
 Status operator+(const Status &a, const Status &b) {

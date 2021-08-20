@@ -22,6 +22,12 @@ struct Status{
     friend Status operator*(const Status& a, float p);
 };
 
+struct HitResult{
+    Face face;
+    glm::vec3 position;
+    bool is_happened;
+};
+
 class Player {
 private:
     static std::array<std::array<float,4>,6> ao;
@@ -29,8 +35,6 @@ private:
     static TileBlock tiles;
 
     Status actual_status;
-public:
-    const Status &getActualStatus() const;
 
 private:
     Status former_status1;
@@ -47,13 +51,9 @@ private:
 
     Frustum frustum;
 public:
+    const Status &getActualStatus() const;
     const Frustum &getFrustum() const;
 
-private:
-    static std::array<glm::vec3, 6> get_planes_ortho(const glm::vec3& up, const glm::vec3& right, const glm::vec3& view_dir);
-    static std::array<glm::vec3, 6> get_planes_persp(const glm::vec3& up, const glm::vec3& right, const glm::vec3& view_dir, const Frustum& frustum,
-                                                     const glm::vec3& view_pos);
-public:
     Player(const Model &model, std::string_view name, int id, const glm::vec3 &position, const glm::vec2 &rotation);
     glm::vec3 get_camera_direction_vector() const;
     glm::vec3 get_motion_vector() const;
@@ -65,6 +65,10 @@ public:
     void update_player(const Status& new_status, bool interpolate);
     void interpolate_player();
     void draw();
+    std::pair<glm::vec3, Item> hit_test(bool previous);
+    std::std::pair<glm::vec3, Item> ray_hit(const Chunk& c, bool previous, int max_distance, int step = 32);
+    HitResult hit_test_face();
+
 };
 
 

@@ -5,6 +5,8 @@
 #ifndef ITEM_HPP
 #define ITEM_HPP
 
+enum class Face{LEFT, RIGHT, TOP, BOTTOM, FRONT, BACK};
+
 // TODO verificare ItemType mancanti
 enum class ItemName{
     EMPTY,
@@ -65,18 +67,22 @@ enum class ItemName{
     COLOR_31
 };
 
-template <ItemName I>
 class Item{
+private:
+    ItemName w;
+
 public:
-    bool is_plant();
-    bool is_obstacle();
-    bool is_transparent();
-    bool is_destructable();
+    explicit Item(int index);
+    Item() = default;
+
+    bool is_plant() const;
+    bool is_obstacle() const;
+    bool is_transparent() const;
+    bool is_destructable() const;
 };
 
-template <ItemName I>
-bool Item<I>::is_plant(){
-    switch (I) {
+bool Item::is_plant() const{
+    switch (w) {
         case ItemName::TALL_GRASS:
         case ItemName::YELLOW_FLOWER:
         case ItemName::RED_FLOWER:
@@ -90,12 +96,11 @@ bool Item<I>::is_plant(){
     }
 }
 
-template <ItemName I>
-bool Item<I>::is_obstacle() {
+bool Item::is_obstacle() const{
     if (is_plant()) {
         return 1;
     }
-    switch (I) {
+    switch (w) {
         case ItemName::EMPTY:
         case ItemName::GLASS:
         case ItemName::LEAVES:
@@ -105,12 +110,11 @@ bool Item<I>::is_obstacle() {
     }
 }
 
-template <ItemName I>
-bool Item<I>::is_transparent() {
+bool Item::is_transparent() const{
     if (is_plant()) {
         return 1;
     }
-    switch (I) {
+    switch (w) {
         case ItemName::EMPTY:
         case ItemName::GLASS:
         case ItemName::LEAVES:
@@ -122,9 +126,8 @@ bool Item<I>::is_transparent() {
 
 }
 
-template<ItemName I>
-bool Item<I>::is_destructable() {
-    switch (I) {
+bool Item::is_destructable() const{
+    switch (w) {
         case ItemName::EMPTY:
         case ItemName::CLOUD:
             return 0;
@@ -132,6 +135,8 @@ bool Item<I>::is_destructable() {
             return 1;
     }
 }
+
+Item::Item(int index) : w{static_cast<ItemName>(index)}{}
 
 
 #endif

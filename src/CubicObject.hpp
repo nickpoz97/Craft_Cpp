@@ -17,16 +17,15 @@ static constexpr int VERTICES_FACE_COUNT = 6;
 
 template<int n_faces, int n_vertices_face>
 class CubicObject : public GameObject<CubeVertex, n_faces * n_vertices_face>{
-private:
-    using SuperClass = GameObject<CubeVertex, n_faces * n_vertices_face>;
-    const bool is_cube = (n_faces == 6);
-
 protected:
     using LightMatrix = std::array<std::array<float, 4>, n_faces>;
     using PositionsMatrix = std::array<std::array<glm::vec3, 4>, n_faces>;
     using IndicesMatrix = std::array<std::array<int, n_vertices_face>, n_faces>;
     using NormalMatrix = std::array<glm::vec3, n_faces>;
     using UvsMatrix = std::array<std::array<glm::bvec2, 4>, n_faces>;
+
+private:
+    using SuperClass = GameObject<CubeVertex, n_faces * n_vertices_face>;
 
 public:
     CubicObject(const TileBlock& tiles,
@@ -40,6 +39,12 @@ public:
                 float a,
                 float b
                 );
+
+    static const PositionsMatrix local_vertex_positions;
+    static const UvsMatrix uvs;
+    static const IndicesMatrix indices;
+    static const IndicesMatrix flipped;
+    static const NormalMatrix normals;
 };
 
 #endif //CPP_CUBICOBJECT_HPP

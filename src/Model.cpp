@@ -73,10 +73,7 @@ Chunk &Model::get_chunk(const glm::ivec2& pq) {
     return chunks.at(pq);
 }
 
-int Model::chunk_distance(const glm::ivec2 &pq_1, const glm::ivec2 &pq_2) {
-    return Chunk::get_distance(get_chunk(pq_1), get_chunk(pq_2));
-}
-
+// TODO to be tested
 bool Model::chunk_visible(const glm::ivec2 &pq) {
     int x = pq.x * Chunk::getSize() - 1;
     int z = pq.y * Chunk::getSize() - 1;
@@ -102,5 +99,27 @@ bool Model::chunk_visible(const glm::ivec2 &pq) {
         }
     }
     return false;
+}
+
+constexpr int Model::chunked(float val) {
+    return glm::floor(glm::round(val) / Chunk::getSize());
+}
+
+Item Model::highest_block(const glm::vec2& pq) {
+    const Chunk& chunk = chunks.at(pq);
+    return chunk.getHighestBlock();
+}
+
+constexpr glm::ivec2 Model::chunked(const glm::vec2& val) {
+    return {chunked(val.x), chunked(val.y)};
+}
+
+const std::unordered_map<glm::ivec2, Chunk> &Model::getChunks() const {
+    return chunks;
+}
+
+int Model::get_chunk_distance(const glm::ivec2 &pq1, const glm::ivec2 &pq2) {
+        auto delta = pq1 - pq2;
+        return glm::max(glm::abs(delta.x), glm::abs(delta.y));
 }
 

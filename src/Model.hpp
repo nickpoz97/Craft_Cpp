@@ -13,16 +13,19 @@
 #include "Chunk.hpp"
 #include "Player.hpp"
 #include "costants.hpp"
-#include "Hashes.hpp"
+#include "map_utils.hpp"
 
 class Model {
     GLFWwindow* window;
 
     std::array<Worker, WORKERS> workers;
     std::unordered_map<glm::ivec2, Chunk> chunks;
+public:
+    const std::unordered_map<glm::ivec2, Chunk> &getChunks() const;
+
+private:
     std::array<std::string_view, MAX_MESSAGES> messages;
 
-    int chunk_count;
     int create_radius;
     int render_radius;
     int delete_radius;
@@ -62,6 +65,9 @@ class Model {
     glm::mat4 proj;
 
 public:
+    static constexpr int chunked(float val);
+    static constexpr glm::ivec2 chunked(const glm::vec2& val);
+
     float get_day_time() const;
     float get_daylight() const;
     int get_scale_factor() const;
@@ -72,8 +78,9 @@ public:
     void delete_player();
     void set_player(const glm::vec3& position, const glm::vec2& rotation, std::string_view name, int id);
     Chunk& get_chunk(const glm::ivec2& pq);
-    int chunk_distance(const glm::ivec2& pq_1, const glm::ivec2& pq_2);
+    static int get_chunk_distance(const glm::ivec2& pq1, const glm::ivec2& pq2);
     bool chunk_visible(const glm::ivec2& pq);
+    Item highest_block(const glm::vec2& pq);
 };
 
 

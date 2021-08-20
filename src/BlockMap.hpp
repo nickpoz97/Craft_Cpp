@@ -6,17 +6,19 @@
 #define CPP_BLOCKMAP_HPP
 
 #include <vec3.hpp>
-#include "Hashes.hpp"
+#include <map>
+#include "map_utils.hpp"
+#include "item.hpp"
 
 // value is w
-using BaseMap = std::unordered_map<glm::ivec3, int>;
+using BaseMap = std::map<glm::ivec3, Item, y_coord_comparator>;
 
 class BlockMap : public BaseMap{
     glm::ivec3 delta;
 
 public:
-    BlockMap(const glm::ivec3& delta);
-    int& at(const glm::ivec3& key);
+    explicit BlockMap(const glm::ivec3& delta);
+    Item at(const glm::ivec3& key);
 };
 
 

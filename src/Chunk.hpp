@@ -19,14 +19,9 @@ class Chunk {
 private:
     static constexpr int size = CHUNK_SIZE;
 
-private:
-
-    glm::ivec2 pq;
+    const glm::ivec2 pq;
     static int min_y;
     static int max_y;
-
-private:
-
     BlockMap map;
     BlockMap lights;
 
@@ -39,10 +34,12 @@ private:
     const Attrib attrib;
 public:
     void draw();
-    static int get_distance(const Chunk& c1, const Chunk& c2);
     static constexpr int getSize();
     static int getMinY();
     static int getMaxY();
+    Item getHighestBlock() const;
+    const glm::ivec2 &getPq() const;
+    Item get_block(const glm::ivec3& block_pos) const;
 };
 
 

@@ -17,12 +17,6 @@ class Cube : public CubicObject<6, VERTICES_FACE_COUNT>{
 private:
     using SuperClass = CubicObject<6, VERTICES_FACE_COUNT>;
 
-    static PositionsMatrix local_vertex_positions;
-    static UvsMatrix uvs;
-    static IndicesMatrix indices;
-    static IndicesMatrix flipped;
-    static NormalMatrix normals;
-
     static constexpr float s = 0.0625;              // TODO check semantic
     static constexpr float a = 0.0 + 1 / 2048.0;    // TODO check semantic
     static constexpr float b = s - 1 / 2048.0;      // TODO check semantic

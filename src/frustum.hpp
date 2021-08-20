@@ -44,10 +44,9 @@ public:
     void update(const Player& player, bool ortho);
     bool is_inside(const glm::vec3& point) const;
 
-    void
-    set_frustum_persp(const glm::vec3 &up, const glm::vec3 &right, const glm::vec3 &view_pos,
+    void set_frustum_persp(const glm::vec3 &up, const glm::vec3 &right, const glm::vec3 &view_pos,
                       const glm::vec3 &view_dir, const SidePoints &center_sidepoints);
-    set_frustum_ortho(const glm::vec3 &up, const glm::vec3 &right, const glm::vec3 &view_pos,
+    void set_frustum_ortho(const glm::vec3 &up, const glm::vec3 &right, const glm::vec3 &view_pos,
                       const glm::vec3 &view_dir, const SidePoints &center_sidepoints)
 };
 

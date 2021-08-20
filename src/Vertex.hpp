@@ -8,8 +8,6 @@
 #include <vec4.hpp>
 #include <vec2.hpp>
 
-enum class Face{LEFT, RIGHT, TOP, BOTTOM, FRONT, BACK};
-
 struct Standard2DVertex{
     glm::vec2 position;
 };

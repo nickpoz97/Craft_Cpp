@@ -5,12 +5,7 @@
 #include "Chunk.hpp"
 
 void Chunk::draw() {
-    buffer.draw_triangles(attrib, faces * 6);
-}
-
-int Chunk::get_distance(const Chunk& c1, const Chunk& c2) {
-    auto delta = c1.pq - c2.pq;
-    return glm::max(glm::abs(delta.x), glm::abs(delta.y));
+    //TODO implement method using CubicObject draw function
 }
 
 constexpr int Chunk::getSize() {
@@ -23,5 +18,21 @@ int Chunk::getMinY() {
 
 int Chunk::getMaxY() {
     return max_y;
+}
+
+Item Chunk::getHighestBlock() const{
+    for(auto rit{map.rbegin()} ; rit != map.rend() ; ++rit){
+        if((rit->second).is_obstacle())
+            return rit->second;
+    }
+    return Item{};
+}
+
+const glm::ivec2 &Chunk::getPq() const {
+    return pq;
+}
+
+Item Chunk::get_block(const glm::ivec3& block_pos) const{
+    return map.at(block_pos);
 }
 

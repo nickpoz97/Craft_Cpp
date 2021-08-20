@@ -48,6 +48,7 @@ void Frustum::update(const Player& player, bool ortho) {
     set_frustum_ortho(up, right, view_pos, center_sidepoints);
 }
 
+// http://www.lighthouse3d.com/tutorials/view-frustum-culling/geometric-approach-extracting-the-planes/
 void Frustum::set_frustum_persp(const glm::vec3 &up, const glm::vec3 &right, const glm::vec3 &view_pos,
                                 const glm::vec3 &view_dir, const SidePoints& center_sidepoints) {
     auto ppv = center_sidepoints - view_pos;
