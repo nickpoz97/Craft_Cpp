@@ -83,6 +83,8 @@ public:
     bool chunk_visible(const glm::ivec2& pq);
     Item highest_block(const glm::vec2& pq);
     bool has_light(const Chunk chunk);
+
+
 };
 
 

@@ -23,11 +23,15 @@ protected:
     using IndicesMatrix = std::array<std::array<int, n_vertices_face>, n_faces>;
     using NormalMatrix = std::array<glm::vec3, n_faces>;
     using UvsMatrix = std::array<std::array<glm::bvec2, 4>, n_faces>;
-
 private:
     using SuperClass = GameObject<CubeVertex, n_faces * n_vertices_face>;
 
+    const LightMatrix& ao;
+    const LightMatrix& light;
+
 public:
+    using IlluminationVector = std::array<float, 27>;
+
     CubicObject(const TileBlock& tiles,
                 const LightMatrix& ao,
                 const LightMatrix& light,
@@ -45,6 +49,8 @@ public:
     static const IndicesMatrix indices;
     static const IndicesMatrix flipped;
     static const NormalMatrix normals;
+
+    void occlusion(IlluminationVector neighbors, IlluminationVector lights, IlluminationVector shades);
 };
 
 #endif //CPP_CUBICOBJECT_HPP
