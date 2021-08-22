@@ -44,6 +44,7 @@ public:
     void store_data(GLsizei size, const GLfloat* const data) const;
     void draw_triangles(int count) const;
     void draw_lines(int components, int count) const ;
+    void delete_buffer();
 };
 
 #endif //CPP_OPENGLBUFFER_HPP

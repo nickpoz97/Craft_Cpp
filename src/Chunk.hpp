@@ -14,10 +14,13 @@
 #include "OpenglBuffer.hpp"
 #include "Vertex.hpp"
 #include "costants.hpp"
+#include "Model.hpp"
 
 class Chunk {
 private:
+    OpenglBuffer<Uv3DVertex> sign_buffer;
     static constexpr int size = CHUNK_SIZE;
+    const Model& model;
 
     const glm::ivec2 pq;
     static int min_y;
@@ -30,7 +33,7 @@ private:
     int faces;
     int sign_faces;
 
-    int dirty;
+    bool dirty;
 
     const OpenglBuffer<CubeVertex> buffer;
     const Attrib attrib;
@@ -43,6 +46,9 @@ public:
     const glm::ivec2 &getPq() const;
     Item get_block(const glm::ivec3& block_pos) const;
     bool operator!() const;
+    void gen_sign_buffer();
+    bool has_lights();
+    void set_dirt();
 };
 
 

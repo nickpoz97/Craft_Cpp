@@ -76,3 +76,8 @@ void OpenglBuffer<VertexType>::draw_lines(int components, int count) const{
     glDisableVertexAttribArray(attrib.position);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
+
+template<typename VertexType>
+void OpenglBuffer<VertexType>::delete_buffer() {
+    glDeleteBuffers(1, &id);
+}

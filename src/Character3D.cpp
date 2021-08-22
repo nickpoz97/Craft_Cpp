@@ -3,6 +3,7 @@
 //
 
 #include "Character3D.hpp"
+#include "item.hpp"
 
 const decltype(Character3D::local_positions) Character3D::local_positions = {{
     {{{0, -2, -1}, {0, +2, +1}, {0, +2, -1}, {0, -2, -1}, {0, -2, +1}, {0, +2, +1}}},
@@ -31,7 +32,7 @@ const decltype(Character3D::offsets) Character3D::offsets = {{
     {0, +1, 0}, {0, +1, 0}, {0, +1, 0}, {0, +1, 0},
 }};
 
-Character3D::Character3D(const glm::vec3 &position, Face face, float n, float m, char c){
+Character3D::Character3D(const glm::vec3& position, float n, Face face, char c){
     float pu = s / 5;
     float pv = s / 2.5;
     float u1 = pu;
@@ -55,3 +56,4 @@ Character3D::Character3D(const glm::vec3 &position, Face face, float n, float m,
         v.uv = {du + (uv_bool.x ? u2 : u1), dv + (uv_bool.y ? v2 : v1)};
     }
 }
+

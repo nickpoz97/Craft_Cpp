@@ -123,3 +123,7 @@ int Model::get_chunk_distance(const glm::ivec2 &pq1, const glm::ivec2 &pq2) {
         return glm::max(glm::abs(delta.x), glm::abs(delta.y));
 }
 
+bool Model::has_light(const Chunk chunk) {
+    return false;
+}
+

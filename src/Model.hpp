@@ -21,6 +21,7 @@ class Model {
     std::array<Worker, WORKERS> workers;
     std::unordered_map<glm::ivec2, Chunk> chunks;
 public:
+    static constexpr bool show_light = SHOW_LIGHT;
     const std::unordered_map<glm::ivec2, Chunk> &getChunks() const;
 
 private:
@@ -81,6 +82,7 @@ public:
     static int get_chunk_distance(const glm::ivec2& pq1, const glm::ivec2& pq2);
     bool chunk_visible(const glm::ivec2& pq);
     Item highest_block(const glm::vec2& pq);
+    bool has_light(const Chunk chunk);
 };
 
 
