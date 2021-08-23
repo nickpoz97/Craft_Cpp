@@ -79,6 +79,9 @@ public:
     bool is_obstacle() const;
     bool is_transparent() const;
     bool is_destructable() const;
+    bool is_empty() const;
+
+    operator int() const;
 };
 
 bool Item::is_plant() const{
@@ -137,6 +140,14 @@ bool Item::is_destructable() const{
 }
 
 Item::Item(int index) : w{static_cast<ItemName>(index)}{}
+
+Item::operator int() const{
+    return static_cast<int>(w);
+}
+
+bool Item::is_empty() const {
+    return w == ItemName::EMPTY;
+}
 
 
 #endif

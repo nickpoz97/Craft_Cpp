@@ -38,7 +38,7 @@ private:
     const Attrib& attrib;
     void set_vao_attributes() const;
 public:
-    OpenglBuffer(const Shader& program);
+    OpenglBuffer();
     ~OpenglBuffer();
 
     void store_data(GLsizei size, const GLfloat* const data) const;

@@ -82,9 +82,6 @@ public:
     static int get_chunk_distance(const glm::ivec2& pq1, const glm::ivec2& pq2);
     bool chunk_visible(const glm::ivec2& pq);
     Item highest_block(const glm::vec2& pq);
-    bool has_light(const Chunk chunk);
-
-
 };
 
 

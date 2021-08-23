@@ -2,6 +2,8 @@
 // Created by ultimatenick on 10/08/21.
 //
 
+#include <numeric>
+
 #include "Chunk.hpp"
 #include "Model.hpp"
 
@@ -97,5 +99,130 @@ void Chunk::set_dirt() {
                 search_result->dirty = true;
             }
         }
+    }
+}
+
+void Chunk::light_fill(std::vector<char>& opaque, std::vector<char>& light, const glm::vec3& v, int w, bool force) {
+
+    int x = v.x;
+    int y = v.y;
+    int z = v.z;
+
+    if (x + w < XZ_LO || z + w < XZ_LO) {
+        return;
+    }
+    if (x - w > XZ_HI || z - w > XZ_HI) {
+        return;
+    }
+    if (y < 0 || y >= Y_SIZE) {
+        return;
+    }
+    if (light[XYZ(x, y, z)] >= w) {
+        return;
+    }
+    if (!force && opaque[XYZ(x, y, z)]) {
+        return;
+    }
+    light[XYZ(x, y, z)] = w--;
+    light_fill(opaque, light, {x - 1, y, z}, w, 0);
+    light_fill(opaque, light, {x + 1, y, z}, w, 0);
+    light_fill(opaque, light, {x, y - 1, z}, w, 0);
+    light_fill(opaque, light, {x, y + 1, z}, w, 0);
+    light_fill(opaque, light, {x, y, z - 1}, w, 0);
+    light_fill(opaque, light, {x, y, z + 1}, w, 0);
+}
+
+Chunk::Chunk(const WorkerItem &wi) : pq{wi.pq_coordinates}, model{model}{
+    std::vector<char> opaque(XZ_SIZE * XZ_SIZE * Y_SIZE);
+    std::vector<char> light(XZ_SIZE * XZ_SIZE * Y_SIZE);
+    std::vector<char> highest(XZ_SIZE * XZ_SIZE);
+
+    glm::ivec3 o{
+        wi.pq_coordinates.x * Chunk::size - Chunk::size - 1,
+        -1,
+        wi.pq_coordinates.y * Chunk::size - Chunk::size - 1
+    };
+
+    bool has_light = wi.has_light();
+
+    populate_opaque(wi, o, opaque, highest);
+    if(has_light){
+        flood_fill(wi, o, opaque, light);
+    }
+
+    auto map = wi.block_maps[1][1];
+    faces += count_exposed_faces(map, opaque, o);
+}
+
+void Chunk::populate_opaque(const WorkerItem &wi, const glm::ivec3 &o, const std::vector<char>& opaque, const std::vector<char>& highest) const {
+    for(const auto& blockmaps_row : wi.block_maps){
+        for(const BlockMap& bm : blockmaps_row){
+            if(bm.empty()){
+                continue;
+            }
+            for(const auto& kv : bm){
+                glm::ivec3 e{kv.first + bm.get_delta()};
+                Item w = kv.second;
+                if(w.is_empty()){
+                    continue;
+                }
+                auto v = e - o;
+
+                opaque[XYZ(v.x, v.y, v.z)] = !w.is_transparent();
+                if (opaque[XYZ(v.x, v.y, v.z)]) {
+                    highest[XZ(v.x, v.z)] = glm::max(highest[XZ(v.x, v.z)], v.y);
+                }
+            }
+        }
+    }
+}
+
+void Chunk::flood_fill(const WorkerItem& wi, const glm::ivec3& o, std::vector<char>& opaque, std::vector<char>& light) {
+    for(const auto& lightmaps_row : wi.light_maps){
+        for(const BlockMap& lm : lightmaps_row){
+            if (lm.empty()) {
+                continue;
+            }
+            for(const auto& kv : lm) {
+                glm::ivec3 e{kv.first + lm.get_delta()};
+                Item w = kv.second;
+                auto v = e - o;
+                light_fill(opaque, light, v, static_cast<int>(w), true);
+            }
+        }
+    }
+}
+
+int Chunk::count_exposed_faces(const BlockMap& map, const std::vector<char>& opaque, const glm::ivec3& o) {
+    int miny = 256;
+    int maxy = 0;
+    int faces = 0;
+
+    for(const auto& kv : map) {
+        glm::ivec3 e{kv.first + map.get_delta()};
+        Item w = kv.second;
+        if(w.is_empty()){
+            continue;
+        }
+        auto v = e - o;
+
+        std::array<int, 6> f{
+            !opaque[XYZ(v.x - 1, v.y, v.z)],
+            !opaque[XYZ(v.x + 1, v.y, v.z)],
+            !opaque[XYZ(v.x, v.y + 1, v.z)],
+            !opaque[XYZ(v.x, v.y - 1, v.z)] && (e.y > 0),
+            !opaque[XYZ(v.x, v.y, v.z - 1)],
+            !opaque[XYZ(v.x, v.y, v.z + 1)]
+        };
+
+        int total = std::accumulate(f.begin(), f.end(), 0);
+        if(w.is_plant()){
+            total = 4;
+        }
+
+        min_y = glm::min(min_y, e.y);
+        max_y = glm::max(max_y, e.y);
+
+        return total;
     }
 }

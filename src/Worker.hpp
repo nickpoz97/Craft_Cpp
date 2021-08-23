@@ -10,15 +10,16 @@
 
 #include "BlockMap.hpp"
 
-class WorkerItem {
-private:
-    glm::ivec2 coordinates;
-    int miny;
-    int maxy;
+struct WorkerItem {
+    const glm::ivec2 pq_coordinates;
+    const int miny;
+    const int maxy;
 
-    int load;
-    std::array<std::array<BlockMap,3>,3> block_maps;
-    std::array<std::array<BlockMap,3>,3> light_maps;
+    const bool load;
+    const std::array<std::array<BlockMap,3>,3> block_maps;
+    const std::array<std::array<BlockMap,3>,3> light_maps;
+
+    bool has_light() const;
 };
 
 class Worker{

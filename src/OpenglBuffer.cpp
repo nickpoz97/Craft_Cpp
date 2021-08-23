@@ -9,7 +9,7 @@
 #include "Vertex.hpp"
 
 template<typename VertexType>
-OpenglBuffer<VertexType>::OpenglBuffer(const Shader& program){
+OpenglBuffer<VertexType>::OpenglBuffer(){
     glGenBuffers(1, &id);
 }
 

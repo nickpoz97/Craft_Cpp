@@ -12,6 +12,7 @@
 
 #include "Vertex.hpp"
 #include "GameObject.hpp"
+#include "Chunk.hpp"
 
 static constexpr int VERTICES_FACE_COUNT = 6;
 

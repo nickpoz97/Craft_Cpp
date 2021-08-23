@@ -19,6 +19,7 @@ class BlockMap : public BaseMap{
 public:
     explicit BlockMap(const glm::ivec3& delta);
     Item at(const glm::ivec3& key) const;
+    const glm::ivec3& get_delta() const;
 };
 
 

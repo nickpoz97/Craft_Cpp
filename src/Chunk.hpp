@@ -19,16 +19,15 @@
 class Chunk {
 private:
     OpenglBuffer<Uv3DVertex> sign_buffer;
-    static constexpr int size = CHUNK_SIZE;
     const Model& model;
 
     const glm::ivec2 pq;
     static int min_y;
     static int max_y;
 
-    BlockMap map;
-    BlockMap lights;
-    std::list<Sign> sign_list;
+    BlockMap map{};
+    BlockMap lights{};
+    std::list<Sign> sign_list{};
 
     int faces;
     int sign_faces;
@@ -36,8 +35,20 @@ private:
     bool dirty;
 
     const OpenglBuffer<CubeVertex> buffer;
-    const Attrib attrib;
+    //const Attrib attrib;
+
+    static constexpr int XZ_SIZE = Chunk::size * 3 + 2;
+    static constexpr int XZ_LO = Chunk::size;
+    static constexpr int XZ_HI = Chunk::size * 2 + 1;
+    static constexpr int Y_SIZE = 258;
+    static constexpr auto XYZ = [](int x, int y, int z){ return y * XZ_SIZE * XZ_SIZE + x * XZ_SIZE + z; };
+    static constexpr auto XZ = [](int x, int z){ return XYZ(x,0,z); };
+
+    static void void light_fill(std::vector<char>& opaque, std::vector<char>& light, const glm::vec3& v, int w, bool force);
 public:
+    static constexpr int size = CHUNK_SIZE;
+
+    Chunk(const WorkerItem& wi)
     void draw();
     static constexpr int getSize();
     static int getMinY();
@@ -49,6 +60,11 @@ public:
     void gen_sign_buffer();
     bool has_lights();
     void set_dirt();
+
+    void populate_opaque(const WorkerItem &wi, const glm::ivec3 &o, const std::vector<char>& opaque, const std::vector<char>& highest) const;
+    void flood_fill(const WorkerItem& wi, const glm::ivec3& o, std::vector<char>& opaque, std::vector<char>& light);
+
+    int count_exposed_faces(const BlockMap& map, const std::vector<char>& opaque, const glm::ivec3& o);
 };
 
 
