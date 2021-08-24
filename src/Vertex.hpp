@@ -30,9 +30,7 @@ struct NormalVertex : Uv3DVertex{
 
 class CubeVertex : public NormalVertex{
 public:
-    glm::vec2 ao_light;
-    /*Face face;
-    int index;*/
+    //glm::vec2 ao_light;
 };
 
 

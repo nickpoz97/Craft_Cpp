@@ -14,11 +14,10 @@ private:
     glm::ivec2 position;
     int p;
     std::array<glm::vec2, 4> ends_coordinates;
-    Shader shader;
-    GLuint buffer;
+    OpenglBuffer<Standard2DVertex> buffer;
 
 public:
-    Crosshair(const Model& model, const Shader& shader);
+    Crosshair(const Model& model);
     ~Crosshair();
 };
 

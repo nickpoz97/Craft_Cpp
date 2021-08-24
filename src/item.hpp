@@ -72,7 +72,7 @@ private:
     ItemName w;
 
 public:
-    explicit Item(int index);
+    explicit constexpr Item(int index);
     Item() = default;
 
     bool is_plant() const;
@@ -139,7 +139,7 @@ bool Item::is_destructable() const{
     }
 }
 
-Item::Item(int index) : w{static_cast<ItemName>(index)}{}
+constexpr Item::Item(int index) : w{static_cast<ItemName>(index)}{}
 
 Item::operator int() const{
     return static_cast<int>(w);

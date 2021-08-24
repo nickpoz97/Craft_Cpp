@@ -19,6 +19,8 @@
 class Chunk {
 private:
     OpenglBuffer<Uv3DVertex> sign_buffer;
+    OpenglBuffer<CubeVertex> cube_buffer;
+
     const Model& model;
 
     const glm::ivec2 pq;
@@ -65,6 +67,16 @@ public:
     void flood_fill(const WorkerItem& wi, const glm::ivec3& o, std::vector<char>& opaque, std::vector<char>& light);
 
     int count_exposed_faces(const BlockMap& map, const std::vector<char>& opaque, const glm::ivec3& o);
+    void generate_geometry(const std::vector<char>& opaque);
+
+    static void Chunk::occlusion(const std::array<char, 27>& neighbors,
+                                 const std::array<char, 27>& lights,
+                                 const std::array<char, 27>& shades,
+                                 std::array<std::array<float,4>, 6>& ao,
+                                 std::array<std::array<float,4>, 6>& light));
+
+    template<typename FT>
+    void map_for_each(const BlockMap& map, FT function);
 };
 
 

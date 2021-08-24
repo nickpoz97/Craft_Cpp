@@ -14,6 +14,10 @@ static constexpr float SIGN_LINE_HEIGHT = 1.25;
 static constexpr int N_SIGN_LINES = 1024;
 static constexpr int MAX_LINE_LENGTH = 1024;
 
+static constexpr int INDICES_FACE_COUNT = 6;
+static constexpr int VERTICES_FACE_COUNT = 4;
+static constexpr float N = 0.5f;
+
 // config
 static constexpr bool SHOW_LIGHT = true;
 #define CPP_COSTANTS_HPP

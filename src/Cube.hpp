@@ -13,9 +13,9 @@
 #include "CubicObject.hpp"
 #include "Block.hpp"
 
-class Cube : public CubicObject<6, VERTICES_FACE_COUNT>{
+class Cube : public CubicObject<6, INDICES_FACE_COUNT>{
 private:
-    using SuperClass = CubicObject<6, VERTICES_FACE_COUNT>;
+    using SuperClass = CubicObject<6, INDICES_FACE_COUNT>;
 
     static constexpr float s = 0.0625;              // TODO check semantic
     static constexpr float a = 0.0 + 1 / 2048.0;    // TODO check semantic

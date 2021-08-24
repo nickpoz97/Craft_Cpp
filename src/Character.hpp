@@ -10,7 +10,7 @@
 #include "GameObject.hpp"
 #include "Vertex.hpp"
 
-class Character : public GameObject<Uv3DVertex, 6>{
+class Character : public GameObject<Uv2DVertex, 6>{
     static constexpr float s = 0.0625;
     static constexpr float a = s;
     static constexpr float b = s * 2;

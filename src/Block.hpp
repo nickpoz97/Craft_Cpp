@@ -5,9 +5,12 @@
 #ifndef CPP_BLOCK_HPP
 #define CPP_BLOCK_HPP
 
-#include <vec3.hpp>
+#include <array>
 
-struct TileBlock{
+#include "item.hpp"
+#include "vec3.hpp"
+
+struct TileBlock {
     int leftFace;
     int rightFace;
     int topFace;
@@ -15,20 +18,18 @@ struct TileBlock{
     int frontFace;
     int backFace;
 
-    int operator[](int i) const;
+    int get_face_val(unsigned index) const;
+    int count_visible_faces() const;
 };
 
 class Block{
 private:
-    static TileBlock cubeTiles[];
-    static int plantTiles[];
-
+    static const std::array<TileBlock, 256> tiles;
     const int tile_index;
-    glm::vec3 position;
 public:
-    explicit Block(int tile_index, const glm::vec3& position);
-    [[nodiscard]] const TileBlock& getBlock() const;
-    int operator[] (int faceIndex) const;
+    explicit Block(Item w);
+    [[nodiscard]] const TileBlock& get_tile_block() const;
+    int face_val(unsigned index) const;
 };
 
 

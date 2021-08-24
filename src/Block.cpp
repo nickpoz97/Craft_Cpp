@@ -4,24 +4,7 @@
 
 #include "Block.hpp"
 
-int TileBlock::operator[](int i) const{
-    const int* address = &(this->leftFace) + i;
-    return *address;
-}
-
-int Block::plantTiles[]{
-    // w => tile
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0 - 16
-    48, // 17 - tall grass
-    49, // 18 - yellow flower
-    50, // 19 - red flower
-    51, // 20 - purple flower
-    52, // 21 - sun flower
-    53, // 22 - white flower
-    54, // 23 - blue flower
-};
-
-TileBlock Block::cubeTiles[]{
+decltype(Block::tiles) Block::tiles{{
     {0, 0, 0, 0, 0, 0}, // 0 - empty
     {16, 16, 32, 0, 16, 16}, // 1 - grass
     {1, 1, 1, 1, 1, 1}, // 2 - sand
@@ -39,21 +22,21 @@ TileBlock Block::cubeTiles[]{
     {13, 13, 13, 13, 13, 13}, // 14 - chest
     {14, 14, 14, 14, 14, 14}, // 15 - leaves
     {15, 15, 15, 15, 15, 15}, // 16 - cloud
-    {0, 0, 0, 0, 0, 0}, // 17
-    {0, 0, 0, 0, 0, 0}, // 18
-    {0, 0, 0, 0, 0, 0}, // 19
-    {0, 0, 0, 0, 0, 0}, // 20
-    {0, 0, 0, 0, 0, 0}, // 21
-    {0, 0, 0, 0, 0, 0}, // 22
-    {0, 0, 0, 0, 0, 0}, // 23
-    /*{0, 0, 0, 0, 0, 0}, // 24
+    {48, 48, 0, 0, 48, 48}, // 17 - tall grass
+    {49, 49, 0, 0, 49, 49}, // 18 - yellow flower
+    {50, 50, 0, 0, 50, 50}, // 19 - red flower
+    {51, 51, 0, 0, 51, 51}, // 20 - purple flower
+    {52, 52, 0, 0, 52, 52}, // 21 - sun flower
+    {53, 53, 0, 0, 53, 53}, // 22 - white flower
+    {54, 54, 0, 0, 54, 54}, // 23 - blue flower
+    {0, 0, 0, 0, 0, 0}, // 24
     {0, 0, 0, 0, 0, 0}, // 25
     {0, 0, 0, 0, 0, 0}, // 26
     {0, 0, 0, 0, 0, 0}, // 27
     {0, 0, 0, 0, 0, 0}, // 28
     {0, 0, 0, 0, 0, 0}, // 29
     {0, 0, 0, 0, 0, 0}, // 30
-    {0, 0, 0, 0, 0, 0}, // 31*/
+    {0, 0, 0, 0, 0, 0}, // 31
     {176, 176, 176, 176, 176, 176}, // 32
     {177, 177, 177, 177, 177, 177}, // 33
     {178, 178, 178, 178, 178, 178}, // 34
@@ -86,14 +69,26 @@ TileBlock Block::cubeTiles[]{
     {205, 205, 205, 205, 205, 205}, // 61
     {206, 206, 206, 206, 206, 206}, // 62
     {207, 207, 207, 207, 207, 207}, // 63
-};
+}};
 
-Block::Block(int tile_index, const Vec<int,3>& position) : tile_index{tile_index}, position{position} {}
+Block::Block(Item w) : tile_index(static_cast<int>(w)){}
 
-const TileBlock &Block::getBlock() const {
-    return cubeTiles[tile_index];
+const TileBlock &Block::get_tile_block() const {
+    return tiles[tile_index];
 }
 
-int Block::operator[] (int faceIndex) const {
-    return cubeTiles[tile_index][faceIndex];
+int Block::face_val(unsigned face_index) const{
+    return tiles[tile_index].get_face_val(face_index);
+}
+
+int TileBlock::get_face_val(unsigned index) const{
+    return *(reinterpret_cast<const int*>(this) + (index % 6));
+}
+
+int TileBlock::count_visible_faces() const{
+    int count = 0;
+    for(int i = 0 ; i < 6 ; i++){
+        count += (get_face_val(i) != 0);
+    }
+    return count;
 }

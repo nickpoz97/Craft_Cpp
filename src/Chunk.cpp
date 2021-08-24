@@ -6,6 +6,7 @@
 
 #include "Chunk.hpp"
 #include "Model.hpp"
+#include "CubicObject.hpp"
 
 void Chunk::draw() {
     //TODO implement method using CubicObject draw function
@@ -137,7 +138,7 @@ Chunk::Chunk(const WorkerItem &wi) : pq{wi.pq_coordinates}, model{model}{
     std::vector<char> light(XZ_SIZE * XZ_SIZE * Y_SIZE);
     std::vector<char> highest(XZ_SIZE * XZ_SIZE);
 
-    glm::ivec3 o{
+    glm::ivec3 offset{
         wi.pq_coordinates.x * Chunk::size - Chunk::size - 1,
         -1,
         wi.pq_coordinates.y * Chunk::size - Chunk::size - 1
@@ -145,13 +146,15 @@ Chunk::Chunk(const WorkerItem &wi) : pq{wi.pq_coordinates}, model{model}{
 
     bool has_light = wi.has_light();
 
-    populate_opaque(wi, o, opaque, highest);
+    populate_opaque(wi, offset, opaque, highest);
     if(has_light){
-        flood_fill(wi, o, opaque, light);
+        flood_fill(wi, offset, opaque, light);
     }
 
     auto map = wi.block_maps[1][1];
     faces += count_exposed_faces(map, opaque, o);
+
+
 }
 
 void Chunk::populate_opaque(const WorkerItem &wi, const glm::ivec3 &o, const std::vector<char>& opaque, const std::vector<char>& highest) const {
@@ -160,7 +163,9 @@ void Chunk::populate_opaque(const WorkerItem &wi, const glm::ivec3 &o, const std
             if(bm.empty()){
                 continue;
             }
+            // kv is key-value (relative_position-item)
             for(const auto& kv : bm){
+                // absolute position
                 glm::ivec3 e{kv.first + bm.get_delta()};
                 Item w = kv.second;
                 if(w.is_empty()){
@@ -224,5 +229,101 @@ int Chunk::count_exposed_faces(const BlockMap& map, const std::vector<char>& opa
         max_y = glm::max(max_y, e.y);
 
         return total;
+    }
+}
+
+void Chunk::generate_geometry(const std::vector<char> &opaque, const std::vector<char> &light,
+                              const std::vector<char> &highest, const glm::vec3& v, Item w, int total) {
+    std::array<char, 27> neighbors{};
+    std::array<char, 27> lights{};
+    std::array<char, 27> shades{};
+
+    int index = 0;
+    for (int dx = -1; dx <= 1; dx++) {
+        for (int dy = -1; dy <= 1; dy++) {
+            for (int dz = -1; dz <= 1; dz++, index++){
+                neighbors[index] = opaque[XYZ(v.x + dx, v.y + dy, v.z + dz)];
+                lights[index] = light[XYZ(v.x + dx, v.y + dy, v.z + dz)];
+                shades[index] = 0;
+                if (v.y + dy <= highest[XZ(v.x + dx, v.z + dz)]) {
+                    for (int oy = 0; oy < 8; oy++) {
+                        if (opaque[XYZ(v.x + dx, v.y + dy + oy, v.z + dz)]) {
+                            shades[index] = 1.0 - oy * 0.125;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    std::array<std::array<float,4>, 6> ao;
+    std::array<std::array<float,4>, 6> _light;
+
+    occlusion(neighbors, lights, shades, ao, _light);
+
+    if(w.is_plant()){
+        total = 4;
+        float min_ao = 1;
+        float max_light = 0;
+        for (int a = 0; a < 6; a++) {
+            for (int b = 0; b < 4; b++) {
+                min_ao = glm::min(min_ao, ao[a][b]);
+                max_light = glm::max(max_light, _light[a][b]);
+            }
+        }
+    }
+
+
+}
+
+void Chunk::occlusion(const std::array<char, 27>& neighbors,
+                      const std::array<char, 27>& lights,
+                      const std::array<char, 27>& shades,
+                      std::array<std::array<float,4>, 6>& ao,
+                      std::array<std::array<float,4>, 6>& light){
+    static const std::array<std::array<glm::vec3, 4>, 6> lookup3{{
+        {{{0, 1, 3}, {2, 1, 5}, {6, 3, 7}, {8, 5, 7}}},
+        {{{18, 19, 21}, {20, 19, 23}, {24, 21, 25}, {26, 23, 25}}},
+        {{{6, 7, 15}, {8, 7, 17}, {24, 15, 25}, {26, 17, 25}}},
+        {{{0, 1, 9}, {2, 1, 11}, {18, 9, 19}, {20, 11, 19}}},
+        {{{0, 3, 9}, {6, 3, 15}, {18, 9, 21}, {24, 15, 21}}},
+        {{{2, 5, 11}, {8, 5, 17}, {20, 11, 23}, {26, 17, 23}}}
+    }};
+
+    static const static const std::array<std::array<glm::vec4, 4>, 6> lookup4{{
+        {{{0, 1, 3, 4}, {1, 2, 4, 5}, {3, 4, 6, 7}, {4, 5, 7, 8}}},
+        {{{18, 19, 21, 22}, {19, 20, 22, 23}, {21, 22, 24, 25}, {22, 23, 25, 26}}},
+        {{{6, 7, 15, 16}, {7, 8, 16, 17}, {15, 16, 24, 25}, {16, 17, 25, 26}}},
+        {{{0, 1, 9, 10}, {1, 2, 10, 11}, {9, 10, 18, 19}, {10, 11, 19, 20}}},
+        {{{0, 3, 9, 12}, {3, 6, 12, 15}, {9, 12, 18, 21}, {12, 15, 21, 24}}},
+        {{{2, 5, 11, 14}, {5, 8, 14, 17}, {11, 14, 20, 23}, {14, 17, 23, 26}}}
+    }};
+
+    static const std::array<float,4> curve{0.0, 0.25, 0.5, 0.75};
+
+    for(int i = 0 ; i < lookup3.size() ; i++){
+        for(int j = 0 ; j < lookup3[0].size() ; j++){
+            int corner = neighbors[lookup3[i][j].x];
+            bool side1 = neighbors[lookup3[i][j].y];
+            bool side2 = neighbors[lookup3[i][j].z];
+            int value = (side1 && side2) ? 3 : corner + side1 + side2;
+            float shade_sum = 0;
+            float light_sum = 0;
+
+            bool is_light = (lights[13] == 15);
+
+            for (int k = 0; k < 4; k++) {
+                shade_sum += shades[lookup4[i][j][k]];
+                light_sum += lights[lookup4[i][j][k]];
+            }
+
+            if (is_light) {
+                light_sum = 15 * 4 * 10;
+            }
+            float total = curve[value] + shade_sum / 4.0;
+            ao[i][j] = glm::min(total, 1.0f);
+            light[i][j] = light_sum / 15.0 / 4.0;
+        }
     }
 }

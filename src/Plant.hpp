@@ -11,7 +11,7 @@
 #include "item.hpp"
 #include "CubicObject.hpp"
 
-class Plant : public CubicObject<4, VERTICES_FACE_COUNT>{
+class Plant : public CubicObject<4, INDICES_FACE_COUNT>{
 private:
     static const glm::vec3 local_vertex_positions[4][4];
     //static const glm::vec3 normals[4];

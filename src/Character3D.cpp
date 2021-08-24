@@ -32,9 +32,8 @@ const decltype(Character3D::offsets) Character3D::offsets = {{
     {0, +1, 0}, {0, +1, 0}, {0, +1, 0}, {0, +1, 0},
 }};
 
-Character3D::Character3D(const glm::vec3& position, float n, Face face, char c){
-    float pu = s / 5;
-    float pv = s / 2.5;
+// TODO check why faces can be more than 6
+Character3D::Character3D(const glm::vec3& position, float n, int face, char c){
     float u1 = pu;
     float v1 = pv;
     float u2 = s - pu;
@@ -43,16 +42,15 @@ Character3D::Character3D(const glm::vec3& position, float n, Face face, char c){
     float du = (w % 16) * s;
     float dv = 1 - (w / 16 + 1) * s * 2;
 
-    int face_index = static_cast<int>(face);
-    glm::vec3 vertex_position{position + p * offsets[face_index]};
+    glm::vec3 world_position{position + p * offsets[face]};
 
     auto pos_it = local_positions.begin();
     auto uv_it = uvs.begin();
 
     for(auto& v : vertices){
-        v.position = vertex_position + n * (*pos_it++)[face_index];
+        v.position = world_position + n * (*pos_it++)[face];
 
-        const glm::vec2& uv_bool = (*uv_it++)[face_index];
+        const glm::vec2& uv_bool = (*uv_it++)[face];
         v.uv = {du + (uv_bool.x ? u2 : u1), dv + (uv_bool.y ? v2 : v1)};
     }
 }

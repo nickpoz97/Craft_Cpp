@@ -12,51 +12,33 @@
 #include "OpenglBuffer.hpp"
 #include "Block.hpp"
 
-template<typename VertexType, int n_vertices>
+template<typename VertexType>
 class GameObject{
 private:
-    const OpenglBuffer<VertexType> buffer;
+    glm::mat4 transform_matrix{1.0};
 protected:
+    static const int n_vertices;
     std::vector<VertexType> vertices;
-    const Shader& shader;
 public:
-    GameObject(const Shader& shader);
-    void set_buffer_data() const;
-    void apply_transform(const glm::mat4 &transform);
-    const OpenglBuffer<VertexType> &getBuffer() const;
-    void draw_triangles();
-    void draw_lines();
+    explicit GameObject(int n_vertices);
+    void apply_transform(const glm::mat4 &tr);
+    void apply_transform(const glm::mat4 &&tr);
 };
 
 // TODO take ownership of vertices array that will be passed to constructor
-template<typename VertexType, int n_vertices>
-GameObject<VertexType, n_vertices>::GameObject(const Shader& shader) : vertices(n_vertices), buffer(), shader(shader) {}
+template<typename VertexType>
+GameObject<VertexType>::GameObject(int n_vertices) : vertices(n_vertices){}
 
-template<typename VertexType, int n_vertices>
-void GameObject<VertexType, n_vertices>::set_buffer_data() const {
-    buffer.store_data(vertices.size() * sizeof(VertexType), reinterpret_cast<const GLfloat* const>(vertices.data()));
+template<typename VertexType>
+void GameObject<VertexType>::apply_transform(const glm::mat4 &tr) {
+    transform_matrix = tr;
+    // TODO do this in shader
 }
 
-template<typename VertexType, int n_vertices>
-void GameObject<VertexType, n_vertices>::apply_transform(const glm::mat4 &transform) {
-    for(auto& v : this->vertices){
-        v.position = transform * glm::vec4{v.position, 1.0f};
-    }
-}
-
-template<typename VertexType, int n_vertices>
-const OpenglBuffer<VertexType> &GameObject<VertexType, n_vertices>::getBuffer() const {
-    return buffer;
-}
-
-template<typename VertexType, int n_vertices>
-void GameObject<VertexType, n_vertices>::draw_triangles() {
-    buffer.draw_triangles(shader.getAttrib(), vertices.size());
-}
-
-template<typename VertexType, int n_vertices>
-void GameObject<VertexType, n_vertices>::draw_lines() {
-    buffer.draw_lines(shader.getAttrib(), vertices.size());
+template<typename VertexType>
+void GameObject<VertexType>::apply_transform(const glm::mat4 &&tr) {
+    transform_matrix = tr;
+    // TODO do this in shader
 }
 
 #endif //CPP_GAMEOBJECT_HPP

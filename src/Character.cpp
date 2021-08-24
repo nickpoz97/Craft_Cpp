@@ -12,14 +12,13 @@ Character::Character(const glm::vec2 &position, int m, int n, char c) : GameObje
     float dv = 1 - (w / 16) * b - b;
 
     vertices = {{
-                        Uv3DVertex{glm::vec4{-n, -m, 0, 0}, glm::vec2{du, dv}},
-                        Uv3DVertex{glm::vec4{+n, -m, 0, 0}, glm::vec2{du + a, dv}},
-                        Uv3DVertex{glm::vec4{+n, +m, 0, 0}, glm::vec2{du + a, dv + b}},
-                        Uv3DVertex{glm::vec4{-n, -m, 0, 0}, glm::vec2{du, dv}},
-                        Uv3DVertex{glm::vec4{+n, +m, 0, 0}, glm::vec2{du + a, dv + b}},
-                        Uv3DVertex{glm::vec4{-n, +m, 0, 0}, glm::vec2{du, dv + b}}
+        {glm::vec2{-n, -m}, glm::vec2{du, dv}},
+        {glm::vec2{+n, -m}, glm::vec2{du + a, dv}},
+        {glm::vec2{+n, +m}, glm::vec2{du + a, dv + b}},
+        {glm::vec2{-n, -m}, glm::vec2{du, dv}},
+        {glm::vec2{+n, +m}, glm::vec2{du + a, dv + b}},
+        {glm::vec2{-n, +m}, glm::vec2{du, dv + b}}
     }};
 
     this->apply_transform(glm::translate(glm::mat4{1.0f}, glm::vec3{position,0}));
-    this->set_buffer_data();
 }
