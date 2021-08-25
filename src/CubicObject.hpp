@@ -14,16 +14,16 @@
 #include "GameObject.hpp"
 #include "Chunk.hpp"
 
+template<unsigned n_faces>
 class CubicObject : public GameObject<CubeVertex>{
+private:
+    using SuperClass = GameObject<CubeVertex>;
 protected:
     //using LightMatrix = std::array<std::array<float, 4>, n_faces>;
     using PositionsMatrix = std::array<std::array<glm::vec3, 4>, n_faces>;
     using IndicesMatrix = std::array<std::array<int, INDICES_FACE_COUNT>, n_faces>;
     using NormalMatrix = std::array<glm::vec3, n_faces>;
     using UvsMatrix = std::array<std::array<glm::bvec2, 4>, n_faces>;
-private:
-    using SuperClass = GameObject<CubeVertex>;
-    static const int n_faces;
 public:
     //using IlluminationVector = std::array<float, 27>;
 
@@ -31,7 +31,7 @@ public:
     static constexpr float A = 0.0 + 1 / 2048.0;    // TODO check semantic
     static constexpr float B = S - 1 / 2048.0;      // TODO check semantic
 
-    CubicObject(const Item& item, const TileBlock& visible_faces);
+    CubicObject(const Item& item, const TileBlock& visible_faces, const glm::mat4& transform);
 
     static const PositionsMatrix local_vertex_positions;
     static const UvsMatrix uvs;
@@ -40,5 +40,7 @@ public:
     static const NormalMatrix normals;
 };
 
+using Plant = CubicObject<4>;
+using Cube = CubicObject<6>;
 
 #endif //CPP_CUBICOBJECT_HPP
