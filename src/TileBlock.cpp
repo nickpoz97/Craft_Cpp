@@ -2,9 +2,9 @@
 // Created by ultimatenick on 07/08/21.
 //
 
-#include "Block.hpp"
+#include "TileBlock.hpp"
 
-decltype(Block::tiles) Block::tiles{{
+decltype(TileBlock::tiles) TileBlock::tiles{{
     {0, 0, 0, 0, 0, 0}, // 0 - empty
     {16, 16, 32, 0, 16, 16}, // 1 - grass
     {1, 1, 1, 1, 1, 1}, // 2 - sand
@@ -71,24 +71,91 @@ decltype(Block::tiles) Block::tiles{{
     {207, 207, 207, 207, 207, 207}, // 63
 }};
 
-Block::Block(Item w) : tile_index(static_cast<int>(w)){}
+TileBlock::TileBlock(int tile_index) : index{static_cast<BlockType>(tile_index)}{}
 
-const TileBlock &Block::get_tile_block() const {
-    return tiles[tile_index];
+const Tiles &TileBlock::get_tile_block() const {
+    return tiles[static_cast<int>(index)];
 }
 
-int Block::face_val(unsigned face_index) const{
-    return tiles[tile_index].get_face_val(face_index);
+int TileBlock::face_tile(unsigned face_index) const{
+    return tiles[static_cast<int>(index)].get_face_val(static_cast<int>(index));
 }
 
-int TileBlock::get_face_val(unsigned index) const{
+int Tiles::get_face_val(unsigned index) const{
     return *(reinterpret_cast<const int*>(this) + (index % 6));
 }
 
-int TileBlock::count_visible_faces() const{
+int Tiles::count_visible_faces() const{
     int count = 0;
     for(int i = 0 ; i < 6 ; i++){
         count += (get_face_val(i) != 0);
     }
     return count;
+}
+
+bool TileBlock::is_plant() const{
+    switch (index) {
+        case BlockType::TALL_GRASS:
+        case BlockType::YELLOW_FLOWER:
+        case BlockType::RED_FLOWER:
+        case BlockType::PURPLE_FLOWER:
+        case BlockType::SUN_FLOWER:
+        case BlockType::WHITE_FLOWER:
+        case BlockType::BLUE_FLOWER:
+            return true;
+        default:
+            return false;
+    }
+}
+
+bool TileBlock::is_obstacle() const{
+    if (is_plant()) {
+        return 1;
+    }
+    switch (index) {
+        case BlockType::EMPTY:
+        case BlockType::GLASS:
+        case BlockType::LEAVES:
+            return 1;
+        default:
+            return 0;
+    }
+}
+
+bool TileBlock::is_transparent() const{
+    if (is_plant()) {
+        return 1;
+    }
+    switch (index) {
+        case BlockType::EMPTY:
+        case BlockType::GLASS:
+        case BlockType::LEAVES:
+            return 1;
+        default:
+            return 0;
+    }
+
+
+}
+
+bool TileBlock::is_destructable() const{
+    switch (index) {
+        case BlockType::EMPTY:
+        case BlockType::CLOUD:
+            return false;
+        default:
+            return true;
+    }
+}
+
+bool TileBlock::is_empty() const {
+    return index == BlockType::EMPTY;
+}
+
+TileBlock::operator int() const {
+    return static_cast<int>(index);
+}
+
+BlockType TileBlock::getIndex() const {
+    return index;
 }

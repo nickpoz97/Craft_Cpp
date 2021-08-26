@@ -32,7 +32,7 @@ class Player {
 private:
     static std::array<std::array<float,4>,6> ao;
     static std::array<std::array<float,4>,6> light;
-    static TileBlock tiles;
+    static Tiles tiles;
 
     Status actual_status;
 
@@ -65,8 +65,8 @@ public:
     void update_player(const Status& new_status, bool interpolate);
     void interpolate_player();
     void draw();
-    std::pair<glm::vec3, Item> hit_test(bool previous);
-    std::std::pair<glm::vec3, Item> ray_hit(const Chunk& c, bool previous, int max_distance, int step = 32);
+    std::pair<glm::vec3, Tile> hit_test(bool previous);
+    std::std::pair<glm::vec3, Tile> ray_hit(const Chunk& c, bool previous, int max_distance, int step = 32);
     HitResult hit_test_face();
     std::pair<bool, glm::vec3> collide(int height);
     bool insersects_block(int height, const glm::ivec3& block_pos);

@@ -58,8 +58,8 @@ private:
     int day_length;
     int time_changed;
 
-    std::array<Block,2> blocks;
-    std::array<Block,2> blocks_copies;
+    std::array<TileBlock,2> blocks;
+    std::array<TileBlock,2> blocks_copies;
 
     glm::mat4 model;
     glm::mat4 view;
@@ -81,7 +81,7 @@ public:
     Chunk& get_chunk(const glm::ivec2& pq);
     static int get_chunk_distance(const glm::ivec2& pq1, const glm::ivec2& pq2);
     bool chunk_visible(const glm::ivec2& pq);
-    Item highest_block(const glm::vec2& pq);
+    Tile highest_block(const glm::vec2& pq);
 };
 
 

@@ -31,7 +31,7 @@ public:
     static constexpr float A = 0.0 + 1 / 2048.0;    // TODO check semantic
     static constexpr float B = S - 1 / 2048.0;      // TODO check semantic
 
-    CubicObject(const Item& item, const TileBlock& visible_faces, const glm::mat4& transform);
+    CubicObject(const BlockType& block_type, const std::array<bool, 6> &visible_faces, const glm::mat4& transform, vertex_iterator vertices_it);
 
     static const PositionsMatrix local_vertex_positions;
     static const UvsMatrix uvs;
@@ -40,7 +40,23 @@ public:
     static const NormalMatrix normals;
 };
 
-using Plant = CubicObject<4>;
-using Cube = CubicObject<6>;
+class Plant : public CubicObject<4>{
+private:
+    using super = CubicObject<4>;
+public:
+    Plant(const BlockType& block_type, const std::array<bool, 6> &visible_faces, const glm::vec3& position,
+          float rotation, vertex_iterator vertices_it);
+
+    static glm::mat4 get_transform_matrix(const glm::vec3& position, float rotation);
+};
+
+class Cube : public CubicObject<6>{
+private:
+    using super = CubicObject<6>;
+public:
+    Cube(const BlockType& block_type, const std::array<bool, 6> &visible_faces, const glm::vec3& position,
+         vertex_iterator vertices_it);
+    static glm::mat4 get_transform_matrix(const glm::vec3& position);
+};
 
 #endif //CPP_CUBICOBJECT_HPP

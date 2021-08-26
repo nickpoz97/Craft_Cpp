@@ -19,7 +19,7 @@ decltype(Player::light) Player::light = {{
     {0.8, 0.8, 0.8, 0.8},
     {0.8, 0.8, 0.8, 0.8}
 }};
-TileBlock Player::tiles{
+Tiles Player::tiles{
     226, 224, 241, 209, 225, 227
 };
 
@@ -142,9 +142,9 @@ const Frustum &Player::getFrustum() const {
     return frustum;
 }
 
-std::pair<glm::vec3, Item> Player::hit_test(bool previous) {
+std::pair<glm::vec3, Tile> Player::hit_test(bool previous) {
     const glm::ivec2& player_pq{Model::chunked({actual_status.position.x, actual_status.position.z})};
-    std::pair<glm::vec3, Item> result{};
+    std::pair<glm::vec3, Tile> result{};
     float best{};
 
     for(const auto& pair : model.getChunks()){
@@ -164,8 +164,8 @@ std::pair<glm::vec3, Item> Player::hit_test(bool previous) {
     return result;
 }
 
-std::pair<glm::vec3, Item> Player::ray_hit(const Chunk& c, bool previous, int max_distance, int step){
-    using return_type = std::pair<glm::vec3, Item>;
+std::pair<glm::vec3, Tile> Player::ray_hit(const Chunk& c, bool previous, int max_distance, int step){
+    using return_type = std::pair<glm::vec3, Tile>;
 
     const glm::vec3& ray{get_camera_direction_vector()};
     glm::ivec3 test_pos{actual_status.position - ray}; // better for loop
@@ -178,7 +178,7 @@ std::pair<glm::vec3, Item> Player::ray_hit(const Chunk& c, bool previous, int ma
         if(previous_pos == test_pos_rounded){
             continue;
         }
-        const Item& material = c.get_block(test_pos_rounded);
+        const Tile& material = c.get_block(test_pos_rounded);
         if(material.is_obstacle()){
             return (previous) ?
                 return_type{previous_pos, material} :
@@ -192,7 +192,7 @@ std::pair<glm::vec3, Item> Player::ray_hit(const Chunk& c, bool previous, int ma
 
 HitResult Player::hit_test_face() {
     auto pair{hit_test(false)};
-    const Item& w = pair.second;
+    const Tile& w = pair.second;
     const glm::vec3& hit_pos = pair.first;
 
     if (w.is_obstacle()){

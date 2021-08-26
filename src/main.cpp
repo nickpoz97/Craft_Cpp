@@ -2,7 +2,7 @@
 #include "item.hpp"
 
 int main() {
-    Item<ItemName::GRASS> grass;
+    Tile<ItemName::GRASS> grass;
     std::cout << "Hello, World!" << std::endl;
 
     TileBlock b = {1, 2, 3, 4, 5, 6};

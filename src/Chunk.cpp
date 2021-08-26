@@ -3,6 +3,7 @@
 //
 
 #include <numeric>
+#include <noise.h>
 
 #include "Chunk.hpp"
 #include "Model.hpp"
@@ -24,19 +25,19 @@ int Chunk::getMaxY() {
     return max_y;
 }
 
-Item Chunk::getHighestBlock() const{
+Tile Chunk::getHighestBlock() const{
     for(auto rit{map.rbegin()} ; rit != map.rend() ; ++rit){
         if((rit->second).is_obstacle())
             return rit->second;
     }
-    return Item{};
+    return Tile{};
 }
 
 const glm::ivec2 &Chunk::getPq() const {
     return pq;
 }
 
-Item Chunk::get_block(const glm::ivec3& block_pos) const{
+Tile Chunk::get_block(const glm::ivec3& block_pos) const{
     return map.at(block_pos);
 }
 
@@ -134,10 +135,10 @@ void Chunk::light_fill(std::vector<char>& opaque, std::vector<char>& light, cons
 }
 
 Chunk::Chunk(const WorkerItem &wi) : pq{wi.pq_coordinates}, model{model}{
-    std::vector<char> opaque(XZ_SIZE * XZ_SIZE * Y_SIZE);
-    std::vector<char> light(XZ_SIZE * XZ_SIZE * Y_SIZE);
+    std::vector<bool> opaque(XZ_SIZE * XZ_SIZE * Y_SIZE);
     std::vector<char> highest(XZ_SIZE * XZ_SIZE);
 
+    // position 0 - 1 for each coordinate
     glm::ivec3 offset{
         wi.pq_coordinates.x * Chunk::size - Chunk::size - 1,
         -1,
@@ -152,29 +153,26 @@ Chunk::Chunk(const WorkerItem &wi) : pq{wi.pq_coordinates}, model{model}{
     }
 
     auto map = wi.block_maps[1][1];
-    faces += count_exposed_faces(map, opaque, o);
-
+    count_exposed_faces(map, opaque, offset);
+    local_buffer = std::vector<CubeVertex>(faces * INDICES_FACE_COUNT);
 
 }
 
-void Chunk::populate_opaque(const WorkerItem &wi, const glm::ivec3 &o, const std::vector<char>& opaque, const std::vector<char>& highest) const {
+void Chunk::populate_opaque(const WorkerItem &wi, const glm::ivec3 &o, const std::vector<bool>& opaque, const std::vector<char>& highest) const {
     for(const auto& blockmaps_row : wi.block_maps){
         for(const BlockMap& bm : blockmaps_row){
             if(bm.empty()){
                 continue;
             }
-            // kv is key-value (relative_position-item)
+            // kv is key-value (position-item)
             for(const auto& kv : bm){
-                // absolute position
-                glm::ivec3 e{kv.first + bm.get_delta()};
-                Item w = kv.second;
-                if(w.is_empty()){
-                    continue;
-                }
+                const glm::ivec3& e{kv.first};
+                TileBlock tileBlock{kv.second};
                 auto v = e - o;
 
-                opaque[XYZ(v.x, v.y, v.z)] = !w.is_transparent();
+                opaque[XYZ(v.x, v.y, v.z)] = !tileBlock.is_transparent();
                 if (opaque[XYZ(v.x, v.y, v.z)]) {
+                    // update highest
                     highest[XZ(v.x, v.z)] = glm::max(highest[XZ(v.x, v.z)], v.y);
                 }
             }
@@ -182,7 +180,7 @@ void Chunk::populate_opaque(const WorkerItem &wi, const glm::ivec3 &o, const std
     }
 }
 
-void Chunk::flood_fill(const WorkerItem& wi, const glm::ivec3& o, std::vector<char>& opaque, std::vector<char>& light) {
+/*void Chunk::flood_fill(const WorkerItem& wi, const glm::ivec3& o, std::vector<char>& opaque, std::vector<char>& light) {
     for(const auto& lightmaps_row : wi.light_maps){
         for(const BlockMap& lm : lightmaps_row){
             if (lm.empty()) {
@@ -190,94 +188,71 @@ void Chunk::flood_fill(const WorkerItem& wi, const glm::ivec3& o, std::vector<ch
             }
             for(const auto& kv : lm) {
                 glm::ivec3 e{kv.first + lm.get_delta()};
-                Item w = kv.second;
+                Tile w = kv.second;
                 auto v = e - o;
                 light_fill(opaque, light, v, static_cast<int>(w), true);
             }
         }
     }
-}
+}*/
 
-int Chunk::count_exposed_faces(const BlockMap& map, const std::vector<char>& opaque, const glm::ivec3& o) {
-    int miny = 256;
+void Chunk::count_exposed_faces(const BlockMap& map, std::vector<bool> opaque, const glm::ivec3& o) {
+    int miny = 256; // max
     int maxy = 0;
-    int faces = 0;
 
     for(const auto& kv : map) {
-        glm::ivec3 e{kv.first + map.get_delta()};
-        Item w = kv.second;
-        if(w.is_empty()){
-            continue;
-        }
+        glm::ivec3 e{kv.first};
+        TileBlock tileBlock{kv.second};
         auto v = e - o;
 
-        std::array<int, 6> f{
+        // if block next to this face is opaque, no need to render
+        std::array<bool, 6> f{
             !opaque[XYZ(v.x - 1, v.y, v.z)],
             !opaque[XYZ(v.x + 1, v.y, v.z)],
             !opaque[XYZ(v.x, v.y + 1, v.z)],
-            !opaque[XYZ(v.x, v.y - 1, v.z)] && (e.y > 0),
+            !opaque[XYZ(v.x, v.y - 1, v.z)] && (e.y > 0), // no underground
             !opaque[XYZ(v.x, v.y, v.z - 1)],
             !opaque[XYZ(v.x, v.y, v.z + 1)]
         };
 
         int total = std::accumulate(f.begin(), f.end(), 0);
-        if(w.is_plant()){
+        if(total == 0){
+            continue;
+        }
+        if(tileBlock.is_plant()){
             total = 4;
         }
 
         min_y = glm::min(min_y, e.y);
         max_y = glm::max(max_y, e.y);
 
-        return total;
+        faces += total;
     }
 }
 
-void Chunk::generate_geometry(const std::vector<char> &opaque, const std::vector<char> &light,
-                              const std::vector<char> &highest, const glm::vec3& v, Item w, int total) {
-    std::array<char, 27> neighbors{};
-    std::array<char, 27> lights{};
-    std::array<char, 27> shades{};
+decltype(Chunk::local_buffer)::iterator Chunk::generate_geometry(const std::vector<char> &opaque, decltype(local_buffer)::iterator vertex_it, const glm::vec3& e,
+                              const std::vector<char> &highest, const glm::vec3& v, TileBlock w) {
+    std::array<bool, 6> f{
+            !opaque[XYZ(v.x - 1, v.y, v.z)],
+            !opaque[XYZ(v.x + 1, v.y, v.z)],
+            !opaque[XYZ(v.x, v.y + 1, v.z)],
+            !opaque[XYZ(v.x, v.y - 1, v.z)] && (e.y > 0), // no underground
+            !opaque[XYZ(v.x, v.y, v.z - 1)],
+            !opaque[XYZ(v.x, v.y, v.z + 1)]
+    };
 
-    int index = 0;
-    for (int dx = -1; dx <= 1; dx++) {
-        for (int dy = -1; dy <= 1; dy++) {
-            for (int dz = -1; dz <= 1; dz++, index++){
-                neighbors[index] = opaque[XYZ(v.x + dx, v.y + dy, v.z + dz)];
-                lights[index] = light[XYZ(v.x + dx, v.y + dy, v.z + dz)];
-                shades[index] = 0;
-                if (v.y + dy <= highest[XZ(v.x + dx, v.z + dz)]) {
-                    for (int oy = 0; oy < 8; oy++) {
-                        if (opaque[XYZ(v.x + dx, v.y + dy + oy, v.z + dz)]) {
-                            shades[index] = 1.0 - oy * 0.125;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    std::array<std::array<float,4>, 6> ao;
-    std::array<std::array<float,4>, 6> _light;
-
-    occlusion(neighbors, lights, shades, ao, _light);
-
+    const decltype(local_buffer)::iterator end;
     if(w.is_plant()){
-        total = 4;
-        float min_ao = 1;
-        float max_light = 0;
-        for (int a = 0; a < 6; a++) {
-            for (int b = 0; b < 4; b++) {
-                min_ao = glm::min(min_ao, ao[a][b]);
-                max_light = glm::max(max_light, _light[a][b]);
-            }
-        }
+        auto plant = Plant(w.getIndex(), f, e, simplex2(e.x, e.z, 4, 0.5, 2) * 360, vertex_it);
+        return plant.get_end();
     }
-
-
+    else{
+        auto cube = Cube(w.getIndex(), f, e, vertex_it);
+        return cube.get_end();
+    }
 }
 
-void Chunk::occlusion(const std::array<char, 27>& neighbors,
+/*void Chunk::occlusion(const std::array<char, 27>& neighbors,
                       const std::array<char, 27>& lights,
                       const std::array<char, 27>& shades,
                       std::array<std::array<float,4>, 6>& ao,
@@ -327,3 +302,4 @@ void Chunk::occlusion(const std::array<char, 27>& neighbors,
         }
     }
 }
+*/

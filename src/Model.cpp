@@ -105,7 +105,7 @@ constexpr int Model::chunked(float val) {
     return glm::floor(glm::round(val) / Chunk::getSize());
 }
 
-Item Model::highest_block(const glm::vec2& pq) {
+Tile Model::highest_block(const glm::vec2& pq) {
     const Chunk& chunk = chunks.at(pq);
     return chunk.getHighestBlock();
 }

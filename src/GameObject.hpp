@@ -10,35 +10,30 @@
 #include "vec3.hpp"
 #include "mat4x4.hpp"
 #include "OpenglBuffer.hpp"
-#include "Block.hpp"
+#include "TileBlock.hpp"
+
+using vertex_iterator = std::vector<CubeVertex>::iterator;
 
 template<typename VertexType>
 class GameObject{
 private:
     glm::mat4 transform_matrix{1.0};
 protected:
-    static const int n_vertices;
-    std::vector<VertexType> vertices;
+    vertex_iterator begin;
+    vertex_iterator end;
 public:
-    explicit GameObject(int n_vertices);
-    void apply_transform(const glm::mat4 &tr);
-    void apply_transform(const glm::mat4 &&tr);
+    vertex_iterator get_end() const;
+
+public:
+    explicit GameObject(const vertex_iterator& begin_it, int n_vertices);
 };
 
-// TODO take ownership of vertices array that will be passed to constructor
 template<typename VertexType>
-GameObject<VertexType>::GameObject(int n_vertices) : vertices(n_vertices){}
+GameObject<VertexType>::GameObject(const vertex_iterator& begin_it, int n_vertices) : begin{begin_it}, end{begin_it + n_vertices}{}
 
 template<typename VertexType>
-void GameObject<VertexType>::apply_transform(const glm::mat4 &tr) {
-    transform_matrix = tr;
-    // TODO do this in shader
-}
-
-template<typename VertexType>
-void GameObject<VertexType>::apply_transform(const glm::mat4 &&tr) {
-    transform_matrix = tr;
-    // TODO do this in shader
+vertex_iterator GameObject<VertexType>::get_end() const {
+    return end;
 }
 
 #endif //CPP_GAMEOBJECT_HPP
