@@ -78,7 +78,7 @@ public:
     int getScale() const;
     void delete_player();
     void set_player(const glm::vec3& position, const glm::vec2& rotation, std::string_view name, int id);
-    Chunk& get_chunk(const glm::ivec2& pq);
+    auto get_chunk_at = [&chunks](const glm::ivec2& pq){return chunks.find(pq)};
     static int get_chunk_distance(const glm::ivec2& pq1, const glm::ivec2& pq2);
     bool chunk_visible(const glm::ivec2& pq);
     Tile highest_block(const glm::vec2& pq);

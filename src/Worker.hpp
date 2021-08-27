@@ -9,17 +9,22 @@
 #include <array>
 
 #include "BlockMap.hpp"
+#include "Chunk.hpp"
 
 struct WorkerItem {
     const glm::ivec2 pq_coordinates;
-    const int miny;
-    const int maxy;
+    int miny{};
+    int maxy{};
+    static bool is_on_edge(int x, int z);
 
-    const bool load;
-    const std::array<std::array<BlockMap,3>,3> block_maps;
-    const std::array<std::array<BlockMap,3>,3> light_maps;
+    //const bool load;
+    int n_faces{};
+
+    const std::array<std::array<BlockMap,3>,3> block_maps{};
+    //const std::array<std::array<BlockMap,3>,3> light_maps{};
 
     bool has_light() const;
+    WorkerItem(const glm::ivec2& pq);
 };
 
 class Worker{

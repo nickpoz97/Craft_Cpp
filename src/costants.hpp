@@ -20,6 +20,9 @@ static constexpr float N = 0.5f;
 
 // config
 static constexpr bool SHOW_LIGHT = true;
+static constexpr bool SHOW_PLANTS = true;
+static constexpr bool SHOW_TREES = true;
+static constexpr bool SHOW_CLOUDS = true;
 #define CPP_COSTANTS_HPP
 
 #endif //CPP_COSTANTS_HPP

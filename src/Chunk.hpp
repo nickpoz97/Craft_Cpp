@@ -18,6 +18,8 @@
 
 class Chunk {
 private:
+    const WorkerItem& wi;
+
     //OpenglBuffer<Uv3DVertex> sign_buffer;
     OpenglBuffer<CubeVertex> gpu_buffer;
     std::vector<CubeVertex> local_buffer;
@@ -32,12 +34,10 @@ private:
     //BlockMap lights{};
     //std::list<Sign> sign_list{};
 
-    int faces; // n of vertices
+    int faces{}; // n of vertices
     //int sign_faces;
 
     bool dirty;
-
-    const OpenglBuffer<CubeVertex> buffer;
     //const Attrib attrib;
 
     static constexpr int XZ_SIZE = Chunk::size * 3 + 2;
@@ -47,11 +47,15 @@ private:
     static constexpr auto XYZ = [](int x, int y, int z){ return y * XZ_SIZE * XZ_SIZE + x * XZ_SIZE + z; };
     static constexpr auto XZ = [](int x, int z){ return XYZ(x,0,z); };
 
+    void populate_opaque(const WorkerItem &wi, const glm::ivec3 &o, const std::vector<bool>& opaque, const std::vector<char>& highest) const;
+    void count_exposed_faces(const BlockMap& map, std::vector<bool> opaque, const glm::ivec3& o);
+    decltype(local_buffer)::iterator generate_geometry(const std::vector<bool> &opaque, decltype(local_buffer)::iterator vertex_it, const glm::vec3& e,
+                                                       const std::vector<char> &highest, const glm::vec3& v, TileBlock w);
     //static void void light_fill(std::vector<char>& opaque, std::vector<char>& light, const glm::vec3& v, int w, bool force);
 public:
     static constexpr int size = CHUNK_SIZE;
 
-    Chunk(const WorkerItem& wi)
+    Chunk(WorkerItem& wi, const Model& model)
     void draw();
     static constexpr int getSize();
     static int getMinY();
@@ -64,20 +68,11 @@ public:
     bool has_lights();
     void set_dirt();
 
-    void populate_opaque(const WorkerItem &wi, const glm::ivec3 &o, const std::vector<bool>& opaque, const std::vector<char>& highest) const;
-    //void flood_fill(const WorkerItem& wi, const glm::ivec3& o, std::vector<char>& opaque, std::vector<char>& light);
+    void compute_chunk();
+    void generate_chunk();
+    void generate_buffer();
 
-    void count_exposed_faces(const BlockMap& map, std::vector<bool> opaque, const glm::ivec3& o);
-    void generate_geometry(const std::vector<char>& opaque);
 
-    static void Chunk::occlusion(const std::array<char, 27>& neighbors,
-                                 const std::array<char, 27>& lights,
-                                 const std::array<char, 27>& shades,
-                                 std::array<std::array<float,4>, 6>& ao,
-                                 std::array<std::array<float,4>, 6>& light));
-
-    template<typename FT>
-    void map_for_each(const BlockMap& map, FT function);
 };
 
 

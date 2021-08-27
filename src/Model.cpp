@@ -69,10 +69,6 @@ void Model::delete_player() {
     player.reset(nullptr);
 }
 
-Chunk &Model::get_chunk(const glm::ivec2& pq) {
-    return chunks.at(pq);
-}
-
 // TODO to be tested
 bool Model::chunk_visible(const glm::ivec2 &pq) {
     int x = pq.x * Chunk::getSize() - 1;

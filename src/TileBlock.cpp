@@ -71,7 +71,7 @@ decltype(TileBlock::tiles) TileBlock::tiles{{
     {207, 207, 207, 207, 207, 207}, // 63
 }};
 
-TileBlock::TileBlock(int tile_index) : index{static_cast<BlockType>(tile_index)}{}
+TileBlock::TileBlock(int tile_index) : TileBlock{static_cast<BlockType>(tile_index)}{}
 
 const Tiles &TileBlock::get_tile_block() const {
     return tiles[static_cast<int>(index)];
@@ -159,3 +159,5 @@ TileBlock::operator int() const {
 BlockType TileBlock::getIndex() const {
     return index;
 }
+
+TileBlock::TileBlock(BlockType tile_index) : index{tile_index} {}
