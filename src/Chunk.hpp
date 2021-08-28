@@ -18,11 +18,11 @@
 
 class Chunk {
 private:
-    const WorkerItem& wi;
+    //const WorkerItem& wi;
 
     //OpenglBuffer<Uv3DVertex> sign_buffer;
-    OpenglBuffer<CubeVertex> gpu_buffer;
-    std::vector<CubeVertex> local_buffer;
+    OpenglBuffer<CubeVertex> gpu_buffer{};
+    std::vector<CubeVertex> local_buffer{};
 
     const Model& model;
 
@@ -34,7 +34,7 @@ private:
     //BlockMap lights{};
     //std::list<Sign> sign_list{};
 
-    int faces{}; // n of vertices
+    int faces{}; // n of faces
     //int sign_faces;
 
     bool dirty;
@@ -55,7 +55,7 @@ private:
 public:
     static constexpr int size = CHUNK_SIZE;
 
-    Chunk(WorkerItem& wi, const Model& model)
+    Chunk(const Model& model, const glm::vec2 &pq)
     void draw();
     static constexpr int getSize();
     static int getMinY();
@@ -68,7 +68,7 @@ public:
     bool has_lights();
     void set_dirt();
 
-    void compute_chunk();
+    void compute_chunk(const WorkerItem &wi);
     void generate_chunk();
     void generate_buffer();
 

@@ -9,7 +9,9 @@
 #include "Model.hpp"
 #include "CubicObject.hpp"
 
-Chunk::Chunk(WorkerItem &wi, const Model& model) : wi{wi}, pq{wi.pq_coordinates}, model{model} {}
+Chunk::Chunk(const Model &model, const glm::vec2 &pq) : model{model},  pq{pq} {
+
+};
 
 void Chunk::draw() {
     //TODO implement method using CubicObject draw function
@@ -48,7 +50,7 @@ bool Chunk::operator!() const {
 }
 
 // checks if one of the neighbors has lights
-bool Chunk::has_lights() {
+/*bool Chunk::has_lights() {
     if(!model.show_light){
         return false;
     }
@@ -70,7 +72,7 @@ bool Chunk::has_lights() {
         }
     }
     return false;
-}
+}*/
 
 void Chunk::set_dirt() {
     dirty = true;
@@ -87,7 +89,7 @@ void Chunk::set_dirt() {
     }
 }
 
-void Chunk::compute_chunk() {
+void Chunk::compute_chunk(const WorkerItem &wi) {
     std::vector<bool> opaque(XZ_SIZE * XZ_SIZE * Y_SIZE);
     std::vector<char> highest(XZ_SIZE * XZ_SIZE);
 
@@ -102,7 +104,7 @@ void Chunk::compute_chunk() {
 
     populate_opaque(wi, offset, opaque, highest);
 
-    auto map = wi.block_maps[1][1];
+    auto map = *(wi.block_maps[1][1]);
     count_exposed_faces(map, opaque, offset);
     local_buffer = std::vector<CubeVertex>(faces * INDICES_FACE_COUNT);
     auto v_it = local_buffer.begin();
@@ -117,12 +119,12 @@ void Chunk::compute_chunk() {
 
 void Chunk::populate_opaque(const WorkerItem &wi, const glm::ivec3 &o, const std::vector<bool>& opaque, const std::vector<char>& highest) const {
     for(const auto& blockmaps_row : wi.block_maps){
-        for(const BlockMap& bm : blockmaps_row){
-            if(bm.empty()){
+        for(const auto bm : blockmaps_row){
+            if(!bm){
                 continue;
             }
             // kv is key-value (position-item)
-            for(const auto& kv : bm){
+            for(const auto& kv : *bm){
                 const glm::ivec3& e{kv.first};
                 TileBlock tileBlock{kv.second};
                 auto v = e - o;
@@ -197,7 +199,9 @@ void Chunk::generate_buffer() {
     gpu_buffer.store_data(sizeof(local_buffer), reinterpret_cast<GLfloat*>(local_buffer.data()));
 }
 
-void Chunk::generate_chunk(){
+void Chunk::generate_chunk() {
+    WorkerItem wi{pq};
+
     for (int dp = -1; dp <= 1; dp++) {
         for (int dq = -1; dq <= 1; dq++) {
             const Chunk* c_ptr = this;
@@ -205,10 +209,10 @@ void Chunk::generate_chunk(){
                 auto it = model.get_chunk_at(pq + glm::ivec2{dp, dq});
                 c_ptr = (it != model.getChunks().end()) ? &(it->second) : nullptr;
             }
-            wi.block_maps[dp + 1][dq + 1] = (c_ptr) ? c_ptr->map : TileBlock{};
+            wi.block_maps[dp + 1][dq + 1] = (c_ptr) ? &c_ptr->map : nullptr;
         }
     }
 
-    compute_chunk();
+    compute_chunk(wi);
     generate_buffer();
 }

@@ -12,19 +12,19 @@
 #include "Chunk.hpp"
 
 struct WorkerItem {
+public:
     const glm::ivec2 pq_coordinates;
     int miny{};
     int maxy{};
-    static bool is_on_edge(int x, int z);
 
     //const bool load;
     int n_faces{};
 
-    const std::array<std::array<BlockMap,3>,3> block_maps{};
-    //const std::array<std::array<BlockMap,3>,3> light_maps{};
+    std::array<std::array<std::shared_ptr<BlockMap>,3>,3> block_maps{};
+    //std::array<std::array<BlockMap,3>,3> light_maps;
 
     bool has_light() const;
-    WorkerItem(const glm::ivec2& pq);
+    WorkerItem(const Chunk& pq);
 };
 
 class Worker{

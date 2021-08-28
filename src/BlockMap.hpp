@@ -16,9 +16,8 @@ using BaseMap = std::map<glm::ivec3, TileBlock, y_coord_comparator>;
 class BlockMap : public BaseMap {
 private:
     glm::ivec3 delta;
-
 public:
-    explicit BlockMap(const glm::ivec3& delta);
+    explicit BlockMap(const glm::ivec2 &pq);
     TileBlock get_tileBlock(const glm::ivec3& key) const;
     void set_tileBlock(const glm::ivec3& key, TileBlock tileBlock);
     const glm::ivec3& get_delta() const;

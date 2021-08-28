@@ -5,8 +5,9 @@
 #include "unordered_map"
 
 #include "BlockMap.hpp"
+#include "Chunk.hpp"
 
-BlockMap::BlockMap(const glm::ivec3& delta) : delta{delta}{}
+BlockMap::BlockMap(const glm::ivec2 &pq) : delta{pq.x * Chunk::size - 1, 0, pq.y * Chunk::size - 1}{}
 
 const glm::ivec3 &BlockMap::get_delta() const{
     return delta;
@@ -52,4 +53,5 @@ BlockMap::Iterator BlockMap::begin() const{
 BlockMap::Iterator BlockMap::end() const{
     return {cend(), delta};
 }
+
 

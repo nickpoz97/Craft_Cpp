@@ -90,8 +90,8 @@ public:
     BlockType getIndex() const;
 
 public:
-    explicit TileBlock(int tile_index);
-    explicit TileBlock(BlockType block_type);
+    TileBlock(int tile_index);
+    TileBlock(BlockType block_type);
     explicit TileBlock() = default;
     TileBlock(const TileBlock& other) = default;
     [[nodiscard]] const Tiles& get_tile_block() const;
