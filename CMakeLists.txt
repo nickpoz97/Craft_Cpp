@@ -3,7 +3,7 @@ project(cpp)
 
 set(CMAKE_CXX_STANDARD 17)
 
-file(GLOB SOURCE_FILES src/*.cpp deps/noise/noise.c)
+file(GLOB SOURCE_FILES src/*.cpp deps/noise/noise.c stc/*.h)
 
 include_directories(deps/glad/include/)
 include_directories(deps/glfw/include/)

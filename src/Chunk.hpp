@@ -5,12 +5,12 @@
 #ifndef CPP_CHUNK_HPP
 #define CPP_CHUNK_HPP
 
-#include <vec2.hpp>
+#include "vec2.hpp"
 
 #include "BlockMap.hpp"
 #include "list"
 #include "Sign.hpp"
-#include "Attrib.hpp"
+#include "AttributesWrapper.hpp"
 #include "OpenglBuffer.hpp"
 #include "Vertex.hpp"
 #include "costants.hpp"
@@ -25,19 +25,19 @@ private:
     std::vector<CubeVertex> local_buffer{};
 
     const Model& model;
-
     const glm::ivec2 pq;
-    static int min_y;
-    static int max_y;
 
-    BlockMap map{};
+    int min_y{};
+    int max_y{};
+
+    BlockMap blockMap{};
     //BlockMap lights{};
     //std::list<Sign> sign_list{};
 
     int faces{}; // n of faces
     //int sign_faces;
 
-    bool dirty;
+    //bool dirty;
     //const Attrib attrib;
 
     static constexpr int XZ_SIZE = Chunk::size * 3 + 2;
@@ -55,24 +55,24 @@ private:
 public:
     static constexpr int size = CHUNK_SIZE;
 
-    Chunk(const Model& model, const glm::vec2 &pq)
-    void draw();
+    Chunk(const Model& model, const glm::vec2 &pq);
+    void render();
     static constexpr int getSize();
-    static int getMinY();
-    static int getMaxY();
+    int getMinY() const;
+    int getMaxY() const;
     Tile getHighestBlock() const;
     const glm::ivec2 &getPq() const;
-    Tile get_block(const glm::ivec3& block_pos) const;
+    TileBlock get_block(const glm::ivec3& block_pos) const;
     bool operator!() const;
-    void gen_sign_buffer();
-    bool has_lights();
-    void set_dirt();
+    //void gen_sign_buffer();
+    //bool has_lights();
+    //void set_dirt();
 
     void compute_chunk(const WorkerItem &wi);
     void generate_chunk();
     void generate_buffer();
 
-
+    void set_block(const glm:ivec3& chunked_position, const TileBlock& w);
 };
 
 

@@ -33,7 +33,7 @@ BlockMap::const_iterator BlockMap::Iterator::operator->() {
     return map_it;
 }
 
-BlockMap::Iterator BlockMap::Iterator::operator++() {
+BlockMap::Iterator& BlockMap::Iterator::operator++() {
     ++map_it;
     return *this;
 }

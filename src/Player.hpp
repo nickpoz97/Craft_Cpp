@@ -8,7 +8,6 @@
 #include <string_view>
 #include <vec3.hpp>
 
-#include "Cube.hpp"
 #include "Model.hpp"
 #include "frustum.hpp"
 
@@ -34,9 +33,6 @@ private:
     static std::array<std::array<float,4>,6> light;
     static Tiles tiles;
 
-    Status actual_status;
-
-private:
     Status former_status1;
     Status former_status2;
 
@@ -50,6 +46,9 @@ private:
     int id;
 
     Frustum frustum;
+
+    Status actual_status;
+
 public:
     const Status &getActualStatus() const;
     const Frustum &getFrustum() const;

@@ -5,8 +5,9 @@
 #ifndef CPP_VERTEX_HPP
 #define CPP_VERTEX_HPP
 
-#include <vec4.hpp>
-#include <vec2.hpp>
+#include "vec4.hpp"
+#include "vec2.hpp"
+#include "mat4x4.hpp"
 
 struct Standard2DVertex{
     glm::vec2 position;

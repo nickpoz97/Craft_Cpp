@@ -33,7 +33,7 @@ public:
         Iterator(const const_iterator& it, const glm::ivec3& delta);
         value_type operator*() const;
         const_iterator operator->();
-        Iterator operator++();
+        Iterator& operator++();
         friend bool operator==(const Iterator& a, const Iterator& b);
         friend bool operator!=(const Iterator& a, const Iterator& b);
 

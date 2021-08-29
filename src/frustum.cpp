@@ -2,8 +2,9 @@
 // Created by ultimatenick on 17/08/21.
 //
 
-#include <geometric.hpp>
+#include "geometric.hpp"
 #include "frustum.hpp"
+#include "trigonometric.hpp"
 
 float Plane::distance(const glm::vec3 &other_point) const {
     auto v = other_point - point;
@@ -82,6 +83,15 @@ Frustum::Frustum(float w_far, float w_near, float h_far, float h_near, float nea
     h_near{h_near},
     near_dist{near_dist},
     far_dist{far_dist}
+{}
+
+Frustum::Frustum(float fov_degrees, float near_dist, float far_dist, float ratio) :
+    near_dist{near_dist},
+    far_dist{far_dist},
+    h_near{2.0f * static_cast<float>(near_dist * glm::tan(glm::radians(fov_degrees) / 2))},
+    h_far{2.0f * static_cast<float>(far_dist * glm::tan(glm::radians(fov_degrees) / 2))},
+    w_near{h_near * ratio},
+    w_far{h_far * ratio}
 {}
 
 SidePoints operator-(const SidePoints& s1, const SidePoints& s2){

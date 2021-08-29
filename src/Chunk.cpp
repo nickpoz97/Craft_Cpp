@@ -13,24 +13,24 @@ Chunk::Chunk(const Model &model, const glm::vec2 &pq) : model{model},  pq{pq} {
 
 };
 
-void Chunk::draw() {
-    //TODO implement method using CubicObject draw function
+void Chunk::render(const glm::mat4& transform) {
+    // TODO complete this
 }
 
 constexpr int Chunk::getSize() {
     return size;
 }
 
-int Chunk::getMinY() {
+int Chunk::getMinY() const{
     return min_y;
 }
 
-int Chunk::getMaxY() {
+int Chunk::getMaxY() const{
     return max_y;
 }
 
 Tile Chunk::getHighestBlock() const{
-    for(auto rit{map.rbegin()} ; rit != map.rend() ; ++rit){
+    for(auto rit{blockMap.rbegin()} ; rit != blockMap.rend() ; ++rit){
         if((rit->second).is_obstacle())
             return rit->second;
     }
@@ -41,12 +41,12 @@ const glm::ivec2 &Chunk::getPq() const {
     return pq;
 }
 
-Tile Chunk::get_block(const glm::ivec3& block_pos) const{
-    return map.at(block_pos);
+TileBlock Chunk::get_block(const glm::ivec3& block_pos) const{
+    return blockMap.at(block_pos);
 }
 
 bool Chunk::operator!() const {
-    return map.empty();
+    return blockMap.empty();
 }
 
 // checks if one of the neighbors has lights
@@ -74,7 +74,7 @@ bool Chunk::operator!() const {
     return false;
 }*/
 
-void Chunk::set_dirt() {
+/*void Chunk::set_dirt() {
     dirty = true;
     if(!has_lights()){
         return;
@@ -87,7 +87,7 @@ void Chunk::set_dirt() {
             }
         }
     }
-}
+}*/
 
 void Chunk::compute_chunk(const WorkerItem &wi) {
     std::vector<bool> opaque(XZ_SIZE * XZ_SIZE * Y_SIZE);
@@ -196,7 +196,7 @@ decltype(Chunk::local_buffer)::iterator Chunk::generate_geometry(const std::vect
 }
 
 void Chunk::generate_buffer() {
-    gpu_buffer.store_data(sizeof(local_buffer), reinterpret_cast<GLfloat*>(local_buffer.data()));
+    gpu_buffer.store_data(local_buffer);
 }
 
 void Chunk::generate_chunk() {
@@ -209,10 +209,14 @@ void Chunk::generate_chunk() {
                 auto it = model.get_chunk_at(pq + glm::ivec2{dp, dq});
                 c_ptr = (it != model.getChunks().end()) ? &(it->second) : nullptr;
             }
-            wi.block_maps[dp + 1][dq + 1] = (c_ptr) ? &c_ptr->map : nullptr;
+            wi.block_maps[dp + 1][dq + 1] = (c_ptr) ? &c_ptr->blockMap : nullptr;
         }
     }
 
     compute_chunk(wi);
     generate_buffer();
+}
+
+void Chunk::set_block(const glm::ivec3& position, const TileBlock& w) {
+    blockMap.set_tileBlock(position, w);
 }

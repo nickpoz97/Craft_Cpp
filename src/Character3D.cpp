@@ -48,7 +48,7 @@ Character3D::Character3D(const glm::vec3& position, float n, int face, char c){
     auto uv_it = uvs.begin();
 
     for(auto& v : vertices){
-        v.position = world_position + n * (*pos_it++)[face];
+        v.chunked_position = world_position + n * (*pos_it++)[face];
 
         const glm::vec2& uv_bool = (*uv_it++)[face];
         v.uv = {du + (uv_bool.x ? u2 : u1), dv + (uv_bool.y ? v2 : v1)};

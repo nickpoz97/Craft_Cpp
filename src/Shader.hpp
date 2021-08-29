@@ -8,19 +8,19 @@
 
 #include <string_view>
 #include "glad/glad.h"
-#include "Attrib.hpp"
+#include "AttributesWrapper.hpp"
 
 class Shader {
 private:
     std::string_view vs;
     std::string_view fs;
-    const Attrib& attrib;
+    const AttributesWrapper& attrib;
 public:
-    const Attrib &getAttrib() const;
+    const AttributesWrapper &getAttrib() const;
 
 private:
 
-    Shader(std::string_view vs, std::string_view fs, const Attrib& attrib);
+    Shader(std::string_view vs, std::string_view fs, const AttributesWrapper& attrib);
 };
 
 

@@ -15,6 +15,8 @@
 #include "costants.hpp"
 #include "map_utils.hpp"
 
+using Block = std::pair<glm::ivec3, TileBlock>;
+
 class Model {
     GLFWwindow* window;
 
@@ -58,16 +60,15 @@ private:
     int day_length;
     int time_changed;
 
-    std::array<TileBlock,2> blocks;
-    std::array<TileBlock,2> blocks_copies;
+    std::array<Block,2> blocks;
+    std::array<Block,2> blocks_copies;
 
     glm::mat4 model;
     glm::mat4 view;
     glm::mat4 proj;
-
 public:
-    static constexpr int chunked(float val);
-    static constexpr glm::ivec2 chunked(const glm::vec2& val);
+    constexpr glm::ivec2 chunked(const glm::vec3& position);
+    constexpr int chunked(int val);
 
     float get_day_time() const;
     float get_daylight() const;
@@ -78,10 +79,15 @@ public:
     int getScale() const;
     void delete_player();
     void set_player(const glm::vec3& position, const glm::vec2& rotation, std::string_view name, int id);
-    auto get_chunk_at = [&chunks](const glm::ivec2& pq){return chunks.find(pq)};
+    Chunk& get_chunk_at(const glm::ivec2& pq);
     static int get_chunk_distance(const glm::ivec2& pq1, const glm::ivec2& pq2);
     bool chunk_visible(const glm::ivec2& pq);
-    Tile highest_block(const glm::vec2& pq);
+    TileBlock highest_block(const glm::vec2& pq);
+    void set_block(const glm::ivec3& pos, const TileBlock& w);
+    void record_block(Block block);
+    TileBlock get_block(const glm::ivec3 position);
+    void builder_block(const glm::ivec3 &pos, BlockType w);
+    std::pair<bool, glm::ivec2> get_player_chunk();
 };
 
 

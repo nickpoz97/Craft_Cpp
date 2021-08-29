@@ -97,17 +97,16 @@ bool Model::chunk_visible(const glm::ivec2 &pq) {
     return false;
 }
 
-constexpr int Model::chunked(float val) {
-    return glm::floor(glm::round(val) / Chunk::getSize());
+constexpr glm::ivec2 Model::chunked(const glm::vec3& position) {
+    return {
+        chunked(position.x),
+        chunked(position.z)
+    };
 }
 
-Tile Model::highest_block(const glm::vec2& pq) {
+TileBlock Model::highest_block(const glm::vec2& pq) {
     const Chunk& chunk = chunks.at(pq);
     return chunk.getHighestBlock();
-}
-
-constexpr glm::ivec2 Model::chunked(const glm::vec2& val) {
-    return {chunked(val.x), chunked(val.y)};
 }
 
 const std::unordered_map<glm::ivec2, Chunk> &Model::getChunks() const {
@@ -119,3 +118,63 @@ int Model::get_chunk_distance(const glm::ivec2 &pq1, const glm::ivec2 &pq2) {
         return glm::max(glm::abs(delta.x), glm::abs(delta.y));
 }
 
+void Model::set_block(const glm::ivec3 &pos, const TileBlock &w) {
+    glm::ivec2 pq = chunked(pos);
+    int p = pq.x;
+    int q = pq.y;
+
+    get_chunk_at(pq).set_block(pos, w);
+    for (int dx = -1; dx <= 1; dx++) {
+        for (int dz = -1; dz <= 1; dz++) {
+            if (dx == 0 && dz == 0) {
+                continue;
+            }
+            if (dx && chunked(pos.x + dx) == p) {
+                continue;
+            }
+            if (dz && chunked(pos.z + dz) == q) {
+                continue;
+            }
+            get_chunk_at({p + dx, q + dz}).set_block({pos.x, pos.y, pos.z}, TileBlock{0});
+        }
+    }
+}
+
+Chunk &Model::get_chunk_at(const glm::ivec2 &pq) {
+    auto c_it = chunks.find(pq);
+    return (c_it != chunks.end()) ? c_it->second : chunks.emplace(pq, Chunk{*this,pq});
+}
+
+constexpr int Model::chunked(int val) {
+    return glm::floor(glm::round(val) / Chunk::getSize());
+}
+
+void Model::record_block(Block block) {
+    blocks[1] = blocks[0];
+    blocks[0] = block;
+}
+
+TileBlock Model::get_block(const glm::ivec3 position) {
+    auto result = chunks.find(chunked(position));
+    return (result != chunks.end()) ? result->second : TileBlock{};
+}
+
+void Model::builder_block(const glm::ivec3 &pos, BlockType w)  {
+    if (pos.y <= 0 || pos.y >= 256 || w == BlockType::EMPTY) {
+        return;
+    }
+    set_block(pos, TileBlock{});
+    /*if (get_block(pos).is_destructable()) {
+        set_block(pos, TileBlock{});
+    }*/
+    /*if (w != BlockType::EMPTY) {
+        set_block(pos, TileBlock{w});
+    }*/
+}
+
+std::pair<bool, glm::ivec2> Model::get_player_chunk() {
+    if(player){
+        return {true,chunked(player->getActualStatus().position)};
+    }
+    return {false, {}};
+}
