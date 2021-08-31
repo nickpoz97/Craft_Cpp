@@ -9,12 +9,10 @@
 #include "Model.hpp"
 #include "CubicObject.hpp"
 
-Chunk::Chunk(const Model &model, const glm::vec2 &pq) : model{model},  pq{pq} {
-
-};
+Chunk::Chunk(const Model &model, const glm::vec2 &pq) : model{model},  pq{pq} {};
 
 void Chunk::render(const glm::mat4& transform) {
-    // TODO complete this
+    gpu_buffer.draw_triangles(faces * INDICES_FACE_COUNT);
 }
 
 constexpr int Chunk::getSize() {
@@ -45,8 +43,8 @@ TileBlock Chunk::get_block(const glm::ivec3& block_pos) const{
     return blockMap.at(block_pos);
 }
 
-bool Chunk::operator!() const {
-    return blockMap.empty();
+Chunk::operator bool() const {
+    return !blockMap.empty();
 }
 
 // checks if one of the neighbors has lights
@@ -204,12 +202,11 @@ void Chunk::generate_chunk() {
 
     for (int dp = -1; dp <= 1; dp++) {
         for (int dq = -1; dq <= 1; dq++) {
-            const Chunk* c_ptr = this;
+            const Chunk& other = *this;
             if(dq || dp){
-                auto it = model.get_chunk_at(pq + glm::ivec2{dp, dq});
-                c_ptr = (it != model.getChunks().end()) ? &(it->second) : nullptr;
+                other = model.get_chunk_at(pq + glm::ivec2{dp, dq});
             }
-            wi.block_maps[dp + 1][dq + 1] = (c_ptr) ? &c_ptr->blockMap : nullptr;
+            wi.block_maps[dp + 1][dq + 1] = (other) ? other.blockMap : nullptr;
         }
     }
 

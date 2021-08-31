@@ -18,10 +18,17 @@
 using Block = std::pair<glm::ivec3, TileBlock>;
 
 class Model {
+    struct ShaderWrapper{
+        Shader block_shader;
+        Shader line_shader;
+        Shader sky_shader;
+    };
+
     GLFWwindow* window;
 
     std::array<Worker, WORKERS> workers;
     std::unordered_map<glm::ivec2, Chunk> chunks;
+    ShaderWrapper shaders;
 public:
     static constexpr bool show_light = SHOW_LIGHT;
     const std::unordered_map<glm::ivec2, Chunk> &getChunks() const;
@@ -31,11 +38,17 @@ private:
 
     int create_radius;
     int render_radius;
+public:
+    int getRenderRadius() const;
+
+    float getFov() const;
+
+private:
     int delete_radius;
     int sign_radius;
 
     std::unique_ptr<Player> player{nullptr};
-    int typing;
+    //int typing;
 
     char typing_buffer[MAX_TEXT_LENGTH];
     int message_index;
@@ -52,6 +65,7 @@ private:
     bool ortho;
 
     float fov;
+
     int suppress_char;
     int mode;
     int mode_changed;
@@ -63,7 +77,7 @@ private:
     std::array<Block,2> blocks;
     std::array<Block,2> blocks_copies;
 
-    glm::mat4 model;
+    //glm::mat4 model;
     glm::mat4 view;
     glm::mat4 proj;
 public:
@@ -87,7 +101,8 @@ public:
     void record_block(Block block);
     TileBlock get_block(const glm::ivec3 position);
     void builder_block(const glm::ivec3 &pos, BlockType w);
-    std::pair<bool, glm::ivec2> get_player_chunk();
+    glm::ivec2 get_player_pq();
+    void render_chunks();
 };
 
 

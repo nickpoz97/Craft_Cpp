@@ -47,7 +47,7 @@ void OpenglBuffer<CubeVertex>::set_vao_attributes() const {
                           STRIDE, (GLvoid *) offsetof(CubeVertex, uv));
     glVertexAttribPointer(attrib.normal, N_NORMAL_ELEMENTS<CubeVertex>::v, GL_FLOAT, GL_FALSE,
                           STRIDE, (GLvoid *) offsetof(CubeVertex, normal));
-    glVertexAttribPointer(attrib.matrix, N_MATRIX_ELEMENTS<CubeVertex>::v, GL_FLOAT, GL_FALSE,
+    glVertexAttribPointer(attrib.model_matrix, N_MATRIX_ELEMENTS<CubeVertex>::v, GL_FLOAT, GL_FALSE,
                           STRIDE, (GLvoid *) offsetof(CubeVertex, normal));
 }
 

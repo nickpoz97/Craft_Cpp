@@ -34,21 +34,22 @@ public:
 
 class Frustum {
     float near_dist, far_dist, h_near, h_far, w_near, w_far;
+    const Player& player;
 
     std::array<Plane,6> planes;
     static SidePoints compute_sidepoints(const glm::vec3 &up, const glm::vec3 &right, const glm::vec3 &view_pos,
                                          const glm::vec3& view_dir,
                                          float width, float height, float dist);
 public:
-    Frustum(float w_far, float w_near, float h_far, float h_near, float near_dist, float far_dist);
-    Frustum(float fov_degrees, float near_dist, float far_dist, float ratio);
-    void update(const Player& player, bool ortho);
+    //Frustum(float w_far, float w_near, float h_far, float h_near, float near_dist = 0.125, float far_dist);
+    Frustum(float fov_degrees, float near_dist, float far_dist, float ratio, const Player& player);
+    void update(bool ortho);
     bool is_inside(const glm::vec3& point) const;
 
     void set_frustum_persp(const glm::vec3 &up, const glm::vec3 &right, const glm::vec3 &view_pos,
                       const glm::vec3 &view_dir, const SidePoints &center_sidepoints);
-    void set_frustum_ortho(const glm::vec3 &up, const glm::vec3 &right, const glm::vec3 &view_pos,
-                      const glm::vec3 &view_dir, const SidePoints &center_sidepoints)
+    int set_frustum_ortho(const glm::vec3 &up, const glm::vec3 &right, const glm::vec3 &view_pos,
+                          const glm::vec3 &view_dir, const SidePoints &center_sidepoints)
 };
 
 #endif //CPP_FRUSTUM_HPP

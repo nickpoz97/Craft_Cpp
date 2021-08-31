@@ -12,18 +12,10 @@
 struct AttributesWrapper {
     using value_type = GLuint;
 
-    const GLuint program;
     const GLuint position;
     const GLuint normal;
     const GLuint uv;
-    const GLuint matrix;
-    const GLuint sampler;
-    const GLuint camera;
-    const GLuint timer;
-    const GLuint extra1;
-    const GLuint extra2;
-    const GLuint extra3;
-    const GLuint extra4;
+    const GLuint model_matrix;
 
     class Iterator : std::iterator<std::output_iterator_tag, value_type>{
     public:

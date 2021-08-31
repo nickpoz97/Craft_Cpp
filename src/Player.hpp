@@ -45,9 +45,9 @@ private:
     std::string_view name;
     int id;
 
-    Frustum frustum;
-
     Status actual_status;
+
+    Frustum frustum;
 
 public:
     const Status &getActualStatus() const;
@@ -60,7 +60,7 @@ public:
     glm::vec3 get_right_vector() const;
 
     void set_movement(int x, int z);
-    void update_player(const glm::vec3& new_position, const glm::vec2& new_rotation={}, bool interpolate={});
+    void update_player_status(const glm::vec3& new_position, const glm::vec2& new_rotation={}, bool interpolate={});
     void update_player(const Status& new_status, bool interpolate);
     void interpolate_player();
     void draw();

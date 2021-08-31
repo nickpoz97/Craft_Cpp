@@ -3,6 +3,7 @@
 //
 
 #include <cmath>
+#include <glad/glad.h>
 
 #include "Model.hpp"
 #include "Player.hpp"
@@ -172,9 +173,26 @@ void Model::builder_block(const glm::ivec3 &pos, BlockType w)  {
     }*/
 }
 
-std::pair<bool, glm::ivec2> Model::get_player_chunk() {
+glm::ivec2 Model::get_player_pq() {
     if(player){
-        return {true,chunked(player->getActualStatus().position)};
+        return chunked(player->getActualStatus().position);
     }
-    return {false, {}};
+    return {};
+}
+
+void Model::render_chunks() {
+    if(!player || !shaders.block_shader.get_id()){
+        return;
+    }
+    glm::ivec2 player_pq = get_player_pq();
+    int light = get_daylight();
+    shaders.block_shader.use();
+}
+
+int Model::getRenderRadius() const {
+    return render_radius;
+}
+
+float Model::getFov() const {
+    return fov;
 }

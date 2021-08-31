@@ -32,7 +32,7 @@ SidePoints Frustum::compute_sidepoints(const glm::vec3 &up, const glm::vec3 &rig
     };
 }
 
-void Frustum::update(const Player& player, bool ortho) {
+void Frustum::update(bool ortho) {
     const auto& up = player.get_up_vector();
     const auto& right = player.get_right_vector();
     const auto& view_pos = player.getActualStatus().position;
@@ -45,8 +45,10 @@ void Frustum::update(const Player& player, bool ortho) {
             near_dist + (far_dist - near_dist) / 2)
     };
 
-    set_frustum_persp(up, right, view_pos, view_dir, center_sidepoints);
-    set_frustum_ortho(up, right, view_pos, center_sidepoints);
+    if(ortho)
+        set_frustum_ortho(up, right, view_pos, view_dir, center_sidepoints);
+    else
+        set_frustum_persp(up, right, view_pos, view_dir, center_sidepoints);
 }
 
 // http://www.lighthouse3d.com/tutorials/view-frustum-culling/geometric-approach-extracting-the-planes/
@@ -76,22 +78,23 @@ int Frustum::set_frustum_ortho(const glm::vec3 &up, const glm::vec3 &right, cons
     }};
 }
 
-Frustum::Frustum(float w_far, float w_near, float h_far, float h_near, float near_dist, float far_dist) :
+/*Frustum::Frustum(float w_far, float w_near, float h_far, float h_near, float near_dist, float far_dist) :
     w_far{w_far},
     w_near{w_near},
     h_far{h_far},
     h_near{h_near},
     near_dist{near_dist},
     far_dist{far_dist}
-{}
+{}*/
 
-Frustum::Frustum(float fov_degrees, float near_dist, float far_dist, float ratio) :
+Frustum::Frustum(float fov_degrees, float near_dist, float far_dist, float ratio, const Player& player) :
     near_dist{near_dist},
     far_dist{far_dist},
     h_near{2.0f * static_cast<float>(near_dist * glm::tan(glm::radians(fov_degrees) / 2))},
     h_far{2.0f * static_cast<float>(far_dist * glm::tan(glm::radians(fov_degrees) / 2))},
     w_near{h_near * ratio},
-    w_far{h_far * ratio}
+    w_far{h_far * ratio},
+    player{player}
 {}
 
 SidePoints operator-(const SidePoints& s1, const SidePoints& s2){

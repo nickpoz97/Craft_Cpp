@@ -7,7 +7,7 @@
 #include <ext/matrix_transform.hpp>
 
 #include "Player.hpp"
-#include "Cube.hpp"
+#include "frustum.hpp"
 #include "costants.hpp"
 
 decltype(Player::ao) Player::ao = {};
@@ -31,7 +31,14 @@ Player::Player(const Model &model, std::string_view name, int id, const glm::vec
     model{model},
     playerCube{tiles, ao, light},
     name{name},
-    id{id}
+    id{id},
+    frustum{
+        model.getFov(),
+        0.125,
+        model.getRenderRadius() * 32 + 64,
+        model.getWidth() / model.getHeight(),
+        *this
+    }
     {
 
     glm::mat4 transform = glm::translate(glm::mat4{1.0f}, position);
@@ -39,6 +46,7 @@ Player::Player(const Model &model, std::string_view name, int id, const glm::vec
     transform = glm::rotate(transform, rotation.x, {1, 0, 0});
 
     playerCube.apply_transform(transform);
+    frustum.update(false);
 }
 
 glm::vec3 Player::get_motion_vector() const{
@@ -92,7 +100,7 @@ void Player::draw() {
     playerCube.draw_triangles();
 }
 
-void Player::update_player(const glm::vec3 &new_position, const glm::vec2 &new_rotation, bool interpolate) {
+void Player::update_player_status(const glm::vec3 &new_position, const glm::vec2 &new_rotation, bool interpolate) {
     if(interpolate){
         former_status1 = former_status2;
         former_status2 = {new_position, new_rotation, glfwGetTime()};
@@ -122,7 +130,7 @@ void Player::interpolate_player() {
 }
 
 void Player::update_player(const Status& new_status, bool interpolate) {
-    update_player(new_status.position, new_status.rotation, interpolate);
+    update_player_status(new_status.position, new_status.rotation, interpolate);
 }
 
 glm::vec3 Player::get_right_vector() const{

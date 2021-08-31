@@ -56,14 +56,14 @@ public:
     static constexpr int size = CHUNK_SIZE;
 
     Chunk(const Model& model, const glm::vec2 &pq);
-    void render();
+    void render(const glm::mat4& transform);
     static constexpr int getSize();
     int getMinY() const;
     int getMaxY() const;
     Tile getHighestBlock() const;
     const glm::ivec2 &getPq() const;
     TileBlock get_block(const glm::ivec3& block_pos) const;
-    bool operator!() const;
+    operator bool() const;
     //void gen_sign_buffer();
     //bool has_lights();
     //void set_dirt();

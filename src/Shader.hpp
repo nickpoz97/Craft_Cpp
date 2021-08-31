@@ -8,19 +8,19 @@
 
 #include <string_view>
 #include "glad/glad.h"
-#include "AttributesWrapper.hpp"
+#include "UniformsWrapper.hpp"
 
-class Shader {
+struct Shader {
 private:
-    std::string_view vs;
-    std::string_view fs;
-    const AttributesWrapper& attrib;
+    GLuint id;
+    int build_shader(std::string_view code_path);
+
 public:
-    const AttributesWrapper &getAttrib() const;
+    const UniformWrapper& uniforms;
+    void use();
 
-private:
-
-    Shader(std::string_view vs, std::string_view fs, const AttributesWrapper& attrib);
+    Shader(std::string_view vs_path, std::string_view fs_path, const UniformWrapper& uniforms);
+    GLuint get_id() const;
 };
 
 
