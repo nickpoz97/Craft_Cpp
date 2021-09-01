@@ -4,9 +4,11 @@
 
 #include <cmath>
 #include <glad/glad.h>
+#include <gtc/matrix_transform.hpp>
 
 #include "Model.hpp"
 #include "Player.hpp"
+#include "trigonometric.hpp"
 
 float Model::get_day_time() const {
     if (day_length <= 0) {
@@ -175,7 +177,7 @@ void Model::builder_block(const glm::ivec3 &pos, BlockType w)  {
 
 glm::ivec2 Model::get_player_pq() {
     if(player){
-        return chunked(player->getActualStatus().position);
+        return chunked(player->get_position());
     }
     return {};
 }
@@ -184,9 +186,31 @@ void Model::render_chunks() {
     if(!player || !shaders.block_shader.get_id()){
         return;
     }
+
+    const Shader& shader = shaders.block_shader;
+    shader.use();
+
     glm::ivec2 player_pq = get_player_pq();
     int light = get_daylight();
-    shaders.block_shader.use();
+    glm::mat4 viewproj{
+        glm::perspective(glm::radians(fov), static_cast<float>(width)/(height), z_near, z_far) *
+        glm::lookAt(player->get_position(), player->get_position() + player->get_camera_direction_vector(), {0,1,0})
+    };
+
+    shader.set_viewproj(viewproj);
+    shader.set_camera(player->get_position());
+    shader.set_sampler(0);
+    shader.set_timer(get_day_time());
+    shader.set_extra(1, 2);
+    shader.set_extra(2, light);
+    shader.set_extra(3, render_radius * Chunk::size);
+    shader.set_extra(4, ortho);
+
+    for(const auto& c : chunks){
+        if(c.is_visible(player->getFrustum()) && get_chunk_distance(player_pq, c.pq) < render_radius){
+            c.render();
+        }
+    }
 }
 
 int Model::getRenderRadius() const {

@@ -49,7 +49,7 @@ public:
     void set_frustum_persp(const glm::vec3 &up, const glm::vec3 &right, const glm::vec3 &view_pos,
                       const glm::vec3 &view_dir, const SidePoints &center_sidepoints);
     int set_frustum_ortho(const glm::vec3 &up, const glm::vec3 &right, const glm::vec3 &view_pos,
-                          const glm::vec3 &view_dir, const SidePoints &center_sidepoints)
+                          const glm::vec3 &view_dir, const SidePoints &center_sidepoints);
 };
 
 #endif //CPP_FRUSTUM_HPP

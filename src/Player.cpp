@@ -9,6 +9,7 @@
 #include "Player.hpp"
 #include "frustum.hpp"
 #include "costants.hpp"
+#include "Wrapper.hpp"
 
 decltype(Player::ao) Player::ao = {};
 decltype(Player::light) Player::light = {{
@@ -271,6 +272,10 @@ bool Player::insersects_block(int height, const glm::ivec3& block_pos) {
         }
     }
     return false;
+}
+
+const glm::vec3 &Player::get_position() const {
+    return actual_status.position;
 }
 
 Status operator+(const Status &a, const Status &b) {

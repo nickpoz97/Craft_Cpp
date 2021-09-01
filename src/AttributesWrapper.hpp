@@ -8,29 +8,8 @@
 
 #include "glad/glad.h"
 #include "Shader.hpp"
+#include "Wrapper.hpp"
 
-struct AttributesWrapper {
-    using value_type = GLuint;
 
-    const GLuint position;
-    const GLuint normal;
-    const GLuint uv;
-    const GLuint model_matrix;
-
-    class Iterator : std::iterator<std::output_iterator_tag, value_type>{
-    public:
-        Iterator(const value_type* actual_attribute);
-        const value_type& operator*();
-        const value_type* operator->();
-        Iterator& operator++();
-        friend bool operator==(const Iterator& a, const Iterator& b);
-        friend bool operator!=(const Iterator& a, const Iterator& b);
-    private:
-        const value_type* actual_attribute;
-    };
-
-    Iterator begin() const;
-    Iterator end() const;
-};
 
 #endif //CPP_ATTRIBUTESWRAPPER_HPP

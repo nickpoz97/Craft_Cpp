@@ -23,27 +23,19 @@ class Model {
         Shader line_shader;
         Shader sky_shader;
     };
+private:
 
     GLFWwindow* window;
-
     std::array<Worker, WORKERS> workers;
     std::unordered_map<glm::ivec2, Chunk> chunks;
     ShaderWrapper shaders;
-public:
-    static constexpr bool show_light = SHOW_LIGHT;
-    const std::unordered_map<glm::ivec2, Chunk> &getChunks() const;
-
-private:
     std::array<std::string_view, MAX_MESSAGES> messages;
 
     int create_radius;
-    int render_radius;
-public:
-    int getRenderRadius() const;
+    static constexpr int render_radius = RENDER_CHUNK_RADIUS;
 
-    float getFov() const;
-
-private:
+    static constexpr float z_near = 0.125f;
+    static constexpr float z_far = static_cast<float>(render_radius) * 32 + 64
     int delete_radius;
     int sign_radius;
 
@@ -103,6 +95,10 @@ public:
     void builder_block(const glm::ivec3 &pos, BlockType w);
     glm::ivec2 get_player_pq();
     void render_chunks();
+    int getRenderRadius() const;
+    float getFov() const;
+    static constexpr bool show_light = SHOW_LIGHT;
+    const std::unordered_map<glm::ivec2, Chunk> &getChunks() const;
 };
 
 

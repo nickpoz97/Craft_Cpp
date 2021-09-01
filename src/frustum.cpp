@@ -8,7 +8,7 @@
 
 float Plane::distance(const glm::vec3 &other_point) const {
     auto v = other_point - point;
-    return glm::length(v * normal);
+    return glm::dot(v, normal);
 }
 
 Plane::Plane(const glm::vec3& point, const glm::vec3 normal) : point{point}, normal{normal}{}
@@ -35,7 +35,7 @@ SidePoints Frustum::compute_sidepoints(const glm::vec3 &up, const glm::vec3 &rig
 void Frustum::update(bool ortho) {
     const auto& up = player.get_up_vector();
     const auto& right = player.get_right_vector();
-    const auto& view_pos = player.getActualStatus().position;
+    const auto& view_pos = player.get_position();
     const auto& view_dir = player.get_camera_direction_vector();
 
     auto center_sidepoints{compute_sidepoints(

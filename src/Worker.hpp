@@ -20,7 +20,7 @@ public:
     //const bool load;
     int n_faces{};
 
-    std::array<std::array<std::shared_ptr<BlockMap>,3>,3> block_maps{};
+    std::array<std::array<BlockMap*,3>,3> block_maps{};
     //std::array<std::array<BlockMap,3>,3> light_maps;
 
     bool has_light() const;

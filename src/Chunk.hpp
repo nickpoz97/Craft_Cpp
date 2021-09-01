@@ -25,10 +25,10 @@ private:
     std::vector<CubeVertex> local_buffer{};
 
     const Model& model;
-    const glm::ivec2 pq;
 
     int min_y{};
     int max_y{};
+    std::array<glm::vec3, 4> xz_boundaries;
 
     BlockMap blockMap{};
     //BlockMap lights{};
@@ -46,6 +46,7 @@ private:
     static constexpr int Y_SIZE = 258;
     static constexpr auto XYZ = [](int x, int y, int z){ return y * XZ_SIZE * XZ_SIZE + x * XZ_SIZE + z; };
     static constexpr auto XZ = [](int x, int z){ return XYZ(x,0,z); };
+    static std::array<glm::vec3, 4> get_xz_boundaries(const glm::vec2 &pq);
 
     void populate_opaque(const WorkerItem &wi, const glm::ivec3 &o, const std::vector<bool>& opaque, const std::vector<char>& highest) const;
     void count_exposed_faces(const BlockMap& map, std::vector<bool> opaque, const glm::ivec3& o);
@@ -53,10 +54,11 @@ private:
                                                        const std::vector<char> &highest, const glm::vec3& v, TileBlock w);
     //static void void light_fill(std::vector<char>& opaque, std::vector<char>& light, const glm::vec3& v, int w, bool force);
 public:
+    const glm::ivec2 pq;
     static constexpr int size = CHUNK_SIZE;
 
     Chunk(const Model& model, const glm::vec2 &pq);
-    void render(const glm::mat4& transform);
+    void render();
     static constexpr int getSize();
     int getMinY() const;
     int getMaxY() const;
@@ -73,6 +75,7 @@ public:
     void generate_buffer();
 
     void set_block(const glm:ivec3& chunked_position, const TileBlock& w);
+    bool is_visible(const Frustum& frustum) const;
 };
 
 

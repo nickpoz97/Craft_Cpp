@@ -17,6 +17,7 @@ static constexpr int MAX_LINE_LENGTH = 1024;
 static constexpr int INDICES_FACE_COUNT = 6;
 static constexpr int VERTICES_FACE_COUNT = 4;
 static constexpr float N = 0.5f;
+static constexpr int RENDER_CHUNK_RADIUS = 4;
 
 // config
 static constexpr bool SHOW_LIGHT = true;

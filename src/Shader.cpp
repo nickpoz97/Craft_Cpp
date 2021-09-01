@@ -4,9 +4,11 @@
 
 #include <fstream>
 #include <sstream>
+#include <vec3.hpp>
+#include <gtc/type_ptr.hpp>
 #include "Shader.hpp"
 
-Shader::Shader(std::string_view vs_path, std::string_view fs_path, const UniformWrapper &uniforms) : uniforms{uniforms} {
+Shader::Shader(std::string_view vs_path, std::string_view fs_path) {
     unsigned vs_id = build_shader(vs_path);
     unsigned fs_id = build_shader(fs_path);
 
@@ -16,13 +18,15 @@ Shader::Shader(std::string_view vs_path, std::string_view fs_path, const Uniform
     glLinkProgram(id);
     glDeleteProgram(vs_id);
     glDeleteProgram(fs_id);
+
+    get_uniforms_location();
 }
 
 GLuint Shader::get_id() const {
     return id;
 }
 
-void Shader::use() {
+void Shader::use() const{
     glUseProgram(id);
 }
 
@@ -39,4 +43,57 @@ int Shader::build_shader(std::string_view path) {
     unsigned id = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(id, 1, &(code_c_string), NULL);
     glCompileShader(id);
+}
+
+void Shader::get_uniforms_location() {
+    for(auto& u : uniforms){
+        u.first = glGetUniformLocation(id, u.second.data());
+    }
+}
+
+void Shader::set_camera(const glm::vec3 &camera_pos) const {
+    glUniform3fv(static_cast<GLint>(uniforms.camera.first), 1, glm::value_ptr(camera_pos));
+}
+
+void Shader::set_sampler(int sampler) const{
+    glUniform1i(static_cast<GLint>(uniforms.camera.first), sampler);
+}
+
+void Shader::set_timer(float timer) const{
+    glUniform1i(static_cast<GLint>(uniforms.timer.first), timer);
+}
+
+template<typename GLtype>
+void Shader::set_extra(int extra_suffix, GLtype value) const{
+    if(extra_suffix < 1 || extra_suffix > 4){
+        return;
+    }
+    switch (extra_suffix) {
+        case 1:
+            _set_extra(uniforms.extra1, value);
+        break;
+        case 2:
+            _set_extra(uniforms.extra2, value);
+        break;
+        case 3:
+            _set_extra(uniforms.extra3, value);
+        break;
+        case 4:
+            _set_extra(uniforms.extra4, value);
+        break;
+    }
+}
+
+void Shader::set_viewproj(const glm::mat4& m) const{
+    glUniformMatrix4fv(uniforms.viewproj_matrix, glm::value_ptr(m));
+}
+
+template<>
+void Shader::_set_extra<float>(int u_location, float val) const{
+    glUniform1f(u_location, val);
+}
+
+template<>
+void Shader::_set_extra<int>(int u_location, int val) const{
+    glUniform1i(u_location, val);
 }

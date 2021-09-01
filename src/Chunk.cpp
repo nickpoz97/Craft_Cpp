@@ -9,9 +9,11 @@
 #include "Model.hpp"
 #include "CubicObject.hpp"
 
-Chunk::Chunk(const Model &model, const glm::vec2 &pq) : model{model},  pq{pq} {};
+Chunk::Chunk(const Model &model, const glm::vec2 &pq) : model{model},  pq{pq},
+    xz_boundaries{get_xz_boundaries()}
+{};
 
-void Chunk::render(const glm::mat4& transform) {
+void Chunk::render() {
     gpu_buffer.draw_triangles(faces * INDICES_FACE_COUNT);
 }
 
@@ -212,6 +214,30 @@ void Chunk::generate_chunk() {
 
     compute_chunk(wi);
     generate_buffer();
+}
+
+std::array<glm::vec3, 4> Chunk::get_xz_boundaries(const glm::vec2 &pq) {
+    glm::vec3 min{pq[0] * Chunk::size - 1.0f, 0, pq[1] * Chunk::size - 1.0f};
+    glm::vec3 max{min + static_cast<float>(Chunk::size + 1) * glm::vec3{1,0,1}};
+
+    return {{
+        {min.x, 0, min.z},
+        {max.x, 0, min.z},
+        {min.x, 0, max.z},
+        {max.x, 0, max.z}
+    }};
+}
+
+bool Chunk::is_visible(const Frustum& frustum) const {
+    for(const auto& p : xz_boundaries){
+        bool is_inside = frustum.is_inside(p + static_cast<float>(min_y));
+        if(is_inside) {return true;}
+    }
+    for(const auto& p : xz_boundaries){
+        bool is_inside = frustum.is_inside(p + static_cast<float>(max_y));
+        if(is_inside) {return true;}
+    }
+    return false;
 }
 
 void Chunk::set_block(const glm::ivec3& position, const TileBlock& w) {

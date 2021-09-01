@@ -51,6 +51,7 @@ private:
 
 public:
     const Status &getActualStatus() const;
+    const glm::vec3& get_position() const;
     const Frustum &getFrustum() const;
 
     Player(const Model &model, std::string_view name, int id, const glm::vec3 &position, const glm::vec2 &rotation);
