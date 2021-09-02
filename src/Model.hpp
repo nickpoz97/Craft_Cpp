@@ -30,6 +30,7 @@ private:
     std::unordered_map<glm::ivec2, Chunk> chunks;
     ShaderWrapper shaders;
     std::array<std::string_view, MAX_MESSAGES> messages;
+    static const Sphere sky;
 
     int create_radius;
     static constexpr int render_radius = RENDER_CHUNK_RADIUS;
@@ -70,11 +71,12 @@ private:
     std::array<Block,2> blocks_copies;
 
     //glm::mat4 model;
-    glm::mat4 view;
-    glm::mat4 proj;
+    glm::mat4 viewproj;
+
+    void update_viewproj();
 public:
-    constexpr glm::ivec2 chunked(const glm::vec3& position);
-    constexpr int chunked(int val);
+    static constexpr glm::ivec2 chunked(const glm::vec3& position);
+    static constexpr int chunked(int val);
 
     float get_day_time() const;
     float get_daylight() const;
@@ -93,12 +95,13 @@ public:
     void record_block(Block block);
     TileBlock get_block(const glm::ivec3 position);
     void builder_block(const glm::ivec3 &pos, BlockType w);
-    glm::ivec2 get_player_pq();
     void render_chunks();
+    void render_sky() const;
     int getRenderRadius() const;
     float getFov() const;
     static constexpr bool show_light = SHOW_LIGHT;
     const std::unordered_map<glm::ivec2, Chunk> &getChunks() const;
+    void render_wireframe();
 };
 
 

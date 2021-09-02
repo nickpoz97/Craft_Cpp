@@ -12,27 +12,26 @@
 #include "OpenglBuffer.hpp"
 #include "TileBlock.hpp"
 
-using vertex_iterator = std::vector<CubeVertex>::iterator;
-
 template<typename VertexType>
 class GameObject{
 private:
     glm::mat4 transform_matrix{1.0};
 protected:
-    vertex_iterator begin;
-    vertex_iterator end;
+    using vertex_iterator_type = typename std::vector<VertexType>::iterator;
+    vertex_iterator_type begin;
+    vertex_iterator_type end;
 public:
-    vertex_iterator get_end() const;
+    vertex_iterator_type get_end() const;
 
 public:
-    explicit GameObject(const vertex_iterator& begin_it, int n_vertices);
+    explicit GameObject(const vertex_iterator_type& begin_it, int n_vertices);
 };
 
 template<typename VertexType>
-GameObject<VertexType>::GameObject(const vertex_iterator& begin_it, int n_vertices) : begin{begin_it}, end{begin_it + n_vertices}{}
+GameObject<VertexType>::GameObject(const vertex_iterator_type& begin_it, int n_vertices) : begin{begin_it}, end{begin_it + n_vertices}{}
 
 template<typename VertexType>
-vertex_iterator GameObject<VertexType>::get_end() const {
+typename GameObject<VertexType>::vertex_iterator_type GameObject<VertexType>::get_end() const {
     return end;
 }
 

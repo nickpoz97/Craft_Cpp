@@ -10,7 +10,7 @@
 
 template<unsigned n_faces>
 CubicObject<n_faces>::CubicObject(const BlockType &block_type, const std::array<bool, 6> &visible_faces, const glm::mat4& transform,
-                                  vertex_iterator vertices_it) :
+                                  vertex_iterator_type vertices_it) :
 SuperClass(vertices_it, std::accumulate(visible_faces.begin(), visible_faces.end(), 0) * INDICES_FACE_COUNT) {
     TileBlock tile_block{block_type};
 
@@ -43,7 +43,7 @@ SuperClass(vertices_it, std::accumulate(visible_faces.begin(), visible_faces.end
 }
 
 Plant::Plant(const BlockType &block_type, const std::array<bool, 6> &visible_faces, const glm::vec3 &position,
-             float rotation, GameObject::vertex_iterator vertices_it) :
+             float rotation, GameObject::vertex_iterator_type vertices_it) :
                 super(block_type, visible_faces, get_transform_matrix(position, rotation), vertices_it)
              {}
 
@@ -55,7 +55,7 @@ glm::mat4 Plant::get_transform_matrix(const glm::vec3 &position, float rotation)
 }
 
 Cube::Cube(const BlockType &block_type, const std::array<bool, 6> &visible_faces, const glm::vec3 &position,
-           GameObject::vertex_iterator vertices_it) :
+           GameObject::vertex_iterator_type vertices_it) :
                 super(block_type, visible_faces, get_transform_matrix(position), vertices_it)
            {}
 

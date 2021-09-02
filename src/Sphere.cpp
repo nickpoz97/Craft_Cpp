@@ -23,57 +23,65 @@ decltype(Sphere::uvs) Sphere::uvs{{
         {0, 1}, {0, 0.5}
 }};
 
-Sphere::Sphere(float r, int detail) : vertices(8 * pow(4, detail) * 24), r{r}{
+Sphere::Sphere(float r, int detail) : r{r}{
+    std::vector<Uv3DVertex> vertices(8 * pow(4, detail) * 24);
+    auto it = vertices.begin();
+
     for(const auto& ti : triangles_indices){
         const std::array<glm::vec3, 3> actual_pos {positions[ti[0]], positions[ti[1]], positions[ti[2]]};
         const std::array<glm::vec2, 3> actual_uvs {uvs[ti[0]], uvs[ti[1]], uvs[ti[2]]};
 
-        rec_gen_sphere(detail, actual_pos, actual_uvs, vertices.begin());
+        it = rec_gen_sphere(detail, actual_pos, actual_uvs, it);
     }
+
+    gpu_buffer.store_data(vertices);
 }
 
-void Sphere::rec_gen_sphere(int detail, const std::array<glm::vec3, 3> &actual_pos,
-                            const std::array<glm::vec2, 3> &actual_uvs,
-                            std::vector<Uv3DVertex>::iterator &&it) {
+Sphere::iterator_type Sphere::rec_gen_sphere(int detail, const std::array<glm::vec3, 3> &actual_pos_triangle,
+                                             const std::array<glm::vec2, 3> &actual_uvs_triangle,
+                                             iterator_type it) {
     if(detail == 0){
-        store_vertices(actual_pos, actual_uvs, it);
+        it = store_vertices(actual_pos_triangle, actual_uvs_triangle, it);
+        return it;
     }
-    else{
-        const auto& a{actual_pos[0]};
-        const auto& b{actual_pos[1]};
-        const auto& c{actual_pos[2]};
+    const auto& a{actual_pos_triangle[0]};
+    const auto& b{actual_pos_triangle[1]};
+    const auto& c{actual_pos_triangle[2]};
 
-        const auto& uv_a{actual_uvs[0]};
-        const auto& uv_b{actual_uvs[1]};
-        const auto& uv_c{actual_uvs[2]};
+    const auto& uv_a{actual_uvs_triangle[0]};
+    const auto& uv_b{actual_uvs_triangle[1]};
+    const auto& uv_c{actual_uvs_triangle[2]};
 
-        auto ab{0.5f * (a + b)};
-        auto ac{0.5f * (a + c)};
-        auto bc{0.5f * (b + c)};
+    auto ab{0.5f * (a + b)};
+    auto ac{0.5f * (a + c)};
+    auto bc{0.5f * (b + c)};
 
-        auto uv_ab{glm::vec2{0, 1 - acosf(ab.y) / PI}};
-        auto uv_ac{glm::vec2{0, 1 - acosf(ac.y) / PI}};
-        auto uv_bc{glm::vec2{0, 1 - acosf(bc.y) / PI}};
+    auto uv_ab{glm::vec2{0, 1 - acosf(ab.y) / PI}};
+    auto uv_ac{glm::vec2{0, 1 - acosf(ac.y) / PI}};
+    auto uv_bc{glm::vec2{0, 1 - acosf(bc.y) / PI}};
 
-        rec_gen_sphere(detail - 1, {a, ab, ac}, {uv_a, uv_ab, uv_ac}, std::vector<Uv3DVertex>::iterator());
-        rec_gen_sphere(detail - 1, {b, bc, ab}, {uv_b, uv_bc, uv_ab}, std::vector<Uv3DVertex>::iterator());
-        rec_gen_sphere(detail - 1, {c, ac, bc}, {uv_c, uv_ac, uv_bc}, std::vector<Uv3DVertex>::iterator());
-        rec_gen_sphere(detail - 1, {ab, bc, ac}, {uv_ab, uv_bc, uv_ac}, std::vector<Uv3DVertex>::iterator());
-    }
+    it = rec_gen_sphere(detail - 1, {a, ab, ac}, {uv_a, uv_ab, uv_ac}, it);
+    it = rec_gen_sphere(detail - 1, {b, bc, ab}, {uv_b, uv_bc, uv_ab}, it);
+    it = rec_gen_sphere(detail - 1, {c, ac, bc}, {uv_c, uv_ac, uv_bc}, it);
+    it = rec_gen_sphere(detail - 1, {ab, bc, ac}, {uv_ab, uv_bc, uv_ac}, it);
+    return it;
 }
 
-void Sphere::store_vertices(const std::array<glm::vec3, 3> &actual_pos, const std::array<glm::vec2, 3> &actual_uvs,
-                            std::vector<Uv3DVertex>::iterator &it) {
+Sphere::iterator_type Sphere::store_vertices(const std::array<glm::vec3, 3> &actual_pos_triangle, const std::array<glm::vec2, 3> &actual_uvs_triangle,
+                                             iterator_type it) {
 
-    auto pos_it {actual_pos.begin()};
-    auto uvs_it {actual_uvs.begin()};
+    auto pos_it {actual_pos_triangle.begin()};
+    auto uvs_it {actual_uvs_triangle.begin()};
 
-    for(;
-        pos_it != actual_pos.end();
-        ++pos_it, ++uvs_it
+    for(; pos_it != actual_pos_triangle.end(); ++pos_it, ++uvs_it
     ){
-        glm::vec4 final_pos{r * (*pos_it), 1};
-        *it = {final_pos, *uvs_it};
-        ++it;
+        glm::vec3 final_pos{r * (*pos_it)};
+        *(it++) = {final_pos, *uvs_it};
     }
+    // next pos on buffer
+    return it;
+}
+
+void Sphere::render() const{
+    gpu_buffer.draw_triangles();
 }

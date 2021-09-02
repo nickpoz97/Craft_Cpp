@@ -24,12 +24,20 @@ decltype(CubeWireframe::indices) CubeWireframe::indices{
     }
 };
 
-CubeWireframe::CubeWireframe() : vertices(N_INDICES){
+CubeWireframe::CubeWireframe(const glm::vec3 &position) {
+    std::vector<Standard3DVertex> vertices(N_INDICES);
+
     decltype(indices)::iterator ii;
     decltype(vertices)::iterator iv;
 
     for(ii = indices.begin(), iv = vertices.begin() ; ii != indices.end() ; ++ii, ++iv){
-        *iv = local_vertex_positions[*ii] * N;
+        iv->position = position + local_vertex_positions[*ii] * N;
     }
+
+    gpu_Buffer.store_data(vertices);
+}
+
+void CubeWireframe::render() const {
+    gpu_Buffer.draw_lines()
 }
 

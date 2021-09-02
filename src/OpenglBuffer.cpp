@@ -14,25 +14,18 @@ OpenglBuffer<VertexType>::OpenglBuffer(){
 }
 
 template<typename VertexType>
-void OpenglBuffer<VertexType>::store_data(GLsizei size, const GLfloat* const data) const {
-    glBindBuffer(GL_ARRAY_BUFFER, id);
-    glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind
-}
-
-template<typename VertexType>
 OpenglBuffer<VertexType>::~OpenglBuffer() {
     glDeleteBuffers(1, &id);
 }
 
 template<typename VertexType>
-void OpenglBuffer<VertexType>::draw_triangles(int count) const{
+void OpenglBuffer<VertexType>::draw_triangles() const{
     glBindBuffer(GL_ARRAY_BUFFER, id);
     for(auto a : attrib){
         if(a != 0) {glEnableVertexAttribArray(a);};
     }
     set_vao_attributes(attrib);
-    glDrawArrays(GL_TRIANGLES, 0, count);
+    glDrawArrays(GL_TRIANGLES, 0, n_indices);
     for(auto a : attrib){
         if(a != 0) {glDisableVertexAttribArray(a);};
     }
@@ -60,17 +53,21 @@ void OpenglBuffer<Uv3DVertex>::set_vao_attributes() const{
 }
 
 template<typename VertexType>
-void OpenglBuffer<VertexType>::draw_lines(int components, int count) const{
+void OpenglBuffer<VertexType>::draw_lines(const std::vector<VertexType>& buffer) const{
     glBindBuffer(GL_ARRAY_BUFFER, id);
     glEnableVertexAttribArray(attrib.position);
     glVertexAttribPointer(
-            attrib.position, components, GL_FLOAT, GL_FALSE, 0, 0);
-    glDrawArrays(GL_LINES, 0, count);
+            attrib.position, N_POS_ELEMENTS<VertexType>::v, GL_FLOAT, GL_FALSE, 0, 0);
+    glDrawArrays(GL_LINES, 0, buffer.size());
     glDisableVertexAttribArray(attrib.position);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 template<typename VertexType>
-void OpenglBuffer<VertexType>::store_data(const std::vector<VertexType> &buffer) {
-    store_data(sizeof(buffer), reinterpret_cast<GLfloat*>(buffer.data()));
+void OpenglBuffer<VertexType>::store_data(const std::vector<VertexType> &buffer) const{
+    glBindBuffer(GL_ARRAY_BUFFER, id);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(buffer), reinterpret_cast<GLfloat*>(buffer.data()), GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind
+
+    n_indices = buffer.size();
 }

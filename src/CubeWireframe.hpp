@@ -17,9 +17,10 @@ private:
     static std::array<glm::vec3, N_VERTICES> local_vertex_positions;
     static std::array<int, N_INDICES> indices;
 
-    std::vector<glm::vec3> vertices;
+    OpenglBuffer<Standard3DVertex> gpu_Buffer;
 public:
-    CubeWireframe();
+    CubeWireframe(const glm::vec3 &position);
+    void render() const;
 };
 
 

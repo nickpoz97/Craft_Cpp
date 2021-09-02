@@ -10,7 +10,6 @@
 
 #include "CubicObject.hpp"
 
-//TODO update mathematics
 class Sphere{
 private:
     static constexpr int N_TRIANGLES = 8;
@@ -19,17 +18,17 @@ private:
     static std::array<glm::vec3,6> positions;
     static std::array<glm::vec2,6> uvs;
 
-    std::vector<Uv3DVertex> vertices;
     const float r;
+    const OpenglBuffer<Uv3DVertex> gpu_buffer;
 
-    void
-    rec_gen_sphere(int detail, const std::array<glm::vec3, 3> &actual_pos, const std::array<glm::vec2, 3> &actual_uvs,
-                   std::vector<Uv3DVertex>::iterator &&it);
-    void store_vertices(const std::array<glm::vec3, 3> &actual_pos, const std::array<glm::vec2, 3> &actual_uvs,
-                        std::vector<Uv3DVertex>::iterator &it);
-
+    using iterator_type = std::vector<Uv3DVertex>::iterator;
+    iterator_type rec_gen_sphere(int detail, const std::array<glm::vec3, 3> &actual_pos_triangle, const std::array<glm::vec2, 3> &actual_uvs_triangle,
+                                 iterator_type it);
+    iterator_type store_vertices(const std::array<glm::vec3, 3> &actual_pos_triangle, const std::array<glm::vec2, 3> &actual_uvs_triangle,
+                                 iterator_type it);
 public:
     Sphere(float r, int detail);
+    void render() const;
 };
 
 

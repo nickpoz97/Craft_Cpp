@@ -13,7 +13,7 @@ Crosshair::Crosshair(const Model &model) :
                      {position.x - p, position.y},
                      {position.x + p, position.y}
     }}{
-    buffer.store_data(sizeof(ends_coordinates), reinterpret_cast<GLfloat *>(ends_coordinates.data()));
+    buffer.store_data(ends_coordinates));
 }
 
 Crosshair::~Crosshair() {

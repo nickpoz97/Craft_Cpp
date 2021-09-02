@@ -151,9 +151,9 @@ const Frustum &Player::getFrustum() const {
     return frustum;
 }
 
-std::pair<glm::vec3, Tile> Player::hit_test(bool previous) {
-    const glm::ivec2& player_pq{Model::chunked({actual_status.position.x, actual_status.position.z})};
-    std::pair<glm::vec3, Tile> result{};
+std::pair<glm::vec3, TileBlock> Player::hit_test(bool previous) {
+    const glm::ivec2& player_pq{};
+    std::pair<glm::vec3, TileBlock> result{};
     float best{};
 
     for(const auto& pair : model.getChunks()){
@@ -276,6 +276,10 @@ bool Player::insersects_block(int height, const glm::ivec3& block_pos) {
 
 const glm::vec3 &Player::get_position() const {
     return actual_status.position;
+}
+
+glm::ivec2 Player::get_pq() {
+    return Model::chunked(actual_status.position);
 }
 
 Status operator+(const Status &a, const Status &b) {

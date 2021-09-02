@@ -43,14 +43,15 @@ private:
     static constexpr GLuint STRIDE = sizeof(VertexType);
     const AttributesWrapper& attrib;
     void set_vao_attributes() const;
+
+    mutable size_t n_indices{};
 public:
     OpenglBuffer();
     ~OpenglBuffer();
 
-    void store_data(GLsizei size, const GLfloat* const data) const;
-    void store_data(const std::vector<VertexType>& buffer);
-    void draw_triangles(int count) const;
-    void draw_lines(int components, int count) const ;
+    void store_data(const std::vector<VertexType>& buffer) const;
+    void draw_triangles() const;
+    void draw_lines(const std::vector<VertexType>& buffer) const;
 };
 
 #endif //CPP_OPENGLBUFFER_HPP

@@ -14,7 +14,7 @@ Chunk::Chunk(const Model &model, const glm::vec2 &pq) : model{model},  pq{pq},
 {};
 
 void Chunk::render() {
-    gpu_buffer.draw_triangles(faces * INDICES_FACE_COUNT);
+    gpu_buffer.draw_triangles();
 }
 
 constexpr int Chunk::getSize() {

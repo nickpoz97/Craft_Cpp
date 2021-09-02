@@ -31,7 +31,7 @@ public:
     static constexpr float A = 0.0 + 1 / 2048.0;    // TODO check semantic
     static constexpr float B = S - 1 / 2048.0;      // TODO check semantic
 
-    CubicObject(const BlockType& block_type, const std::array<bool, 6> &visible_faces, const glm::mat4& transform, vertex_iterator vertices_it);
+    CubicObject(const BlockType& block_type, const std::array<bool, 6> &visible_faces, const glm::mat4& transform, vertex_iterator_type vertices_it);
 
     static const PositionsMatrix local_vertex_positions;
     static const UvsMatrix uvs;
@@ -45,7 +45,7 @@ private:
     using super = CubicObject<4>;
 public:
     Plant(const BlockType& block_type, const std::array<bool, 6> &visible_faces, const glm::vec3& position,
-          float rotation, vertex_iterator vertices_it);
+          float rotation, vertex_iterator_type vertices_it);
 
     static glm::mat4 get_transform_matrix(const glm::vec3& position, float rotation);
 };
@@ -55,7 +55,7 @@ private:
     using super = CubicObject<6>;
 public:
     Cube(const BlockType& block_type, const std::array<bool, 6> &visible_faces, const glm::vec3& position,
-         vertex_iterator vertices_it);
+         vertex_iterator_type vertices_it);
     static glm::mat4 get_transform_matrix(const glm::vec3& position);
 };
 

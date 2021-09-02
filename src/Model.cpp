@@ -9,6 +9,7 @@
 #include "Model.hpp"
 #include "Player.hpp"
 #include "trigonometric.hpp"
+#include "Sphere.hpp"
 
 float Model::get_day_time() const {
     if (day_length <= 0) {
@@ -32,6 +33,8 @@ float Model::get_daylight() const {
         return 1 - 1 / (1 + powf(2, -t));
     }
 }
+
+Sphere Model::sky{1,3};
 
 int Model::get_scale_factor() const {
     int window_width, window_height;
@@ -175,13 +178,6 @@ void Model::builder_block(const glm::ivec3 &pos, BlockType w)  {
     }*/
 }
 
-glm::ivec2 Model::get_player_pq() {
-    if(player){
-        return chunked(player->get_position());
-    }
-    return {};
-}
-
 void Model::render_chunks() {
     if(!player || !shaders.block_shader.get_id()){
         return;
@@ -190,13 +186,10 @@ void Model::render_chunks() {
     const Shader& shader = shaders.block_shader;
     shader.use();
 
-    glm::ivec2 player_pq = get_player_pq();
+    glm::ivec2 player_pq = player->get_pq();
     int light = get_daylight();
-    glm::mat4 viewproj{
-        glm::perspective(glm::radians(fov), static_cast<float>(width)/(height), z_near, z_far) *
-        glm::lookAt(player->get_position(), player->get_position() + player->get_camera_direction_vector(), {0,1,0})
-    };
 
+    update_viewproj();
     shader.set_viewproj(viewproj);
     shader.set_camera(player->get_position());
     shader.set_sampler(0);
@@ -219,4 +212,39 @@ int Model::getRenderRadius() const {
 
 float Model::getFov() const {
     return fov;
+}
+
+void Model::render_sky() const {
+
+}
+
+void Model::update_viewproj() {
+
+    const glm::mat4 view{
+        glm::perspective(glm::radians(fov),
+        static_cast<float>(width)/(height), z_near, z_far)
+    };
+    const glm::mat4 proj{
+        glm::lookAt(player->get_position(),
+        player->get_position() + player->get_camera_direction_vector(),
+        {0,1,0})
+    };
+
+    viewproj = view * proj;
+}
+
+void Model::render_wireframe() {
+    if(!player){
+        return;
+    }
+    update_viewproj();
+    std::pair<glm::ivec3, TileBlock> hit_info = player->hit_test(false);
+    if(hit_info.second.is_obstacle()){
+        Shader& s = shaders.line_shader;
+        glLineWidth(1);
+        glEnable(GL_COLOR_LOGIC_OP);
+        s.use();
+        s.set_viewproj(viewproj);
+        glDisable(GL_COLOR_LOGIC_OP);
+    }
 }
