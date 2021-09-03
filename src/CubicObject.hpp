@@ -31,12 +31,19 @@ protected:
     using UvsMatrix = std::array<std::array<glm::bvec2, 4>, n_faces>;
 public:
     //using IlluminationVector = std::array<float, 27>;
+    const int n_indices;
 
     static constexpr float S = 0.0625;              // TODO check semantic
     static constexpr float A = 0.0 + 1 / 2048.0;    // TODO check semantic
     static constexpr float B = S - 1 / 2048.0;      // TODO check semantic
 
-    CubicObject(const BlockType& block_type, const std::array<bool, 6> &visible_faces, const glm::mat4& transform, cube_vertex_iterator_t vertices_it);
+    static constexpr int max_indices = VERTICES_FACE_COUNT * n_faces;
+
+    CubicObject(const BlockType& block_type,
+                const std::array<bool, 6> &visible_faces,
+                const glm::mat4& transform,
+                cube_vertex_iterator_t vertices_it
+    );
 
     static const PositionsMatrix local_vertex_positions;
     static const UvsMatrix uvs;

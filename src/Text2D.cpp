@@ -2,13 +2,13 @@
 // Created by ultimatenick on 13/08/21.
 //
 
-#include "Text.hpp"
+#include "Text2D.hpp"
 #include "Character.hpp"
 
-Text::Text(const glm::vec2& position, int n, std::string_view text) : SuperClass{gen_buffer(position, n, text)} {
+Text2D::Text2D(const glm::vec2& position, int n, std::string_view text) : SuperClass{gen_buffer(position, n, text)} {
 }
 
-void Text::render_object() const {
+void Text2D::render_object() const {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -17,7 +17,7 @@ void Text::render_object() const {
     glDisable(GL_BLEND);
 }
 
-std::vector<Uv2DVertex> Text::gen_buffer(const glm::vec2 &position, int n, std::string_view text) {
+std::vector<Uv2DVertex> Text2D::gen_buffer(const glm::vec2 &position, int n, std::string_view text) {
     std::vector<Uv2DVertex> buffer(text.size());
     auto buffer_it{buffer.begin()};
 

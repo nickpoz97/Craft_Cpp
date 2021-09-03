@@ -10,4 +10,4 @@ include_directories(deps/glfw/include/)
 include_directories(deps/glm)
 include_directories(deps/noise/)
 
-add_executable(app ${SOURCE_FILES} src/UniformsWrapper.hpp src/GameObject.cpp)
+add_executable(app ${SOURCE_FILES} src/UniformsWrapper.hpp src/GameObject.cpp src/Item.cpp src/Item.hpp)

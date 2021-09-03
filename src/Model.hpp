@@ -53,7 +53,7 @@ private:
     int observe2;
     bool flying;
 
-    int item_index;
+    TileBlock item_index;
     int scale;
     bool ortho;
 
@@ -105,6 +105,8 @@ public:
     const std::unordered_map<glm::ivec2, Chunk> &getChunks() const;
     void render_wireframe();
     void render_crosshair();
+    void render_text(int justify, const glm::vec3 &position, int n, std::string_view text);
+    void render_item();
 };
 
 

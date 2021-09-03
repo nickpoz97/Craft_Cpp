@@ -11,6 +11,8 @@
 #include "trigonometric.hpp"
 #include "Sphere.hpp"
 #include "CubeWireframe.hpp"
+#include "Text2D.hpp"
+#include "Item.hpp"
 
 float Model::get_day_time() const {
     if (day_length <= 0) {
@@ -260,4 +262,26 @@ void Model::render_crosshair() {
     glEnable(GL_COLOR_LOGIC_OP);
     shader.set_viewproj(get_viewproj(proj_type::ORTHO_2D));
     crosshair.render_lines();
+}
+
+void Model::render_text(int justify, const glm::vec3 &position, int n, std::string_view text) {
+    const Shader& shader = shaders.line_shader;
+
+    shader.use();
+    shader.set_viewproj(get_viewproj(proj_type::ORTHO_2D));
+    shader.set_sampler(1);
+    shader.set_extra(1, 0);
+    const glm::vec3 justified_position{position - glm::vec3{n * justify * (text.size() - 1) / 2, 0, 0}};
+    Text2D{justified_position, n, text}.render_object();
+}
+
+void Model::render_item() {
+    const Shader& shader = shaders.block_shader;
+    shader.use();
+    shader.set_viewproj(get_viewproj(proj_type::PERSP));
+    shader.set_camera({0,0,5});
+    shader.set_sampler(0);
+    shader.set_timer(get_day_time());
+
+    Item{item_index}.render_object();
 }

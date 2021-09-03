@@ -44,6 +44,11 @@ CubicObject<n_faces>::CubicObject(const BlockType &block_type, const std::array<
     }
 }
 
+template<unsigned int n_faces>
+cube_vertex_iterator_t CubicObject<n_faces>::get_end() const {
+    return begin + n_vertices;
+}
+
 Plant::Plant(const BlockType &block_type, const std::array<bool, 6> &visible_faces, const glm::vec3 &position,
              float rotation, cube_vertex_iterator_t vertices_it) :
                 super(block_type, visible_faces, get_transform_matrix(position, rotation), vertices_it)
