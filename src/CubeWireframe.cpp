@@ -24,7 +24,9 @@ decltype(CubeWireframe::indices) CubeWireframe::indices{
     }
 };
 
-CubeWireframe::CubeWireframe(const glm::vec3 &position) {
+CubeWireframe::CubeWireframe(const glm::vec3 &position) : SuperClass{generate_local_buffer(position)} {}
+
+std::vector<Standard3DVertex> CubeWireframe::generate_local_buffer(const glm::vec3 &position) {
     std::vector<Standard3DVertex> vertices(N_INDICES);
 
     decltype(indices)::iterator ii;
@@ -34,10 +36,6 @@ CubeWireframe::CubeWireframe(const glm::vec3 &position) {
         iv->position = position + local_vertex_positions[*ii] * N;
     }
 
-    gpu_Buffer.store_data(vertices);
-}
-
-void CubeWireframe::render() const {
-    gpu_Buffer.draw_lines()
+    return vertices;
 }
 

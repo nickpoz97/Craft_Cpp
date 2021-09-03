@@ -10,40 +10,42 @@
 
 template<unsigned n_faces>
 CubicObject<n_faces>::CubicObject(const BlockType &block_type, const std::array<bool, 6> &visible_faces, const glm::mat4& transform,
-                                  vertex_iterator_type vertices_it) :
-SuperClass(vertices_it, std::accumulate(visible_faces.begin(), visible_faces.end(), 0) * INDICES_FACE_COUNT) {
+                                  cube_vertex_iterator_t vertices_it) :
+        begin{vertices_it},
+        n_vertices{static_cast<size_t>(std::accumulate(visible_faces.begin(), visible_faces.end(), 0) * INDICES_FACE_COUNT)}{
     TileBlock tile_block{block_type};
 
     auto pos_it = local_vertex_positions.begin();
     auto uvs_it = uvs.begin();
     auto nrm_it = normals.begin();
 
-    for(const auto& face_ind_it : indices){
+    for(auto face_ind_it = indices.begin() ; face_ind_it != indices.end() ; ++face_ind_it){
         int face_index = face_ind_it - indices.begin();
-        float du = (tile_block.face_tile(face_index) % 16) * S;
-        float dv = (tile_block.face_tile(face_index) / 16) * S;
+        for(int face : *face_ind_it) {
+            float du = (tile_block.face_tile(face_index) % 16) * S;
+            float dv = (tile_block.face_tile(face_index) / 16) * S;
 
-        if(!visible_faces[face_index]){
-            continue;
-        }
+            if (!visible_faces[face_index]) {
+                continue;
+            }
 
-        for(int i : face_ind_it){
-            vertices_it->position = N * (*pos_it++)[i];
-            vertices_it->normal = (*nrm_it++)[i];
-            vertices_it->uv = {
-                du + (uvs_it->x ? B : A),
-                dv + (uvs_it->y ? B : A)
-            };
-            vertices_it->transform = transform;
-            ++uvs_it;
-            ++vertices_it;
+            for (int i : *face_ind_it) {
+                vertices_it->position = N * (*pos_it++)[i];
+                vertices_it->normal = (*nrm_it++)[i];
+                vertices_it->uv = {
+                        du + (uvs_it->x ? B : A),
+                        dv + (uvs_it->y ? B : A)
+                };
+                vertices_it->transform = transform;
+                ++uvs_it;
+                ++vertices_it;
+            }
         }
     }
-    apply_transform(transform);
 }
 
 Plant::Plant(const BlockType &block_type, const std::array<bool, 6> &visible_faces, const glm::vec3 &position,
-             float rotation, GameObject::vertex_iterator_type vertices_it) :
+             float rotation, cube_vertex_iterator_t vertices_it) :
                 super(block_type, visible_faces, get_transform_matrix(position, rotation), vertices_it)
              {}
 
@@ -55,7 +57,7 @@ glm::mat4 Plant::get_transform_matrix(const glm::vec3 &position, float rotation)
 }
 
 Cube::Cube(const BlockType &block_type, const std::array<bool, 6> &visible_faces, const glm::vec3 &position,
-           GameObject::vertex_iterator_type vertices_it) :
+           cube_vertex_iterator_t vertices_it) :
                 super(block_type, visible_faces, get_transform_matrix(position), vertices_it)
            {}
 

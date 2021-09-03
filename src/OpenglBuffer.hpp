@@ -6,6 +6,7 @@
 #define CPP_OPENGLBUFFER_HPP
 
 #include <vector>
+#include <array>
 #include "glad/glad.h"
 #include "AttributesWrapper.hpp"
 #include "Vertex.hpp"
@@ -43,6 +44,7 @@ private:
     static constexpr GLuint STRIDE = sizeof(VertexType);
     const AttributesWrapper& attrib;
     void set_vao_attributes() const;
+    void _store_data(int size, GLfloat* data) const;
 
     mutable size_t n_indices{};
 public:
@@ -50,8 +52,12 @@ public:
     ~OpenglBuffer();
 
     void store_data(const std::vector<VertexType>& buffer) const;
+
+    template<size_t n_values>
+    void store_data(const std::array<VertexType, n_values>& buffer) const;
+
     void draw_triangles() const;
-    void draw_lines(const std::vector<VertexType>& buffer) const;
+    void draw_lines() const;
 };
 
 #endif //CPP_OPENGLBUFFER_HPP

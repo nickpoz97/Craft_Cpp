@@ -53,21 +53,32 @@ void OpenglBuffer<Uv3DVertex>::set_vao_attributes() const{
 }
 
 template<typename VertexType>
-void OpenglBuffer<VertexType>::draw_lines(const std::vector<VertexType>& buffer) const{
+void OpenglBuffer<VertexType>::draw_lines() const{
     glBindBuffer(GL_ARRAY_BUFFER, id);
     glEnableVertexAttribArray(attrib.position);
     glVertexAttribPointer(
             attrib.position, N_POS_ELEMENTS<VertexType>::v, GL_FLOAT, GL_FALSE, 0, 0);
-    glDrawArrays(GL_LINES, 0, buffer.size());
+    glDrawArrays(GL_LINES, 0, n_indices);
     glDisableVertexAttribArray(attrib.position);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 template<typename VertexType>
 void OpenglBuffer<VertexType>::store_data(const std::vector<VertexType> &buffer) const{
+    _store_data(sizeof(buffer), reinterpret_cast<GLfloat*>(buffer.data()));
+}
+
+template<typename VertexType>
+void OpenglBuffer<VertexType>::_store_data(int size, GLfloat *data) const{
     glBindBuffer(GL_ARRAY_BUFFER, id);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(buffer), reinterpret_cast<GLfloat*>(buffer.data()), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind
 
-    n_indices = buffer.size();
+    n_indices = size;
+}
+
+template<typename VertexType>
+template<size_t n_values>
+void OpenglBuffer<VertexType>::store_data(const std::array<VertexType, n_values> &buffer) const {
+    _store_data(sizeof(buffer), reinterpret_cast<GLfloat*>(buffer.data()));
 }

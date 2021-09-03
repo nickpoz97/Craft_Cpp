@@ -9,16 +9,13 @@
 #include "Model.hpp"
 #include "Shader.hpp"
 
-class Crosshair {
+class Crosshair : public GameObject<Standard2DVertex>{
 private:
-    glm::ivec2 position;
-    int p;
-    std::array<glm::vec2, 4> ends_coordinates;
-    OpenglBuffer<Standard2DVertex> buffer;
-
+    using SuperClass = GameObject<Standard2DVertex>;
+    static std::array<Standard2DVertex, 4> get_ends_coordinates(const Model& model);
 public:
     Crosshair(const Model& model);
-    ~Crosshair();
+    void render_object() = delete;
 };
 
 

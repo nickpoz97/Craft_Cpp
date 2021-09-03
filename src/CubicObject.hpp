@@ -14,10 +14,15 @@
 #include "GameObject.hpp"
 #include "Chunk.hpp"
 
+using cube_vertex_iterator_t = typename std::vector<CubeVertex>::iterator;
+
 template<unsigned n_faces>
-class CubicObject : public GameObject<CubeVertex>{
+class CubicObject{
 private:
-    using SuperClass = GameObject<CubeVertex>;
+    glm::mat4 transform_matrix{1.0};
+    cube_vertex_iterator_t begin;
+    size_t n_vertices;
+
 protected:
     //using LightMatrix = std::array<std::array<float, 4>, n_faces>;
     using PositionsMatrix = std::array<std::array<glm::vec3, 4>, n_faces>;
@@ -31,13 +36,15 @@ public:
     static constexpr float A = 0.0 + 1 / 2048.0;    // TODO check semantic
     static constexpr float B = S - 1 / 2048.0;      // TODO check semantic
 
-    CubicObject(const BlockType& block_type, const std::array<bool, 6> &visible_faces, const glm::mat4& transform, vertex_iterator_type vertices_it);
+    CubicObject(const BlockType& block_type, const std::array<bool, 6> &visible_faces, const glm::mat4& transform, cube_vertex_iterator_t vertices_it);
 
     static const PositionsMatrix local_vertex_positions;
     static const UvsMatrix uvs;
     static const IndicesMatrix indices;
     //static const IndicesMatrix flipped;
     static const NormalMatrix normals;
+
+    cube_vertex_iterator_t get_end() const;
 };
 
 class Plant : public CubicObject<4>{
@@ -45,7 +52,7 @@ private:
     using super = CubicObject<4>;
 public:
     Plant(const BlockType& block_type, const std::array<bool, 6> &visible_faces, const glm::vec3& position,
-          float rotation, vertex_iterator_type vertices_it);
+          float rotation, cube_vertex_iterator_t vertices_it);
 
     static glm::mat4 get_transform_matrix(const glm::vec3& position, float rotation);
 };
@@ -55,7 +62,7 @@ private:
     using super = CubicObject<6>;
 public:
     Cube(const BlockType& block_type, const std::array<bool, 6> &visible_faces, const glm::vec3& position,
-         vertex_iterator_type vertices_it);
+         cube_vertex_iterator_t vertices_it);
     static glm::mat4 get_transform_matrix(const glm::vec3& position);
 };
 

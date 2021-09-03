@@ -11,6 +11,8 @@
 
 struct Standard2DVertex{
     glm::vec2 position;
+
+    operator glm::ivec2();
 };
 
 struct Uv2DVertex : Standard2DVertex{

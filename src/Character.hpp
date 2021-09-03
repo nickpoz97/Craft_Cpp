@@ -10,12 +10,15 @@
 #include "GameObject.hpp"
 #include "Vertex.hpp"
 
-class Character : public GameObject<Uv2DVertex, 6>{
+class Character{
     static constexpr float s = 0.0625;
     static constexpr float a = s;
     static constexpr float b = s * 2;
 
-    int w, du, dv;
+    std::array<Uv2DVertex, 6> vertices;
+public:
+    auto begin() {return vertices.begin();}
+    auto end() {return vertices.end();}
 
 public:
     Character(const glm::vec2 &position, int m, int n, char c);

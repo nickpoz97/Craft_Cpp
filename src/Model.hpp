@@ -70,10 +70,12 @@ private:
     std::array<Block,2> blocks;
     std::array<Block,2> blocks_copies;
 
-    //glm::mat4 model;
-    glm::mat4 viewproj;
+    enum class proj_type{PERSP, ORTHO_2D};
+    const glm::mat4 persp_proj{glm::perspective(glm::radians(fov), static_cast<float>(width) / (height), z_near, z_far)};
+    static const glm::mat4 ortho_proj_2d{glm::ortho(0, width, 0, height, -1, 1)};
 
-    void update_viewproj();
+    Crosshair crosshair{*this};
+    glm::mat4 get_viewproj(proj_type pt);
 public:
     static constexpr glm::ivec2 chunked(const glm::vec3& position);
     static constexpr int chunked(int val);
@@ -102,6 +104,7 @@ public:
     static constexpr bool show_light = SHOW_LIGHT;
     const std::unordered_map<glm::ivec2, Chunk> &getChunks() const;
     void render_wireframe();
+    void render_crosshair();
 };
 
 

@@ -5,17 +5,15 @@
 #include "Crosshair.hpp"
 #include "Shader.hpp"
 
-Crosshair::Crosshair(const Model &model) :
-    position{model.getWidth() / 2, model.getHeight() / 2},
-    p{10 * model.getScale()},
-    ends_coordinates{{{position.x, position.y - p},
-                      {position.x, position.y + p},
-                     {position.x - p, position.y},
-                     {position.x + p, position.y}
-    }}{
-    buffer.store_data(ends_coordinates));
-}
+Crosshair::Crosshair(const Model &model) : SuperClass(get_ends_coordinates(model)) {};
 
-Crosshair::~Crosshair() {
-    shader.del_buffer()
+std::array<Standard2DVertex, 4> Crosshair::get_ends_coordinates(const Model& model) {
+    glm::ivec2 position{model.getWidth() / 2, model.getHeight() / 2};
+    int p{10 * model.getScale()};
+
+    return {{glm::ivec2{position.x, position.y - p},
+             glm::ivec2{position.x, position.y + p},
+             glm::ivec2{position.x - p, position.y},
+             glm::ivec2{position.x + p, position.y}
+    }};
 }

@@ -15,24 +15,35 @@
 template<typename VertexType>
 class GameObject{
 private:
-    glm::mat4 transform_matrix{1.0};
-protected:
-    using vertex_iterator_type = typename std::vector<VertexType>::iterator;
-    vertex_iterator_type begin;
-    vertex_iterator_type end;
-public:
-    vertex_iterator_type get_end() const;
+    OpenglBuffer<VertexType> gpu_buffer{};
 
 public:
-    explicit GameObject(const vertex_iterator_type& begin_it, int n_vertices);
+    explicit GameObject(const std::vector<VertexType>& local_buffer);
+    template<size_t n_values>
+    explicit GameObject(const std::array<VertexType, n_values>& local_buffer);
+    void render_object() const;
+    void render_lines() const;
 };
 
 template<typename VertexType>
-GameObject<VertexType>::GameObject(const vertex_iterator_type& begin_it, int n_vertices) : begin{begin_it}, end{begin_it + n_vertices}{}
+GameObject<VertexType>::GameObject(const std::vector<VertexType>& local_buffer) {
+    gpu_buffer.store_data(local_buffer);
+}
 
 template<typename VertexType>
-typename GameObject<VertexType>::vertex_iterator_type GameObject<VertexType>::get_end() const {
-    return end;
+void GameObject<VertexType>::render_object() const {
+    gpu_buffer.draw_triangles();
+}
+
+template<typename VertexType>
+void GameObject<VertexType>::render_lines() const {
+    gpu_buffer.draw_lines();
+}
+
+template<typename VertexType>
+template<size_t n_values>
+GameObject<VertexType>::GameObject(const std::array<VertexType, n_values> &local_buffer) {
+    gpu_buffer.template store_data(local_buffer);
 }
 
 #endif //CPP_GAMEOBJECT_HPP

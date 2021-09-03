@@ -10,6 +10,7 @@
 #include "Player.hpp"
 #include "trigonometric.hpp"
 #include "Sphere.hpp"
+#include "CubeWireframe.hpp"
 
 float Model::get_day_time() const {
     if (day_length <= 0) {
@@ -189,8 +190,7 @@ void Model::render_chunks() {
     glm::ivec2 player_pq = player->get_pq();
     int light = get_daylight();
 
-    update_viewproj();
-    shader.set_viewproj(viewproj);
+    shader.set_viewproj(get_viewproj(proj_type::PERSP));
     shader.set_camera(player->get_position());
     shader.set_sampler(0);
     shader.set_timer(get_day_time());
@@ -214,37 +214,50 @@ float Model::getFov() const {
     return fov;
 }
 
+// TODO to be completed
 void Model::render_sky() const {
 
 }
 
-void Model::update_viewproj() {
-
+glm::mat4 Model::get_viewproj(proj_type pt) {
     const glm::mat4 view{
-        glm::perspective(glm::radians(fov),
-        static_cast<float>(width)/(height), z_near, z_far)
-    };
-    const glm::mat4 proj{
-        glm::lookAt(player->get_position(),
-        player->get_position() + player->get_camera_direction_vector(),
-        {0,1,0})
+            glm::lookAt(player->get_position(),
+            player->get_position() + player->get_camera_direction_vector(),
+            {0, 1, 0})
     };
 
-    viewproj = view * proj;
+    switch (pt) {
+        case proj_type::PERSP:
+            return persp_proj * view;
+        break;
+        case proj_type::ORTHO_2D:
+            return ortho_proj_2d * view;
+        break;
+    }
 }
 
 void Model::render_wireframe() {
     if(!player){
         return;
     }
-    update_viewproj();
     std::pair<glm::ivec3, TileBlock> hit_info = player->hit_test(false);
     if(hit_info.second.is_obstacle()){
         Shader& s = shaders.line_shader;
         glLineWidth(1);
         glEnable(GL_COLOR_LOGIC_OP);
         s.use();
-        s.set_viewproj(viewproj);
+        s.set_viewproj(get_viewproj(proj_type::PERSP););
+        CubeWireframe{hit_info.first}.render_lines();
         glDisable(GL_COLOR_LOGIC_OP);
     }
+}
+
+void Model::render_crosshair() {
+    const Shader& shader = shaders.line_shader;
+
+    shader.use();
+    glLineWidth(4 * scale);
+    glEnable(GL_COLOR_LOGIC_OP);
+    shader.set_viewproj(get_viewproj(proj_type::ORTHO_2D));
+    crosshair.render_lines();
 }

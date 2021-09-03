@@ -11,12 +11,14 @@
 #include <list>
 #include "Character.hpp"
 
-class Text {
+class Text : public GameObject<Uv2DVertex>{
 private:
-    std::vector<Character> chars;
+    using SuperClass = GameObject<Uv2DVertex>;
+
+    static std::vector<Uv2DVertex> gen_buffer(const glm::vec2& position, int n, std::string_view text);
 public:
-    Text(const glm::vec2& position, int n, const std::string_view text);
-    void draw();
+    Text(const glm::vec2& position, int n, std::string_view text);
+    void render_object() const;
 };
 
 

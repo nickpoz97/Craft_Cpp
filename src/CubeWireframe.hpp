@@ -8,8 +8,10 @@
 #include <array>
 #include "CubicObject.hpp"
 
-class CubeWireframe{
+class CubeWireframe : public GameObject<Standard3DVertex>{
 private:
+    using SuperClass = GameObject<Standard3DVertex>;
+
     static constexpr int N_VERTICES = 8;
     static constexpr int N_INDICES = 24;
     static constexpr float N = 0.5;
@@ -19,8 +21,9 @@ private:
 
     OpenglBuffer<Standard3DVertex> gpu_Buffer;
 public:
-    CubeWireframe(const glm::vec3 &position);
-    void render() const;
+    static std::vector<Standard3DVertex> generate_local_buffer(const glm::vec3 &position);
+    explicit CubeWireframe(const glm::vec3 &position);
+    void render_object() = delete;
 };
 
 
