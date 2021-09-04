@@ -29,10 +29,11 @@ protected:
     using IndicesMatrix = std::array<std::array<int, INDICES_FACE_COUNT>, n_faces>;
     using NormalMatrix = std::array<glm::vec3, n_faces>;
     using UvsMatrix = std::array<std::array<glm::bvec2, 4>, n_faces>;
+
+    glm::mat4 get_transform_matrix(const glm::vec3& position);
+    glm::mat4 get_transform_matrix(const glm::vec3& position, float rotation);
 public:
     //using IlluminationVector = std::array<float, 27>;
-    const int n_indices;
-
     static constexpr float S = 0.0625;              // TODO check semantic
     static constexpr float A = 0.0 + 1 / 2048.0;    // TODO check semantic
     static constexpr float B = S - 1 / 2048.0;      // TODO check semantic
@@ -60,8 +61,6 @@ private:
 public:
     Plant(const BlockType& block_type, const std::array<bool, 6> &visible_faces, const glm::vec3& position,
           float rotation, cube_vertex_iterator_t vertices_it);
-
-    static glm::mat4 get_transform_matrix(const glm::vec3& position, float rotation);
 };
 
 class Cube : public CubicObject<6>{
@@ -70,7 +69,6 @@ private:
 public:
     Cube(const BlockType& block_type, const std::array<bool, 6> &visible_faces, const glm::vec3& position,
          cube_vertex_iterator_t vertices_it);
-    static glm::mat4 get_transform_matrix(const glm::vec3& position);
 };
 
 #endif //CPP_CUBICOBJECT_HPP

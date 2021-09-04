@@ -151,7 +151,7 @@ const Frustum &Player::getFrustum() const {
     return frustum;
 }
 
-std::pair<glm::vec3, TileBlock> Player::hit_test(bool previous) {
+Block Player::hit_test(bool previous) const {
     const glm::ivec2& player_pq{};
     std::pair<glm::vec3, TileBlock> result{};
     float best{};
@@ -164,7 +164,7 @@ std::pair<glm::vec3, TileBlock> Player::hit_test(bool previous) {
         auto kv_pair = ray_hit(c, previous, 8);
         if(kv_pair.second.is_obstacle()){
             auto distance = glm::distance(actual_status.position, kv_pair.first);
-            if(best == 0 || distance < best){
+            if(best == 0.0f || distance < best){
                 best = distance;
                 result = kv_pair;
             }
@@ -173,8 +173,7 @@ std::pair<glm::vec3, TileBlock> Player::hit_test(bool previous) {
     return result;
 }
 
-std::pair<glm::vec3, Tile> Player::ray_hit(const Chunk& c, bool previous, int max_distance, int step){
-    using return_type = std::pair<glm::vec3, Tile>;
+Block Player::ray_hit(const Chunk& c, bool previous, int max_distance, int step) const {
 
     const glm::vec3& ray{get_camera_direction_vector()};
     glm::ivec3 test_pos{actual_status.position - ray}; // better for loop
@@ -187,21 +186,21 @@ std::pair<glm::vec3, Tile> Player::ray_hit(const Chunk& c, bool previous, int ma
         if(previous_pos == test_pos_rounded){
             continue;
         }
-        const Tile& material = c.get_block(test_pos_rounded);
+        const TileBlock& material = c.get_block(test_pos_rounded);
         if(material.is_obstacle()){
             return (previous) ?
-                return_type{previous_pos, material} :
-                return_type{test_pos_rounded, material};
+                Block{previous_pos, material} :
+                Block{test_pos_rounded, material};
         }
         previous_pos = test_pos_rounded;
     }
 
-    return {};
+    return Block{};
 }
 
 HitResult Player::hit_test_face() {
     auto pair{hit_test(false)};
-    const Tile& w = pair.second;
+    const TileBlock& w = pair.second;
     const glm::vec3& hit_pos = pair.first;
 
     if (w.is_obstacle()){
@@ -263,7 +262,7 @@ std::pair<bool, glm::vec3> Player::collide(int height) {
     return {result, collision_point};
 }
 
-bool Player::insersects_block(int height, const glm::ivec3& block_pos) {
+bool Player::insersects_block(int height, const glm::ivec3& block_pos) const {
     const glm::ivec3 int_pos{glm::round(actual_status.position)};
 
     for(int i = 0 ; i < height ; i++){

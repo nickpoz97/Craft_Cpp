@@ -285,3 +285,23 @@ void Model::render_item() {
 
     Item{item_index}.render_object();
 }
+
+void Model::record_block(const glm::ivec3 &pos, const TileBlock &w) {
+    record_block(Block{pos, w});
+}
+
+void Model::set_block(const glm::ivec3 &pos) {
+    set_block(pos, item_index);
+}
+
+void Model::record_block(const glm::ivec3 &pos) {
+    record_block(pos, item_index);
+}
+
+TileBlock Model::get_item_index() const {
+    return item_index;
+}
+
+void Model::set_item_index(TileBlock tile_block) {
+    item_index = tile_block;
+}

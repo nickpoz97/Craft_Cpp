@@ -49,25 +49,26 @@ cube_vertex_iterator_t CubicObject<n_faces>::get_end() const {
     return begin + n_vertices;
 }
 
+template<unsigned int n_faces>
+glm::mat4 CubicObject<n_faces>::get_transform_matrix(const glm::vec3& position) {
+    glm::mat4 transform{1.0f};
+    transform = glm::translate(transform, position);
+    return transform;
+}
+
+template<unsigned int n_faces>
+glm::mat4 CubicObject<n_faces>::get_transform_matrix(const glm::vec3 &position, float rotation) {
+    return glm::rotate(get_transform_matrix(position), glm::radians(rotation), {0,1,0});
+}
+
 Plant::Plant(const BlockType &block_type, const std::array<bool, 6> &visible_faces, const glm::vec3 &position,
              float rotation, cube_vertex_iterator_t vertices_it) :
                 super(block_type, visible_faces, get_transform_matrix(position, rotation), vertices_it)
              {}
 
-glm::mat4 Plant::get_transform_matrix(const glm::vec3 &position, float rotation) {
-    glm::mat4 transform{1.0f};
-    transform = glm::translate(transform, position);
-    transform = glm::rotate(transform, glm::radians(rotation), {0,1,0});
-    return transform;
-}
 
 Cube::Cube(const BlockType &block_type, const std::array<bool, 6> &visible_faces, const glm::vec3 &position,
            cube_vertex_iterator_t vertices_it) :
                 super(block_type, visible_faces, get_transform_matrix(position), vertices_it)
            {}
 
-glm::mat4 Cube::get_transform_matrix(const glm::vec3 &position) {
-    glm::mat4 transform{1.0f};
-    transform = glm::translate(transform, position);
-    return transform;
-}

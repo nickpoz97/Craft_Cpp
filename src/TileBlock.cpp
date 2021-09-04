@@ -2,6 +2,7 @@
 // Created by ultimatenick on 07/08/21.
 //
 
+#include <unordered_set>
 #include "TileBlock.hpp"
 
 decltype(TileBlock::tiles) TileBlock::tiles{{
@@ -161,3 +162,7 @@ BlockType TileBlock::getIndex() const {
 }
 
 TileBlock::TileBlock(BlockType tile_index) : index{tile_index} {}
+
+bool TileBlock::is_user_buildable() const {
+    return is_destructable();
+}

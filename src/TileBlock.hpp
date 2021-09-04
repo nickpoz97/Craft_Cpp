@@ -11,7 +11,7 @@
 #include "vec3.hpp"
 
 // TODO verificare ItemType mancanti
-enum class BlockType{
+enum BlockType{
     EMPTY,
     GRASS,
     SAND,
@@ -102,6 +102,7 @@ public:
     bool is_transparent() const;
     bool is_destructable() const;
     bool is_empty() const;
+    bool is_user_buildable() const;
 
     operator int() const;
 };

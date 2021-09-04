@@ -33,19 +33,19 @@ private:
     static std::array<std::array<float,4>,6> light;
     static Tiles tiles;
 
+    Status actual_status;
     Status former_status1;
     Status former_status2;
 
     Cube playerCube;
+
     const Model& model;
-
     int x_movement = 0;
+
     int z_movement = 0;
-
     std::string_view name;
-    int id;
 
-    Status actual_status;
+    int id;
 
     Frustum frustum;
 
@@ -65,11 +65,11 @@ public:
     void update_player(const Status& new_status, bool interpolate);
     void interpolate_player();
     void draw();
-    std::pair<glm::vec3, TileBlock> hit_test(bool previous);
-    std::std::pair<glm::vec3, Tile> ray_hit(const Chunk& c, bool previous, int max_distance, int step = 32);
+    Block hit_test(bool previous) const;
+    Block ray_hit(const Chunk& c, bool previous, int max_distance, int step = 32) const;
     HitResult hit_test_face();
     std::pair<bool, glm::vec3> collide(int height);
-    bool insersects_block(int height, const glm::ivec3& block_pos);
+    bool insersects_block(int height, const glm::ivec3& block_pos) const;
     glm::ivec2 get_pq();
 };
 

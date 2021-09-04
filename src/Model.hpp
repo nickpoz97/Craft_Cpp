@@ -29,7 +29,7 @@ private:
     std::array<Worker, WORKERS> workers;
     std::unordered_map<glm::ivec2, Chunk> chunks;
     ShaderWrapper shaders;
-    std::array<std::string_view, MAX_MESSAGES> messages;
+    //std::array<std::string_view, MAX_MESSAGES> messages;
     static const Sphere sky;
 
     int create_radius;
@@ -62,7 +62,7 @@ private:
     int suppress_char;
     int mode;
     int mode_changed;
-    std::string_view db_path;
+    //std::string_view db_path;
 
     int day_length;
     int time_changed;
@@ -93,8 +93,14 @@ public:
     static int get_chunk_distance(const glm::ivec2& pq1, const glm::ivec2& pq2);
     bool chunk_visible(const glm::ivec2& pq);
     TileBlock highest_block(const glm::vec2& pq);
+
     void set_block(const glm::ivec3& pos, const TileBlock& w);
+    void set_block(const glm::ivec3& pos);
+
     void record_block(Block block);
+    void record_block(const glm::ivec3& pos, const TileBlock& w);
+    void record_block(const glm::ivec3& pos);
+
     TileBlock get_block(const glm::ivec3 position);
     void builder_block(const glm::ivec3 &pos, BlockType w);
     void render_chunks();
@@ -107,6 +113,8 @@ public:
     void render_crosshair();
     void render_text(int justify, const glm::vec3 &position, int n, std::string_view text);
     void render_item();
+    TileBlock get_item_index() const;
+    void set_item_index(TileBlock tile_block);
 };
 
 
