@@ -305,3 +305,7 @@ TileBlock Model::get_item_index() const {
 void Model::set_item_index(TileBlock tile_block) {
     item_index = tile_block;
 }
+
+void Model::switch_flying() {
+    flying = !flying;
+}

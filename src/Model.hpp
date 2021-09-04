@@ -84,6 +84,7 @@ public:
     float get_daylight() const;
     int get_scale_factor() const;
     bool is_flying() const;
+    void switch_flying();
     int getWidth() const;
     int getHeight() const;
     int getScale() const;

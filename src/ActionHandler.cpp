@@ -4,51 +4,54 @@
 
 #include "ActionHandler.hpp"
 
-ActionHandler::ActionHandler(const Player &player, Model &model) :
-    player{player},
-    model{model}{
-    instance.reset(this);
-}
-
-void ActionHandler::on_left_click() const{
-    Block result = player.hit_test(false);
+void ActionHandler::on_left_click() {
+    if(!initialized){
+        return;
+    }
+    Block result = player_p->hit_test(false);
     const auto& hit_pos {result.first};
     const auto& hit_tile_block {result.second};
 
     if(hit_pos.y > 0 && hit_pos.y < 256 && hit_tile_block.is_destructable()){
-        model.set_block(hit_pos, BlockType::EMPTY);
-        model.record_block(hit_pos, BlockType::EMPTY);
-        if(model.get_block(hit_pos + glm::ivec3{0,1,0}));{
-            model.set_block(hit_pos + glm::ivec3{0,1,0}, BlockType::EMPTY);
+        model_p->set_block(hit_pos, BlockType::EMPTY);
+        model_p->record_block(hit_pos, BlockType::EMPTY);
+        if(model_p->get_block(hit_pos + glm::ivec3{0,1,0}));{
+            model_p->set_block(hit_pos + glm::ivec3{0,1,0}, BlockType::EMPTY);
         }
     }
 }
 
-void ActionHandler::on_right_click() const{
-    Block result = player.hit_test(false);
+void ActionHandler::on_right_click() {
+    if(!initialized){
+        return;
+    }
+    Block result = player_p->hit_test(false);
     const auto& hit_pos {result.first};
     const auto& hit_tile_block {result.second};
 
     if(hit_pos.y > 0 && hit_pos.y < 256 && hit_tile_block.is_destructable()){
-        if(!player.insersects_block(2, hit_pos)){
+        if(!player_p->insersects_block(2, hit_pos)){
             // using actual item index
-            model.set_block(hit_pos);
-            model.record_block(hit_pos);
+            model_p->set_block(hit_pos);
+            model_p->record_block(hit_pos);
         }
     }
 }
 
-void ActionHandler::on_middle_click() const {
-    const Block hit_block{player.hit_test(false)};
+void ActionHandler::on_middle_click() {
+    if(!initialized){
+        return;
+    }
+    const Block hit_block{player_p->hit_test(false)};
     const TileBlock& hit_tile {hit_block.second};
     if(hit_tile.is_user_buildable()){
-        model.set_item_index(hit_tile);
+        model_p->set_item_index(hit_tile);
     }
 }
 
 void ActionHandler::on_key(GLFWwindow *window, int key, int scancode, int action, int mods) {
     // no action handler check
-    if(!get_instance()){
+    if(!initialized){
         return;
     }
 
@@ -64,16 +67,38 @@ void ActionHandler::on_key(GLFWwindow *window, int key, int scancode, int action
     }
     if(key == GLFW_KEY_ENTER){
         if(control){
-            get_instance()->on_right_click();
+            on_right_click();
         }
         else{
-            get_instance()->on_left_click();
+            on_left_click();
         }
+    }
+    if (key == GLFW_KEY_TAB) {
+        model_p->switch_flying();
+    }
+    if (key >= '1' && key <= '9') {
+        // +1 to skip empty
+        model_p->set_item_index(TileBlock::items[key - '1']);
+    }
+    if(key == '0'){
+        model_p->set_item_index(BlockType::GLASS);
+    }
+    if(key == 'E'){
+        model_p->set_item_index(TileBlock::items[(model_p->get_item_index() + 1) % TileBlock::items.size()]);
+    }
+    if(key == 'R'){
+        int index = model_p->get_item_index() - 1;
+        index = (index < 0) ? static_cast<int>(TileBlock::items.size()) - 1 : index;
+        model_p->set_item_index(TileBlock::items[index]);
     }
 }
 
-std::shared_ptr<const ActionHandler> ActionHandler::get_instance() {
-    return instance;
+void ActionHandler::attach_components(Player* player_address, Model* model_address){
+    if(!initialized) {
+        player_p = player_address;
+        model_p = model_address;
+        initialized = (player_p != nullptr) && (model_p != nullptr);
+    }
 }
 
 /*void ActionHandler::on_light() {
