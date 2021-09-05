@@ -18,12 +18,18 @@ static constexpr int INDICES_FACE_COUNT = 6;
 static constexpr int VERTICES_FACE_COUNT = 4;
 static constexpr float N = 0.5f;
 static constexpr int RENDER_CHUNK_RADIUS = 4;
+static constexpr double SCROLL_TRESHOLD = 0.1;
 
 // config
 static constexpr bool SHOW_LIGHT = true;
 static constexpr bool SHOW_PLANTS = true;
 static constexpr bool SHOW_TREES = true;
 static constexpr bool SHOW_CLOUDS = true;
+
+static constexpr int WINDOW_WIDTH = 1024;
+static constexpr int WINDOW_HEIGTH = 768;
+
+static constexpr bool FULLSCREEN = false;
 #define CPP_COSTANTS_HPP
 
 #endif //CPP_COSTANTS_HPP

@@ -50,7 +50,7 @@ Player::Player(const Model &model, std::string_view name, int id, const glm::vec
     frustum.update(false);
 }
 
-glm::vec3 Player::get_motion_vector() const{
+glm::vec3 Player::get_motion_vector(int x_movement, int z_movement) const{
     const glm::vec2& rotation = actual_status.rotation;
 
     if (!z_movement && !x_movement) {
@@ -279,6 +279,22 @@ const glm::vec3 &Player::get_position() const {
 
 glm::ivec2 Player::get_pq() {
     return Model::chunked(actual_status.position);
+}
+
+void Player::update_player_position(const glm::vec3 &new_position) {
+    actual_status.position = new_position;
+}
+
+bool Player::is_flying() const {
+    return flying;
+}
+
+void Player::update_player_rotation(const glm::vec2 &new_rotation) {
+    actual_status.rotation = new_rotation;
+}
+
+void Player::increment_player_rotation(const glm::ivec2 &increment) {
+    actual_status.rotation += increment;
 }
 
 Status operator+(const Status &a, const Status &b) {

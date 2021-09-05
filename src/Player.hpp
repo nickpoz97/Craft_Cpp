@@ -29,20 +29,14 @@ struct HitResult{
 
 class Player {
 private:
-    static std::array<std::array<float,4>,6> ao;
-    static std::array<std::array<float,4>,6> light;
-    static Tiles tiles;
-
     Status actual_status;
     Status former_status1;
     Status former_status2;
 
-    Cube playerCube;
-
     const Model& model;
-    int x_movement = 0;
 
-    int z_movement = 0;
+    bool flying{false};
+
     std::string_view name;
 
     int id;
@@ -54,14 +48,19 @@ public:
     const glm::vec3& get_position() const;
     const Frustum &getFrustum() const;
 
+
     Player(const Model &model, std::string_view name, int id, const glm::vec3 &position, const glm::vec2 &rotation);
     glm::vec3 get_camera_direction_vector() const;
-    glm::vec3 get_motion_vector() const;
+    glm::vec3 get_motion_vector(int x_movement, int z_movement) const;
     glm::vec3 get_up_vector() const;
     glm::vec3 get_right_vector() const;
 
     void set_movement(int x, int z);
-    void update_player_status(const glm::vec3& new_position, const glm::vec2& new_rotation={}, bool interpolate={});
+    void update_player_status(const glm::vec3& new_position, const glm::vec2& new_rotation, bool interpolate);
+    void update_player_position(const glm::vec3& new_position);
+    void update_player_rotation(const glm::vec2& new_rotation);
+    void increment_player_rotation(const glm::ivec2& increment);
+
     void update_player(const Status& new_status, bool interpolate);
     void interpolate_player();
     void draw();
@@ -71,6 +70,7 @@ public:
     std::pair<bool, glm::vec3> collide(int height);
     bool insersects_block(int height, const glm::ivec3& block_pos) const;
     glm::ivec2 get_pq();
+    bool is_flying() const;
 };
 
 

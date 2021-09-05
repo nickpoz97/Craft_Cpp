@@ -51,11 +51,10 @@ private:
 
     int observe1;
     int observe2;
-    bool flying;
 
-    TileBlock item_index;
+    TileBlock actual_item;
     int scale;
-    bool ortho;
+    int ortho;
 
     float fov;
 
@@ -76,14 +75,17 @@ private:
 
     Crosshair crosshair{*this};
     glm::mat4 get_viewproj(proj_type pt);
+    void create_window(bool is_fullscreen);
 public:
+    Model();
+    ~Model();
+
     static constexpr glm::ivec2 chunked(const glm::vec3& position);
     static constexpr int chunked(int val);
 
     float get_day_time() const;
     float get_daylight() const;
     int get_scale_factor() const;
-    bool is_flying() const;
     void switch_flying();
     int getWidth() const;
     int getHeight() const;
@@ -114,8 +116,17 @@ public:
     void render_crosshair();
     void render_text(int justify, const glm::vec3 &position, int n, std::string_view text);
     void render_item();
-    TileBlock get_item_index() const;
-    void set_item_index(TileBlock tile_block);
+
+    TileBlock get_actual_item() const;
+    void set_actual_item(TileBlock item);
+    void set_next_item();
+    void set_prev_item();
+
+    GLFWwindow* get_window();
+
+    void set_ortho(int ortho_size) const;
+    void set_fov(int fov_degrees) const;
+    Player* get_player() const;
 };
 
 

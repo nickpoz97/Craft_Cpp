@@ -283,7 +283,7 @@ void Model::render_item() {
     shader.set_sampler(0);
     shader.set_timer(get_day_time());
 
-    Item{item_index}.render_object();
+    Item{actual_item}.render_object();
 }
 
 void Model::record_block(const glm::ivec3 &pos, const TileBlock &w) {
@@ -291,21 +291,71 @@ void Model::record_block(const glm::ivec3 &pos, const TileBlock &w) {
 }
 
 void Model::set_block(const glm::ivec3 &pos) {
-    set_block(pos, item_index);
+    set_block(pos, actual_item);
 }
 
 void Model::record_block(const glm::ivec3 &pos) {
-    record_block(pos, item_index);
+    record_block(pos, actual_item);
 }
 
-TileBlock Model::get_item_index() const {
-    return item_index;
+TileBlock Model::get_actual_item() const {
+    return actual_item;
 }
 
-void Model::set_item_index(TileBlock tile_block) {
-    item_index = tile_block;
+void Model::set_actual_item(TileBlock item) {
+    actual_item = item;
 }
 
 void Model::switch_flying() {
     flying = !flying;
+}
+
+void Model::set_next_item() {
+    actual_item = TileBlock::items[(actual_item.getIndex() + 1) % TileBlock::items.size()];
+}
+
+void Model::set_prev_item() {
+    int new_index = actual_item.getIndex() - 1;
+    if(new_index < 0) {
+        new_index = static_cast<int>(TileBlock::items.size()) - 1;
+    }
+    actual_item = TileBlock::items[new_index];
+}
+
+Model::Model() : width{WINDOW_WIDTH}, height{WINDOW_HEIGTH} {
+    create_window(FULLSCREEN);
+}
+
+void Model::create_window(bool is_fullscreen) {
+    GLFWmonitor *monitor = nullptr;
+
+    if(is_fullscreen){
+        int mode_count;
+        monitor = glfwGetPrimaryMonitor();
+        const GLFWvidmode *modes = glfwGetVideoModes(monitor, &mode_count);
+        width = modes[mode_count - 1].width;
+        height = modes[mode_count - 1].height;
+    }
+
+    window = glfwCreateWindow(width, height, "Craft Cpp", monitor, nullptr);
+}
+
+Model::~Model() {
+    glfwDestroyWindow(window);
+}
+
+GLFWwindow *Model::get_window() {
+    return window;
+}
+
+void Model::set_ortho(int ortho_size) const{
+    ortho = ortho_size;
+}
+
+void Model::set_fov(int fov_degrees) const {
+    fov = fov_degrees;
+}
+
+Player *Model::get_player() const{
+    return player.get();
 }
