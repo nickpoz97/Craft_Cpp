@@ -35,8 +35,6 @@ private:
 
     const Model& model;
 
-    bool flying{false};
-
     std::string_view name;
 
     int id;
@@ -70,7 +68,6 @@ public:
     std::pair<bool, glm::vec3> collide(int height);
     bool insersects_block(int height, const glm::ivec3& block_pos) const;
     glm::ivec2 get_pq();
-    bool is_flying() const;
 };
 
 

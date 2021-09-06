@@ -30,6 +30,7 @@ static constexpr int WINDOW_WIDTH = 1024;
 static constexpr int WINDOW_HEIGTH = 768;
 
 static constexpr bool FULLSCREEN = false;
+static constexpr int DAY_LENGTH = 600;
 #define CPP_COSTANTS_HPP
 
 #endif //CPP_COSTANTS_HPP

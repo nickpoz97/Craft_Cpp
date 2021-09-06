@@ -19,15 +19,15 @@ using Block = std::pair<glm::ivec3, TileBlock>;
 
 class Model {
     struct ShaderWrapper{
-        Shader block_shader;
-        Shader line_shader;
-        Shader sky_shader;
+        Shader block_shader{"block_vertex.vs", "block_fragment.fs"};
+        Shader line_shader{"line_vertex.vs", "line_fragment.fs"};
+        Shader sky_shader{"sky_vertex.vs", "sky_fragment.fs"};
     };
 private:
 
     GLFWwindow* window;
-    std::array<Worker, WORKERS> workers;
-    std::unordered_map<glm::ivec2, Chunk> chunks;
+    //std::array<Worker, WORKERS> workers;
+    std::unordered_map<glm::ivec2, Chunk> chunks{};
     ShaderWrapper shaders;
     //std::array<std::string_view, MAX_MESSAGES> messages;
     static const Sphere sky;
@@ -41,22 +41,16 @@ private:
     int sign_radius;
 
     std::unique_ptr<Player> player{nullptr};
-    //int typing;
-
-    char typing_buffer[MAX_TEXT_LENGTH];
-    int message_index;
 
     int width;
     int height;
 
-    int observe1;
-    int observe2;
-
-    TileBlock actual_item;
+    TileBlock& actual_item{TileBlock::items[0]};
     int scale;
     int ortho;
 
     float fov;
+    bool flying{false};
 
     int suppress_char;
     int mode;
@@ -64,17 +58,17 @@ private:
     //std::string_view db_path;
 
     int day_length;
-    int time_changed;
+    int time_changed{true};
 
-    std::array<Block,2> blocks;
-    std::array<Block,2> blocks_copies;
+    std::array<Block,2> blocks{};
+    std::array<Block,2> blocks_copies{};
 
     enum class proj_type{PERSP, ORTHO_2D};
     const glm::mat4 persp_proj{glm::perspective(glm::radians(fov), static_cast<float>(width) / (height), z_near, z_far)};
     static const glm::mat4 ortho_proj_2d{glm::ortho(0, width, 0, height, -1, 1)};
 
     Crosshair crosshair{*this};
-    glm::mat4 get_viewproj(proj_type pt);
+    glm::mat4 get_viewproj(proj_type pt) const;
     void create_window(bool is_fullscreen);
 public:
     Model();
@@ -87,6 +81,7 @@ public:
     float get_daylight() const;
     int get_scale_factor() const;
     void switch_flying();
+    bool is_flying() const;
     int getWidth() const;
     int getHeight() const;
     int getScale() const;
@@ -124,8 +119,8 @@ public:
 
     GLFWwindow* get_window();
 
-    void set_ortho(int ortho_size) const;
-    void set_fov(int fov_degrees) const;
+    void set_ortho(int ortho_size) ;
+    void set_fov(int fov_degrees) ;
     Player* get_player() const;
 };
 

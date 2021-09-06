@@ -285,10 +285,6 @@ void Player::update_player_position(const glm::vec3 &new_position) {
     actual_status.position = new_position;
 }
 
-bool Player::is_flying() const {
-    return flying;
-}
-
 void Player::update_player_rotation(const glm::vec2 &new_rotation) {
     actual_status.rotation = new_rotation;
 }

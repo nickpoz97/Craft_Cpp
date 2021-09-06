@@ -218,10 +218,18 @@ float Model::getFov() const {
 
 // TODO to be completed
 void Model::render_sky() const {
-
+    if(!player){
+        return;
+    }
+    const Shader& shader{shaders.sky_shader};
+    shader.set_viewproj(get_viewproj(proj_type::PERSP));
+    shader.set_sampler(2);
+    shader.set_timer(get_day_time());
+    // TODO switch to render object
+    sky.render();
 }
 
-glm::mat4 Model::get_viewproj(proj_type pt) {
+glm::mat4 Model::get_viewproj(proj_type pt) const {
     const glm::mat4 view{
             glm::lookAt(player->get_position(),
             player->get_position() + player->get_camera_direction_vector(),
@@ -323,6 +331,7 @@ void Model::set_prev_item() {
 }
 
 Model::Model() : width{WINDOW_WIDTH}, height{WINDOW_HEIGTH} {
+    glfwSetTime(day_length/3.0);
     create_window(FULLSCREEN);
 }
 
@@ -348,14 +357,18 @@ GLFWwindow *Model::get_window() {
     return window;
 }
 
-void Model::set_ortho(int ortho_size) const{
+void Model::set_ortho(int ortho_size) {
     ortho = ortho_size;
 }
 
-void Model::set_fov(int fov_degrees) const {
+void Model::set_fov(int fov_degrees) {
     fov = fov_degrees;
 }
 
 Player *Model::get_player() const{
     return player.get();
+}
+
+bool Model::is_flying(){
+    return flying;
 }

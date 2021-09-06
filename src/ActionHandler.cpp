@@ -151,7 +151,7 @@ void ActionHandler::handle_movement(double delta_t) {
     glm::vec3 motion_vector = handle_motion_input(delta_t, x_movement, z_movement);
 
     if(glfwGetKey(model_p->get_window(), GLFW_KEY_SPACE)){
-        if(player_p->is_flying()){
+        if(model_p->is_flying()){
             motion_vector.y = 1;
         }
         else if(delta_y == 0){
