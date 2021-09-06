@@ -3,9 +3,9 @@
 //
 
 #include <cmath>
-#include <glad/glad.h>
-#include <gtc/matrix_transform.hpp>
 
+#include "glad/glad.h"
+#include "gtc/matrix_transform.hpp"
 #include "Model.hpp"
 #include "Player.hpp"
 #include "trigonometric.hpp"
@@ -13,6 +13,8 @@
 #include "CubeWireframe.hpp"
 #include "Text2D.hpp"
 #include "Item.hpp"
+#include "stb_image.h"
+#include "ActionHandler.hpp"
 
 float Model::get_day_time() const {
     if (day_length <= 0) {
@@ -273,12 +275,11 @@ void Model::render_crosshair() {
 }
 
 void Model::render_text(int justify, const glm::vec3 &position, int n, std::string_view text) {
-    const Shader& shader = shaders.line_shader;
+    const Shader& shader = shaders.text_shader;
 
     shader.use();
     shader.set_viewproj(get_viewproj(proj_type::ORTHO_2D));
     shader.set_sampler(1);
-    shader.set_extra(1, 0);
     const glm::vec3 justified_position{position - glm::vec3{n * justify * (text.size() - 1) / 2, 0, 0}};
     Text2D{justified_position, n, text}.render_object();
 }
@@ -330,12 +331,12 @@ void Model::set_prev_item() {
     actual_item = TileBlock::items[new_index];
 }
 
-Model::Model() : width{WINDOW_WIDTH}, height{WINDOW_HEIGTH} {
-    glfwSetTime(day_length/3.0);
-    create_window(FULLSCREEN);
-}
+Model::Model() : Model({"block_vertex.vs", "block_fragment.fs"},
+                       {"line_vertex.vs", "line_fragment.fs"},
+                       {"sky_vertex.vs", "sky_fragment.fs"}, <#initializer#>)
+{}
 
-void Model::create_window(bool is_fullscreen) {
+GLFWwindow * Model::create_window(bool is_fullscreen) {
     GLFWmonitor *monitor = nullptr;
 
     if(is_fullscreen){
@@ -346,11 +347,11 @@ void Model::create_window(bool is_fullscreen) {
         height = modes[mode_count - 1].height;
     }
 
-    window = glfwCreateWindow(width, height, "Craft Cpp", monitor, nullptr);
+    return glfwCreateWindow(width, height, "Craft Cpp", monitor, nullptr);
 }
 
 Model::~Model() {
-    glfwDestroyWindow(window);
+    glfwTerminate();
 }
 
 GLFWwindow *Model::get_window() {
@@ -369,6 +370,20 @@ Player *Model::get_player() const{
     return player.get();
 }
 
-bool Model::is_flying(){
-    return flying;
+Model::Model(const Shader &block_shader, const Shader &line_shader, const Shader &sky_shader, const Shader &text_shader) :
+    shaders{block_shader, line_shader, sky_shader, text_shader},
+    width{WINDOW_WIDTH},
+    height{WINDOW_HEIGTH}
+    {
+    glfwSetTime(day_length / 3.0);
+    window = create_window(FULLSCREEN);
+    set_player({},{},"player_0", 0);
+    ActionHandler::initialize(this);
+}
+
+void Model::update_window_size() {
+    // TODO update vars that use width and height
+    scale = get_scale_factor();
+    glfwGetFramebufferSize(window, &width, &height);
+    glViewport(0, 0, width, height);
 }

@@ -8,7 +8,7 @@
 #include <gtc/type_ptr.hpp>
 #include "Shader.hpp"
 
-Shader::Shader(std::string_view vs_path, std::string_view fs_path) {
+Shader::Shader(std::string_view vs_path, std::string_view fs_path, const UniformsWrapper &uniforms) : uniforms{uniforms}{
     unsigned vs_id = build_shader(vs_path);
     unsigned fs_id = build_shader(fs_path);
 
@@ -85,7 +85,7 @@ void Shader::set_extra(int extra_suffix, GLtype value) const{
 }
 
 void Shader::set_viewproj(const glm::mat4& m) const{
-    glUniformMatrix4fv(uniforms.viewproj_matrix, glm::value_ptr(m));
+    glUniformMatrix4fv(uniforms.viewproj_matrix.first, 1, GL_FALSE, glm::value_ptr(m));
 }
 
 template<>

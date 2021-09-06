@@ -19,9 +19,18 @@ using Block = std::pair<glm::ivec3, TileBlock>;
 
 class Model {
     struct ShaderWrapper{
-        Shader block_shader{"block_vertex.vs", "block_fragment.fs"};
-        Shader line_shader{"line_vertex.vs", "line_fragment.fs"};
-        Shader sky_shader{"sky_vertex.vs", "sky_fragment.fs"};
+        const Shader& block_shader{
+            "block_vertex.vs", "block_fragment.fs", {"sky_sampler", "daylight", "fog_distance", "ortho"}
+        };
+        const Shader& line_shader{
+            "line_vertex.vs", "line_fragment.fs"
+        };
+        const Shader& sky_shader{
+            "sky_vertex.vs", "sky_fragment.fs"
+        };
+        const Shader& text_shader{
+            "text_vertex.vs", "text_fragment.fs"
+        };
     };
 private:
 
@@ -32,13 +41,12 @@ private:
     //std::array<std::string_view, MAX_MESSAGES> messages;
     static const Sphere sky;
 
-    int create_radius;
+    static constexpr int create_radius = CREATE_CHUNK_RADIUS;
     static constexpr int render_radius = RENDER_CHUNK_RADIUS;
+    static constexpr int delete_radius = DELETE_CHUNK_RADIUS;
 
     static constexpr float z_near = 0.125f;
     static constexpr float z_far = static_cast<float>(render_radius) * 32 + 64
-    int delete_radius;
-    int sign_radius;
 
     std::unique_ptr<Player> player{nullptr};
 
@@ -69,9 +77,11 @@ private:
 
     Crosshair crosshair{*this};
     glm::mat4 get_viewproj(proj_type pt) const;
-    void create_window(bool is_fullscreen);
+    GLFWwindow * create_window(bool is_fullscreen);
 public:
     Model();
+    Model(const Shader &block_shader, const Shader &line_shader, const Shader &sky_shader,
+          const Shader &text_shader);
     ~Model();
 
     static constexpr glm::ivec2 chunked(const glm::vec3& position);
@@ -122,6 +132,8 @@ public:
     void set_ortho(int ortho_size) ;
     void set_fov(int fov_degrees) ;
     Player* get_player() const;
+
+    void update_window_size();
 };
 
 

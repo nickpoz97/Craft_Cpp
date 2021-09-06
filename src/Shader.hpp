@@ -13,7 +13,7 @@
 struct Shader {
 private:
     GLuint id;
-    UniformWrapper uniforms{};
+    const UniformWrapper& uniforms{};
     int build_shader(std::string_view code_path);
     void get_uniforms_location();
 
@@ -22,7 +22,7 @@ private:
 public:
     void use() const;
 
-    Shader(std::string_view vs_path, std::string_view fs_path);
+    Shader(std::string_view vs_path, std::string_view fs_path, const UniformsWrapper &uniforms = {});
     GLuint get_id() const;
 
     void set_camera(const glm::vec3& camera_pos) const;

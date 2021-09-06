@@ -29,7 +29,7 @@ class ActionHandler {
     static void on_mouse_button(GLFWwindow *window, int button, int action, int mods);
 
 public:
-    static void initialize(Player* player_address, Model* model_address);
+    static void initialize(Model* model_address);
 
     static glm::vec3 handle_motion_input(double delta_t, int x_movement, int z_movement);
 };

@@ -89,11 +89,19 @@ void ActionHandler::on_key(GLFWwindow *window, int key, int scancode, int action
     }
 }
 
-void ActionHandler::initialize(Player* player_address, Model* model_address){
+void ActionHandler::initialize(Model* model_address){
     if(!initialized) {
         model_p = model_address;
         player_p = model_p->get_player();
         initialized = (player_p != nullptr) && (model_p != nullptr);
+        if(initialized && model_p->get_window()){
+            glfwMakeContextCurrent(model_p->get_window());
+            glfwSwapInterval(VSYNC);
+            glfwSetInputMode(model_p->get_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            glfwSetKeyCallback(model_p->get_window(), on_key);
+            glfwSetMouseButtonCallback(model_p->get_window(), on_mouse_button);
+            glfwSetScrollCallback(model_p->get_window(), on_scroll);
+        }
     }
 }
 
@@ -160,7 +168,7 @@ void ActionHandler::handle_movement(double delta_t) {
     }
 
     // TODO move everything to player class and check get_highest_block function in model
-    float speed = player_p->is_flying() ? 20 : 5;
+    float speed = model_p->is_flying() ? 20 : 5;
     int estimate = glm::length(motion_vector * speed + glm::vec3{0, glm::abs(static_cast<float>(delta_y)) * 2, 0});
     int step = glm::max(estimate, 8);
 
@@ -168,7 +176,7 @@ void ActionHandler::handle_movement(double delta_t) {
     motion_vector *= (ut * speed);
 
     for(int i = 0 ; i < step ; i++){
-        delta_y = player_p->is_flying() ? 0 : glm::max(delta_y - ut * 25, -250.0);
+        delta_y = model_p->is_flying() ? 0 : glm::max(delta_y - ut * 25, -250.0);
         player_p->update_player_position(motion_vector + glm::vec3{0, delta_y * ut, 0});
 
         auto collision_result = player_p->collide(2);

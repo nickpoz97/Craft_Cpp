@@ -66,6 +66,9 @@ struct UniformsWrapper : public Wrapper<UniformsWrapper>{
     const value_type extra3{0, "extra3"};
     const value_type extra4{0, "extra4"};
     const value_type viewproj_matrix{0, "viewproj_matrix"};
+
+    UniformsWrapper() = default;
+    UniformsWrapper(std::string_view extra1_name, std::string_view extra2_name, std::string_view extra3_name, std::string_view extra4_name)
 };
 
 #endif //CPP_WRAPPER_HPP

@@ -26,7 +26,7 @@ Wrapper<WrapperType>::Iterator& Wrapper<WrapperType>::Iterator::operator++() {
 }
 
 template<typename WrapperType>
-bool operator==(const AWrapper::Iterator &a, const Wrapper<WrapperType>::Iterator &b) {
+bool operator==(const Wrapper::Iterator &a, const Wrapper<WrapperType>::Iterator &b) {
     return a.actual_attribute == b.actual_attribute;
 }
 
@@ -49,3 +49,13 @@ template<typename WrapperType>
 Wrapper<WrapperType>::Iterator Wrapper<WrapperType>::end() const{
     return {reinterpret_cast<const value_type*>(this) + (get_size() / sizeof(value_type))};
 }
+
+UniformsWrapper::UniformsWrapper(std::string_view extra1_name,
+                                 std::string_view extra2_name,
+                                 std::string_view extra3_name,
+                                 std::string_view extra4_name) :
+                                 extra1{0, extra1_name},
+                                 extra2{0, extra1_name},
+                                 extra3{0, extra1_name},
+                                 extra4{0, extra1_name}
+                                 {}
