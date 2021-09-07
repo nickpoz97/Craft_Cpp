@@ -10,5 +10,6 @@ include_directories(deps/glfw/include/)
 include_directories(deps/glm)
 include_directories(deps/noise/)
 include_directories(deps/stbi/)
+include_directories(deps/fmt/include/)
 
 add_executable(app ${SOURCE_FILES} src/UniformsWrapper.hpp src/GameObject.cpp src/Item.cpp src/Item.hpp src/ActionHandler.cpp src/ActionHandler.hpp deps/stbi/stb_image.h)

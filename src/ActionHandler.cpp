@@ -2,6 +2,7 @@
 // Created by ultimatenick on 04/09/21.
 //
 
+#include <trigonometric.hpp>
 #include "ActionHandler.hpp"
 
 void ActionHandler::on_left_click() {
@@ -106,16 +107,16 @@ void ActionHandler::initialize(Model* model_address){
 }
 
 void ActionHandler::on_scroll(GLFWwindow *window, double xdelta, double ydelta) {
-    scroll_y_pos += ydelta;
+    scroll_pos += ydelta;
 
-    if(scroll_y_pos < -SCROLL_TRESHOLD){
+    if(scroll_pos < -SCROLL_TRESHOLD){
         model_p->set_prev_item();
-        scroll_y_pos = 0;
+        scroll_pos = 0;
     }
 
-    if(scroll_y_pos > SCROLL_TRESHOLD){
+    if(scroll_pos > SCROLL_TRESHOLD){
         model_p->set_next_item();
-        scroll_y_pos = 0;
+        scroll_pos = 0;
     }
 }
 
@@ -156,7 +157,7 @@ void ActionHandler::handle_movement(double delta_t) {
     model_p->set_ortho(glfwGetKey(model_p->get_window(), 'F') ? 64 : 0);
     model_p->set_fov(glfwGetKey(model_p->get_window(), GLFW_KEY_LEFT_SHIFT) ? 15 : 65);
 
-    glm::vec3 motion_vector = handle_motion_input(delta_t, x_movement, z_movement);
+    glm::vec3 motion_vector = compute_motion(delta_t, x_movement, z_movement);
 
     if(glfwGetKey(model_p->get_window(), GLFW_KEY_SPACE)){
         if(model_p->is_flying()){
@@ -190,7 +191,7 @@ void ActionHandler::handle_movement(double delta_t) {
     }
 }
 
-glm::vec3 ActionHandler::handle_motion_input(double delta_t, int x_movement, int z_movement) {
+glm::vec3 ActionHandler::compute_motion(double delta_t, int x_movement, int z_movement) {
     if (glfwGetKey(model_p->get_window(), 'W')) { z_movement--; }
     if (glfwGetKey(model_p->get_window(), 'S')) { z_movement++; }
     if (glfwGetKey(model_p->get_window(), 'A')) { x_movement--; }
@@ -202,6 +203,50 @@ glm::vec3 ActionHandler::handle_motion_input(double delta_t, int x_movement, int
 
     glm::vec3 motion_vector{player_p->get_motion_vector(x_movement, z_movement)};
     return motion_vector;
+}
+
+void ActionHandler::set_callbacks(GLFWwindow* window) {
+    if(!members_set && initialized) {
+        glfwSetKeyCallback(window, ActionHandler::on_key);
+        glfwSetMouseButtonCallback(window, on_mouse_button);
+        glfwSetScrollCallback(window, on_scroll);
+
+        members_set = true;
+    }
+}
+
+void ActionHandler::handle_mouse_input() {
+    int exclusive = glfwGetInputMode(model_p->get_window(), GLFW_CURSOR) == GLFW_CURSOR_DISABLED;
+
+    if(exclusive && former_cursor_pos != glm::vec2{} && initialized){
+        double mx, my;
+        glfwGetCursorPos(model_p->get_window(), &mx, &my);
+        glm::vec2 actual_cursor_pos{mx, my};
+
+        float m = 0.0025;
+
+        auto updated_rotation = player_p->get_rotation() + (actual_cursor_pos - former_cursor_pos) * m;
+
+        static constexpr float rx_limit = glm::radians(360.0f);
+
+        if(updated_rotation.x < 0){
+            updated_rotation.x += rx_limit;
+        }
+        if(updated_rotation.x >= rx_limit){
+            updated_rotation.x -= rx_limit;
+        }
+        static constexpr float ry_limit = -glm::radians(90.0f);
+
+        updated_rotation.y = glm::min(glm::max(updated_rotation.y, -ry_limit), ry_limit);
+
+        player_p->update_player_rotation(updated_rotation);
+        former_cursor_pos = actual_cursor_pos;
+    }
+    else{
+        double mx, my;
+        glfwGetCursorPos(model_p->get_window(), &mx, &my);
+        former_cursor_pos = glm::vec2{mx, my};
+    }
 }
 
 

@@ -44,6 +44,7 @@ private:
 public:
     const Status &getActualStatus() const;
     const glm::vec3& get_position() const;
+    const glm::vec2& get_rotation() const;
     const Frustum &getFrustum() const;
 
 

@@ -44,6 +44,20 @@ int main() {
     double previous = glfwGetTime();
     while(true){
         model.update_window_size();
+        double now = glfwGetTime();
+        double dt = now - previous;
+
+        dt = glm::min(dt, 0.2);
+        dt = glm::max(dt, 0.0);
+        previous = now;
+
+        model.handle_input(dt);
+
+        model.render_scene();
+        bool continue_loop = model.swap_pool();
+        if(!continue_loop){
+            break;
+        }
     }
 
     return 0;
@@ -72,4 +86,5 @@ int load_texture(std::string_view path, GLint clamp_type){
     //glGenerateMipmap(GL_TEXTURE_2D);
 
     stbi_image_free(data);
+    return 0;
 }

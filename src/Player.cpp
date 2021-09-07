@@ -293,6 +293,10 @@ void Player::increment_player_rotation(const glm::ivec2 &increment) {
     actual_status.rotation += increment;
 }
 
+const glm::vec2 &Player::get_rotation() const {
+    return actual_status.rotation;
+}
+
 Status operator+(const Status &a, const Status &b) {
     return {
         a.position + b.position,

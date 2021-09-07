@@ -46,7 +46,7 @@ private:
     static constexpr int delete_radius = DELETE_CHUNK_RADIUS;
 
     static constexpr float z_near = 0.125f;
-    static constexpr float z_far = static_cast<float>(render_radius) * 32 + 64
+    static constexpr float z_far = static_cast<float>(render_radius) * 32 + 64;
 
     std::unique_ptr<Player> player{nullptr};
 
@@ -111,7 +111,7 @@ public:
 
     TileBlock get_block(const glm::ivec3 position);
     void builder_block(const glm::ivec3 &pos, BlockType w);
-    void render_chunks();
+    void render_chunks() const;
     void render_sky() const;
     int getRenderRadius() const;
     float getFov() const;
@@ -119,7 +119,7 @@ public:
     const std::unordered_map<glm::ivec2, Chunk> &getChunks() const;
     void render_wireframe();
     void render_crosshair();
-    void render_text(int justify, const glm::vec3 &position, int n, std::string_view text);
+    void render_text(int justify, const glm::vec2 &position, float n, std::string_view text);
     void render_item();
 
     TileBlock get_actual_item() const;
@@ -134,6 +134,10 @@ public:
     Player* get_player() const;
 
     void update_window_size();
+    void handle_input(double dt);
+
+    void render_scene();
+    bool swap_pool();
 };
 
 

@@ -15,6 +15,7 @@
 #include "Item.hpp"
 #include "stb_image.h"
 #include "ActionHandler.hpp"
+#include "fmt/format.h"
 
 float Model::get_day_time() const {
     if (day_length <= 0) {
@@ -183,7 +184,7 @@ void Model::builder_block(const glm::ivec3 &pos, BlockType w)  {
     }*/
 }
 
-void Model::render_chunks() {
+void Model::render_chunks() const {
     if(!player || !shaders.block_shader.get_id()){
         return;
     }
@@ -274,13 +275,13 @@ void Model::render_crosshair() {
     crosshair.render_lines();
 }
 
-void Model::render_text(int justify, const glm::vec3 &position, int n, std::string_view text) {
+void Model::render_text(int justify, const glm::vec2 &position, float n, std::string_view text) {
     const Shader& shader = shaders.text_shader;
 
     shader.use();
     shader.set_viewproj(get_viewproj(proj_type::ORTHO_2D));
     shader.set_sampler(1);
-    const glm::vec3 justified_position{position - glm::vec3{n * justify * (text.size() - 1) / 2, 0, 0}};
+    const glm::vec2 justified_position{position - glm::vec2{n * justify * (text.size() - 1) / 2, 0}};
     Text2D{justified_position, n, text}.render_object();
 }
 
@@ -377,8 +378,16 @@ Model::Model(const Shader &block_shader, const Shader &line_shader, const Shader
     {
     glfwSetTime(day_length / 3.0);
     window = create_window(FULLSCREEN);
-    set_player({},{},"player_0", 0);
-    ActionHandler::initialize(this);
+
+    if(window) {
+        set_player({}, {}, "player_0", 0);
+        ActionHandler::initialize(this);
+
+        glfwMakeContextCurrent(window);
+        glfwSwapInterval(VSYNC);
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        ActionHandler::set_callbacks(window);
+    }
 }
 
 void Model::update_window_size() {
@@ -386,4 +395,56 @@ void Model::update_window_size() {
     scale = get_scale_factor();
     glfwGetFramebufferSize(window, &width, &height);
     glViewport(0, 0, width, height);
+}
+
+void Model::handle_input(double dt) {
+    ActionHandler::handle_mouse_input();
+    ActionHandler::handle_movement(dt);
+}
+
+void Model::render_scene() {
+    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    render_sky();
+    glClear(GL_DEPTH_BUFFER_BIT);
+    render_chunks();
+    if(SHOW_WIREFRAME){
+        render_wireframe();
+    }
+    glClear(GL_DEPTH_BUFFER_BIT);
+    if (SHOW_CROSSHAIRS) {
+        render_crosshair();
+    }
+    if (SHOW_ITEM) {
+        render_item();
+    }
+    if(SHOW_INFO_TEXT){
+        float ts = 12 * scale;
+        float tx = ts / 2;
+        float ty = height - ts;
+
+        int hour = get_day_time() * 24;
+        char am_pm = hour < 12 ? 'a' : 'p';
+        hour = hour % 12;
+        hour = hour ? hour : 12;
+
+        int p = player->get_pq().x;
+        int q = player->get_pq().y;
+        float x = player->get_position().x;
+        float y = player->get_position().y;
+        float z = player->get_position().z;
+
+        std::string_view s{
+            fmt::format("(%d, %d) (%.2f, %.2f, %.2f) n_chunks: %d, hour: %d%cm",
+                        p, q, x, y, z, chunks.size(), hour, am_pm);
+        };
+
+        render_text(ALIGN_LEFT, {tx, ty}, ts, s);
+    }
+}
+
+bool Model::swap_pool() {
+    glfwSwapBuffers(window);
+    glfwPollEvents();
+    return !glfwWindowShouldClose(window);
 }

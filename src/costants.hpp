@@ -22,6 +22,9 @@ static constexpr int CREATE_CHUNK_RADIUS = 10;
 static constexpr int DELETE_CHUNK_RADIUS = 14;
 
 static constexpr double SCROLL_TRESHOLD = 0.1;
+static constexpr int ALIGN_LEFT = 0;
+static constexpr int ALIGN_CENTER = 1;
+static constexpr int ALIGN_RIGHT = 2;
 
 // config
 static constexpr bool SHOW_LIGHT = true;
@@ -33,6 +36,10 @@ static constexpr int WINDOW_WIDTH = 1024;
 static constexpr int WINDOW_HEIGTH = 768;
 
 static constexpr bool FULLSCREEN = false;
+static constexpr bool SHOW_WIREFRAME = false;
+static constexpr bool SHOW_CROSSHAIRS = true;
+static constexpr bool SHOW_INFO_TEXT = true;
+static constexpr bool SHOW_ITEM = true;
 static constexpr int DAY_LENGTH = 600;
 static constexpr bool VSYNC = true;
 #define CPP_COSTANTS_HPP
