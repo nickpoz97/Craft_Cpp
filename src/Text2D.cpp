@@ -5,7 +5,7 @@
 #include "Text2D.hpp"
 #include "Character.hpp"
 
-Text2D::Text2D(const glm::vec2& position, int n, std::string_view text) : SuperClass{gen_buffer(position, n, text)} {
+Text2D::Text2D(const glm::vec2& position, float n, std::string_view text) : SuperClass{gen_buffer(position, n, text)} {
 }
 
 void Text2D::render_object() const {

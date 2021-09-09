@@ -41,20 +41,8 @@ int main() {
         return -1;
     }
 
-    double previous = glfwGetTime();
     while(true){
-        model.update_window_size();
-        double now = glfwGetTime();
-        double dt = now - previous;
-
-        dt = glm::min(dt, 0.2);
-        dt = glm::max(dt, 0.0);
-        previous = now;
-
-        model.handle_input(dt);
-
-        model.render_scene();
-        bool continue_loop = model.swap_pool();
+        bool continue_loop = model.loop();
         if(!continue_loop){
             break;
         }

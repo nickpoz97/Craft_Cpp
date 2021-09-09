@@ -16,6 +16,7 @@
 #include "stb_image.h"
 #include "ActionHandler.hpp"
 #include "fmt/format.h"
+#include "Shader.hpp"
 
 float Model::get_day_time() const {
     if (day_length <= 0) {
@@ -87,8 +88,9 @@ bool Model::chunk_visible(const glm::ivec2 &pq) {
     int z = pq.y * Chunk::getSize() - 1;
     int d = Chunk::getSize() + 1;
 
-    int miny = Chunk::getMinY();
-    int maxy = Chunk::getMaxY();
+    const Chunk& c = get_chunk_at(pq);
+    int miny = c.getMinY();
+    int maxy = c.getMaxY();
 
     std::array<glm::vec3, 8> points{{
             {x + 0, miny, z + 0},
@@ -116,9 +118,9 @@ constexpr glm::ivec2 Model::chunked(const glm::vec3& position) {
     };
 }
 
-TileBlock Model::highest_block(const glm::vec2& pq) {
+int Model::highest_block(const glm::vec2& pq) {
     const Chunk& chunk = chunks.at(pq);
-    return chunk.getHighestBlock();
+    return chunk.getMaxY();
 }
 
 const std::unordered_map<glm::ivec2, Chunk> &Model::getChunks() const {
@@ -153,8 +155,11 @@ void Model::set_block(const glm::ivec3 &pos, const TileBlock &w) {
 }
 
 Chunk &Model::get_chunk_at(const glm::ivec2 &pq) {
-    auto c_it = chunks.find(pq);
-    return (c_it != chunks.end()) ? c_it->second : chunks.emplace(pq, Chunk{*this,pq});
+    if (!chunks.contains(pq)) {
+        const auto &inserted_pair = chunks.emplace(pq, Chunk{*this, pq}, false).first;
+        return inserted_pair->second;
+    }
+    return chunks[pq]
 }
 
 constexpr int Model::chunked(int val) {
@@ -172,23 +177,18 @@ TileBlock Model::get_block(const glm::ivec3 position) {
 }
 
 void Model::builder_block(const glm::ivec3 &pos, BlockType w)  {
-    if (pos.y <= 0 || pos.y >= 256 || w == BlockType::EMPTY) {
+    if (pos.y <= 0 || pos.y >= 256) {
         return;
     }
-    set_block(pos, TileBlock{});
-    /*if (get_block(pos).is_destructable()) {
+    if (get_block(pos).is_destructable() && w != BlockType::CLOUD) {
         set_block(pos, TileBlock{});
-    }*/
-    /*if (w != BlockType::EMPTY) {
-        set_block(pos, TileBlock{w});
-    }*/
+    }
 }
 
 void Model::render_chunks() const {
     if(!player || !shaders.block_shader.get_id()){
         return;
     }
-
     const Shader& shader = shaders.block_shader;
     shader.use();
 
@@ -205,14 +205,10 @@ void Model::render_chunks() const {
     shader.set_extra(4, ortho);
 
     for(const auto& c : chunks){
-        if(c.is_visible(player->getFrustum()) && get_chunk_distance(player_pq, c.pq) < render_radius){
+        if(c.is_visible(player->getFrustum()) && get_chunk_distance(player_pq, c.pq) < RENDER_CHUNK_RADIUS){
             c.render();
         }
     }
-}
-
-int Model::getRenderRadius() const {
-    return render_radius;
 }
 
 float Model::getFov() const {
@@ -259,7 +255,7 @@ void Model::render_wireframe() {
         glLineWidth(1);
         glEnable(GL_COLOR_LOGIC_OP);
         s.use();
-        s.set_viewproj(get_viewproj(proj_type::PERSP););
+        s.set_viewproj(get_viewproj(proj_type::PERSP));
         CubeWireframe{hit_info.first}.render_lines();
         glDisable(GL_COLOR_LOGIC_OP);
     }
@@ -308,10 +304,6 @@ void Model::record_block(const glm::ivec3 &pos) {
     record_block(pos, actual_item);
 }
 
-TileBlock Model::get_actual_item() const {
-    return actual_item;
-}
-
 void Model::set_actual_item(TileBlock item) {
     actual_item = item;
 }
@@ -334,7 +326,8 @@ void Model::set_prev_item() {
 
 Model::Model() : Model({"block_vertex.vs", "block_fragment.fs"},
                        {"line_vertex.vs", "line_fragment.fs"},
-                       {"sky_vertex.vs", "sky_fragment.fs"}, <#initializer#>)
+                       {"sky_vertex.vs", "sky_fragment.fs"},
+                       {"text_vertex.vs", "text_fragment.fs"})
 {}
 
 GLFWwindow * Model::create_window(bool is_fullscreen) {
@@ -378,6 +371,7 @@ Model::Model(const Shader &block_shader, const Shader &line_shader, const Shader
     {
     glfwSetTime(day_length / 3.0);
     window = create_window(FULLSCREEN);
+    previous_timestamp = glfwGetTime();
 
     if(window) {
         set_player({}, {}, "player_0", 0);
@@ -391,10 +385,10 @@ Model::Model(const Shader &block_shader, const Shader &line_shader, const Shader
 }
 
 void Model::update_window_size() {
-    // TODO update vars that use width and height
     scale = get_scale_factor();
     glfwGetFramebufferSize(window, &width, &height);
     glViewport(0, 0, width, height);
+    update_proj_matrix();
 }
 
 void Model::handle_input(double dt) {
@@ -447,4 +441,76 @@ bool Model::swap_pool() {
     glfwSwapBuffers(window);
     glfwPollEvents();
     return !glfwWindowShouldClose(window);
+}
+
+// build chunks around the player to test collisions
+void Model::load_collision_chunks() {
+    if(!Player){
+        return;
+    }
+    const glm::ivec2& player_chunk = player->get_pq();
+    const int r = 1;
+    for(int dp = -r ; dp <= r ; dp++){
+        for(int dq = -r ; dq <= r ; dq++) {
+            glm::vec2 pos{player_chunk.x + dp, player_chunk.x + dq};
+            if(!chunks.contains(pos)) {chunks.emplace(pos, Chunk{*this, pos, true});}
+        }
+    }
+}
+
+void Model::update_proj_matrix() {
+    persp_proj = glm::perspective(glm::radians(fov), static_cast<float>(width) / (height), z_near, z_far);
+    ortho_proj_2d = glm::ortho(0, width, 0, height, -1, 1);
+}
+
+void Model::load_visible_chunks() {
+    if(!player){
+        return;
+    }
+    glm::ivec2 pq = player->get_pq();
+    for(int dp = -RENDER_CHUNK_RADIUS ; dp <= RENDER_CHUNK_RADIUS ; dp++ ){
+        for(int dq = -RENDER_CHUNK_RADIUS ; dq <= RENDER_CHUNK_RADIUS ; dq++ ){
+            Chunk c{*this, {pq.x + dq, pq.y + dq}, false};
+            if(c.is_visible(player->getFrustum()) && !chunks.contains(c.pq)){
+                c.init();
+                chunks.insert({c.pq, c})
+            }
+        }
+    }
+}
+
+void Model::remove_distant_chunks() {
+    if(!player || chunks.size() < (MAX_CHUNKS / 4 * 3)){
+        return;
+    }
+    glm::ivec2 player_pq = player->get_pq();
+    // position-chunk pair
+    for(const auto& pq_c_pair : chunks){
+        if(get_chunk_distance(player_pq, pq_c_pair.first) > DELETE_CHUNK_RADIUS){
+            // every modification of chunk is lost
+            chunks.erase(pq_c_pair.first);
+        }
+    }
+}
+
+void Model::update_chunk_map() {
+    remove_distant_chunks();
+    load_collision_chunks();
+    load_visible_chunks();
+}
+
+bool Model::loop() {
+    update_window_size();
+    double now = glfwGetTime();
+    double dt = now - previous_timestamp;
+
+    dt = glm::min(dt, 0.2);
+    dt = glm::max(dt, 0.0);
+    previous_timestamp = now;
+
+    update_chunk_map();
+    handle_input(dt);
+    render_scene();
+
+    return swap_pool();
 }

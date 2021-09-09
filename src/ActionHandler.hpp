@@ -22,8 +22,6 @@ private:
 
     static inline glm::vec2 former_cursor_pos{};
 
-    //void on_light();
-
     static void on_right_click();
     static void on_left_click();
     static void on_middle_click();

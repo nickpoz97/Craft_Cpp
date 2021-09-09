@@ -21,7 +21,7 @@ public:
     auto end() {return vertices.end();}
 
 public:
-    Character(const glm::vec2 &position, int m, int n, char c);
+    Character(const glm::vec2 &position, float m, float n, char c);
 };
 
 

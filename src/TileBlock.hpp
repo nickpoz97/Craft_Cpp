@@ -8,7 +8,6 @@
 #include <array>
 #include <vector>
 
-#include "item.hpp"
 #include "vec3.hpp"
 
 // TODO verificare ItemType mancanti

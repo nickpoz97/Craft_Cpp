@@ -8,7 +8,6 @@
 
 #include <string_view>
 #include "glad/glad.h"
-#include "UniformsWrapper.hpp"
 
 struct Shader {
 private:

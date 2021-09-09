@@ -17,8 +17,7 @@ private:
 
     static std::vector<Uv2DVertex> gen_buffer(const glm::vec2& position, int n, std::string_view text);
 public:
-    Text2D(const glm::vec2& position, int n, std::string_view text);
-    void render_object() const;
+    Text2D(const glm::vec2& position, float n, std::string_view text);
 };
 
 

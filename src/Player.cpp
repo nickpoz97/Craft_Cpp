@@ -35,8 +35,8 @@ Player::Player(const Model &model, std::string_view name, int id, const glm::vec
     id{id},
     frustum{
         model.getFov(),
-        0.125,
-        model.getRenderRadius() * 32 + 64,
+        model.z_near,
+        model.z_far,
         model.getWidth() / model.getHeight(),
         *this
     }
@@ -46,7 +46,6 @@ Player::Player(const Model &model, std::string_view name, int id, const glm::vec
     transform = glm::rotate(transform, rotation.y, {0, 1, 0});
     transform = glm::rotate(transform, rotation.x, {1, 0, 0});
 
-    playerCube.apply_transform(transform);
     frustum.update(false);
 }
 
@@ -92,15 +91,6 @@ glm::vec3 Player::get_camera_direction_vector() const {
     });
 }
 
-void Player::set_movement(int x, int z) {
-    x_movement = x;
-    z_movement = z;
-}
-
-void Player::draw() {
-    playerCube.draw_triangles();
-}
-
 void Player::update_player_status(const glm::vec3 &new_position, const glm::vec2 &new_rotation, bool interpolate) {
     if(interpolate){
         former_status1 = former_status2;
@@ -127,7 +117,7 @@ void Player::interpolate_player() {
     dt1 = glm::max(dt1, 0.1);
 
     auto p = static_cast<float>(glm::min(dt2/dt1, 1.0));
-    update_player(former_status1 + (former_status2 - former_status1) * p, 0);
+    update_player(former_status1 + (former_status2 - former_status1) * p, false);
 }
 
 void Player::update_player(const Status& new_status, bool interpolate) {
@@ -158,7 +148,7 @@ Block Player::hit_test(bool previous) const {
 
     for(const auto& pair : model.getChunks()){
         const Chunk& c = pair.second;
-        if(model.get_chunk_distance(player_pq, c.getPq()) > 1){
+        if(model.get_chunk_distance(player_pq, c.pq) > 1){
             continue;
         }
         auto kv_pair = ray_hit(c, previous, 8);
@@ -233,9 +223,6 @@ std::pair<bool, glm::vec3> Player::collide(int height) {
     glm::vec3 collision_point{};
     bool result{};
 
-    if(!c){
-        return false;
-    }
     const glm::ivec3 int_pos{glm::round(position)};
     const glm::vec3 decimal_dif_pos(position - static_cast<glm::vec3>(int_pos));
     float pad = 0.25;

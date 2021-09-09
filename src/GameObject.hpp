@@ -16,18 +16,18 @@ template<typename VertexType>
 class GameObject{
 private:
     OpenglBuffer<VertexType> gpu_buffer{};
-
 public:
     explicit GameObject(const std::vector<VertexType>& local_buffer);
-    template<size_t n_values>
-    explicit GameObject(const std::array<VertexType, n_values>& local_buffer);
+    template<size_t n_values> explicit GameObject(const std::array<VertexType, n_values>& local_buffer);
+    void update_buffer(const std::vector<VertexType>& local_buffer);
     void render_object() const;
     void render_lines() const;
 };
 
 template<typename VertexType>
 GameObject<VertexType>::GameObject(const std::vector<VertexType>& local_buffer) {
-    gpu_buffer.store_data(local_buffer);
+    if(!local_buffer.empty())
+        gpu_buffer.update_buffer(local_buffer);
 }
 
 template<typename VertexType>
@@ -43,7 +43,12 @@ void GameObject<VertexType>::render_lines() const {
 template<typename VertexType>
 template<size_t n_values>
 GameObject<VertexType>::GameObject(const std::array<VertexType, n_values> &local_buffer) {
-    gpu_buffer.template store_data(local_buffer);
+    gpu_buffer.store_data(local_buffer);
+}
+
+template<typename VertexType>
+void GameObject<VertexType>::update_buffer(const std::vector<VertexType> &local_buffer) {
+    gpu_buffer.store_data(local_buffer);
 }
 
 #endif //CPP_GAMEOBJECT_HPP

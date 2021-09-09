@@ -9,13 +9,9 @@
 #include "Model.hpp"
 #include "CubicObject.hpp"
 
-Chunk::Chunk(const Model &model, const glm::vec2 &pq) : model{model},  pq{pq},
-    xz_boundaries{get_xz_boundaries()}
+Chunk::Chunk(const Model &model, const glm::vec2 &pq, bool init) : model{model}, pq{pq},
+                                                                   xz_boundaries{get_xz_boundaries(pq)}
 {};
-
-void Chunk::render() {
-    gpu_buffer.draw_triangles();
-}
 
 constexpr int Chunk::getSize() {
     return size;
@@ -29,87 +25,42 @@ int Chunk::getMaxY() const{
     return max_y;
 }
 
-Tile Chunk::getHighestBlock() const{
-    for(auto rit{blockMap.rbegin()} ; rit != blockMap.rend() ; ++rit){
-        if((rit->second).is_obstacle())
-            return rit->second;
-    }
-    return Tile{};
-}
+int Chunk::getHighestBlock() const{
+    int highest_y = -1;
 
-const glm::ivec2 &Chunk::getPq() const {
-    return pq;
+    for(const auto& rit : block_map){
+        if((rit.second).is_obstacle() && rit.first.y > highest_y)
+            highest_y = rit.first;
+    }
+    return highest_y;
 }
 
 TileBlock Chunk::get_block(const glm::ivec3& block_pos) const{
-    return blockMap.at(block_pos);
+    return block_map.at(block_pos);
 }
 
 Chunk::operator bool() const {
-    return !blockMap.empty();
+    return !block_map.empty();
 }
 
-// checks if one of the neighbors has lights
-/*bool Chunk::has_lights() {
-    if(!model.show_light){
-        return false;
-    }
-    const auto& chunks_map = model.getChunks();
-
-    // iterate through neighbors
-    for (int dp = -1; dp <= 1; dp++) {
-        for (int dq = -1; dq <= 1; dq++) {
-            if (dp || dq) {
-                auto search_result = chunks_map.find(pq.x + dp, pq.y + dq);
-                if(search_result == chunks_map.end()){
-                    continue;
-                }
-                Chunk& other = *search_result;
-                if(!other.lights.empty()){
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
-}*/
-
-/*void Chunk::set_dirt() {
-    dirty = true;
-    if(!has_lights()){
-        return;
-    }
-    for (int dp = -1; dp <= 1; dp++) {
-        for (int dq = -1; dq <= 1; dq++) {
-            auto search_result{model.getChunks().find(pq.x + dp, pq.y + dq)};
-            if(search_result != model.getChunks().end()){
-                search_result->dirty = true;
-            }
-        }
-    }
-}*/
-
-void Chunk::compute_chunk(const WorkerItem &wi) {
+void Chunk::compute_chunk(const std::array<std::array<BlockMap*,3>,3>& neighbors_block_maps) {
     std::vector<bool> opaque(XZ_SIZE * XZ_SIZE * Y_SIZE);
     std::vector<char> highest(XZ_SIZE * XZ_SIZE);
 
     // position 0 - 1 for each coordinate
     glm::ivec3 offset{
-        wi.pq_coordinates.x * Chunk::size - Chunk::size - 1,
+        pq.x * Chunk::size - Chunk::size - 1,
         -1,
-        wi.pq_coordinates.y * Chunk::size - Chunk::size - 1
+        pq.y * Chunk::size - Chunk::size - 1
     };
 
-    bool has_light = wi.has_light();
+    populate_opaque(neighbors_block_maps, offset, opaque, highest);
 
-    populate_opaque(wi, offset, opaque, highest);
-
-    auto map = *(wi.block_maps[1][1]);
-    count_exposed_faces(map, opaque, offset);
+    count_exposed_faces(block_map, opaque, offset);
     local_buffer = std::vector<CubeVertex>(faces * INDICES_FACE_COUNT);
     auto v_it = local_buffer.begin();
 
-    for(const auto& kv : map){
+    for(const auto& kv : block_map){
         const glm::ivec3& e{kv.first};
         const TileBlock& tileBlock{kv.second};
 
@@ -117,14 +68,14 @@ void Chunk::compute_chunk(const WorkerItem &wi) {
     }
 }
 
-void Chunk::populate_opaque(const WorkerItem &wi, const glm::ivec3 &o, const std::vector<bool>& opaque, const std::vector<char>& highest) const {
-    for(const auto& blockmaps_row : wi.block_maps){
-        for(const auto bm : blockmaps_row){
-            if(!bm){
+void Chunk::populate_opaque(const std::array<std::array<BlockMap*,3>,3>& neighbors_block_maps, const glm::ivec3 &o, const std::vector<bool>& opaque, const std::vector<char>& highest) const {
+    for(const auto& blockmaps_row : neighbors_block_maps){
+        for(const auto bm_ref : blockmaps_row){
+            if(!bm_ref){
                 continue;
             }
             // kv is key-value (position-item)
-            for(const auto& kv : *bm){
+            for(const auto& kv : *bm_ref){
                 const glm::ivec3& e{kv.first};
                 TileBlock tileBlock{kv.second};
                 auto v = e - o;
@@ -195,12 +146,8 @@ decltype(Chunk::local_buffer)::iterator Chunk::generate_geometry(const std::vect
     }
 }
 
-void Chunk::generate_buffer() {
-    gpu_buffer.store_data(local_buffer);
-}
-
 void Chunk::generate_chunk() {
-    WorkerItem wi{pq};
+    std::array<std::array<BlockMap*,3>,3> neighbor_block_maps{};
 
     for (int dp = -1; dp <= 1; dp++) {
         for (int dq = -1; dq <= 1; dq++) {
@@ -208,12 +155,11 @@ void Chunk::generate_chunk() {
             if(dq || dp){
                 other = model.get_chunk_at(pq + glm::ivec2{dp, dq});
             }
-            wi.block_maps[dp + 1][dq + 1] = (other) ? other.blockMap : nullptr;
+            neighbor_block_maps[dp + 1][dq + 1] = (other) ? &(other.block_map) : nullptr;
         }
     }
 
-    compute_chunk(wi);
-    generate_buffer();
+    compute_chunk(neighbor_block_maps);
 }
 
 std::array<glm::vec3, 4> Chunk::get_xz_boundaries(const glm::vec2 &pq) {
@@ -240,6 +186,85 @@ bool Chunk::is_visible(const Frustum& frustum) const {
     return false;
 }
 
+void Chunk::update_buffer() {
+    generate_chunk();
+    SuperClass::update_buffer();
+    dirty = false;
+}
+
+bool Chunk::is_dirty() const {
+    return dirty;
+}
+
+void Chunk::init() {
+    const int pad = 1;
+    for(int dx{-pad}; dx < Chunk::size ; dx++){
+        for(int dz{-pad}; dz < Chunk::size ; dz++){
+            bool on_edge_flag = (dx < 0 || dz < 0 || dx >= Chunk::size || dz >= Chunk::size);
+            int x = pq.x * Chunk::size + dx;
+            int z = pq.y * Chunk::size + dz;
+
+            float f = simplex2(x * 0.01, z * 0.01, 4, 0.5, 2);
+            float g = simplex2(-x * 0.01, -z * 0.01, 2, 0.9, 2);
+            int mh = g * 32 + 16;
+            int h = f * mh;
+            BlockType w = BlockType::GRASS;
+            int t = 12;
+            if (h <= t) {
+                h = t;
+                w = BlockType::SAND;
+            }
+            // sand and grass terrain
+            for(int y = 0 ; y < h ; y++){
+                block_map.set_tileBlock({x,y,z}, static_cast<int>(w) * on_edge_flag);
+            }
+            if(w == BlockType::GRASS){
+                if(SHOW_PLANTS){
+                    // grass
+                    if (simplex2(-x * 0.1, z * 0.1, 4, 0.8, 2) > 0.6) {
+                        block_map.set_tileBlock({x, h, z}, static_cast<int>(BlockType::TALL_GRASS) * on_edge_flag);
+                    }
+                    // flowers
+                    if (simplex2(x * 0.05, -z * 0.05, 4, 0.8, 2) > 0.7) {
+                        // w_f max == 23
+                        int w_f = 18 + simplex2(x * 0.1, z * 0.1, 4, 0.8, 2) * 7;
+                        block_map.set_tileBlock({x, h, z}, w_f * on_edge_flag);
+                    }
+                }
+                bool ok = SHOW_TREES && !(dx - 4 < 0 || dz - 4 < 0 || dx + 4 >= CHUNK_SIZE || dz + 4 >= CHUNK_SIZE);
+                ok = ok && (simplex2(x, z, 6, 0.5, 2) > 0.84);
+
+                if(ok){
+                    for(int y = h + 3; y < h + 8; y++){
+                        for (int ox = -3; ox <= 3; ox++) {
+                            for (int oz = -3; oz <= 3; oz++) {
+                                int d = (ox * ox) + (oz * oz) +
+                                        (y - (h + 4)) * (y - (h + 4));
+                                if (d < 11) {
+                                    block_map.set_tileBlock({x + ox, y, z + oz}, BlockType::LEAVES);
+                                }
+                            }
+                        }
+                    }
+                    for (int y = h; y < h + 7; y++) {
+                        block_map.set_tileBlock({x, y, z}, BlockType::WOOD);
+                    }
+                }
+                if (SHOW_CLOUDS) {
+                    for (int y = 64; y < 72; y++) {
+                        if (simplex3(
+                                x * 0.01, y * 0.1, z * 0.01, 8, 0.5, 2) > 0.75)
+                        {
+                            block_map.set_tileBlock({x, y, z}, 16);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 void Chunk::set_block(const glm::ivec3& position, const TileBlock& w) {
-    blockMap.set_tileBlock(position, w);
+    block_map.set_tileBlock(position, w);
+    dirty = true;
 }

@@ -187,7 +187,8 @@ void ActionHandler::handle_movement(double delta_t) {
         }
     }
     if(player_p->get_position().y < 0){
-        player_p->update_player_position(player_p->get_position() + glm::vec3{0, model_p->highest_block(), 0});
+        player_p->update_player_position(
+                player_p->get_position() + glm::vec3{0, model_p->highest_block(player_p->get_pq()), 0});
     }
 }
 
@@ -248,15 +249,3 @@ void ActionHandler::handle_mouse_input() {
         former_cursor_pos = glm::vec2{mx, my};
     }
 }
-
-
-/*void ActionHandler::on_light() {
-    auto result = player.hit_test(false);
-    const auto& hit_pos {result.first};
-    const auto& hit_tile_block {result.second};
-
-    if(hit_pos.y > 0 && hit_pos.y < 256 && hit_tile_block.is_destructable()){
-
-    }
-}*/
-

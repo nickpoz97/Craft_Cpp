@@ -8,8 +8,8 @@
 #include <vector>
 #include <array>
 #include "glad/glad.h"
-#include "AttributesWrapper.hpp"
 #include "Vertex.hpp"
+#include "Wrapper.hpp"
 
 template<typename VertexType, std::enable_if_t<std::is_base_of_v<NormalVertex, VertexType>, bool> = true>
 struct N_NORMAL_ELEMENTS{

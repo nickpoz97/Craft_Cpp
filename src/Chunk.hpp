@@ -9,19 +9,15 @@
 
 #include "BlockMap.hpp"
 #include "list"
-#include "Sign.hpp"
-#include "AttributesWrapper.hpp"
 #include "OpenglBuffer.hpp"
 #include "Vertex.hpp"
 #include "costants.hpp"
 #include "Model.hpp"
 
-class Chunk {
+class Chunk : public GameObject<CubeVertex>{
 private:
-    //const WorkerItem& wi;
+    using SuperClass = GameObject<CubeVertex>;
 
-    //OpenglBuffer<Uv3DVertex> sign_buffer;
-    OpenglBuffer<CubeVertex> gpu_buffer{};
     std::vector<CubeVertex> local_buffer{};
 
     const Model& model;
@@ -30,15 +26,10 @@ private:
     int max_y{};
     std::array<glm::vec3, 4> xz_boundaries;
 
-    BlockMap blockMap{};
-    //BlockMap lights{};
-    //std::list<Sign> sign_list{};
+    BlockMap block_map{};
+    bool dirty{false};
 
     int faces{}; // n of faces
-    //int sign_faces;
-
-    //bool dirty;
-    //const Attrib attrib;
 
     static constexpr int XZ_SIZE = Chunk::size * 3 + 2;
     static constexpr int XZ_LO = Chunk::size;
@@ -48,34 +39,32 @@ private:
     static constexpr auto XZ = [](int x, int z){ return XYZ(x,0,z); };
     static std::array<glm::vec3, 4> get_xz_boundaries(const glm::vec2 &pq);
 
-    void populate_opaque(const WorkerItem &wi, const glm::ivec3 &o, const std::vector<bool>& opaque, const std::vector<char>& highest) const;
+    void populate_opaque(const std::array<std::array<BlockMap*,3>,3>& neighbors_block_maps, const glm::ivec3 &o, const std::vector<bool>& opaque, const std::vector<char>& highest) const;
     void count_exposed_faces(const BlockMap& map, std::vector<bool> opaque, const glm::ivec3& o);
     decltype(local_buffer)::iterator generate_geometry(const std::vector<bool> &opaque, decltype(local_buffer)::iterator vertex_it, const glm::vec3& e,
                                                        const std::vector<char> &highest, const glm::vec3& v, TileBlock w);
-    //static void void light_fill(std::vector<char>& opaque, std::vector<char>& light, const glm::vec3& v, int w, bool force);
 public:
-    const glm::ivec2 pq;
-    static constexpr int size = CHUNK_SIZE;
 
-    Chunk(const Model& model, const glm::vec2 &pq);
-    void render();
+    Chunk(const Model &model, const glm::vec2 &pq, bool init);
+    const glm::ivec2 pq;
+
+    static constexpr int size = CHUNK_SIZE;
     static constexpr int getSize();
     int getMinY() const;
     int getMaxY() const;
-    Tile getHighestBlock() const;
-    const glm::ivec2 &getPq() const;
+    int getHighestBlock() const;
     TileBlock get_block(const glm::ivec3& block_pos) const;
     operator bool() const;
-    //void gen_sign_buffer();
-    //bool has_lights();
-    //void set_dirt();
 
-    void compute_chunk(const WorkerItem &wi);
+    void compute_chunk(const std::array<std::array<BlockMap*,3>,3>&);
     void generate_chunk();
-    void generate_buffer();
 
-    void set_block(const glm:ivec3& chunked_position, const TileBlock& w);
+    void set_block(const glm:ivec3& position, const TileBlock& w);
     bool is_visible(const Frustum& frustum) const;
+    void update_buffer();
+    bool is_dirty() const;
+
+    void init();
 };
 
 

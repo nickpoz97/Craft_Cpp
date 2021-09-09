@@ -5,7 +5,7 @@
 #include "Character.hpp"
 #include "ext/matrix_transform.hpp"
 
-Character::Character(const glm::vec2 &position, int m, int n, char c){
+Character::Character(const glm::vec2 &position, float m, float n, char c){
     int w = c - 32;
 
     float du = (w % 16) * a;
