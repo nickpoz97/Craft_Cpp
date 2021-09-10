@@ -5,10 +5,10 @@
 #ifndef CPP_WRAPPER_HPP
 #define CPP_WRAPPER_HPP
 
+#include <string>
+#include <array>
 
 #include "glad/glad.h"
-#include "Shader.hpp"
-#include <string>
 
 template<typename WrapperType>
 struct value_type;
@@ -23,7 +23,7 @@ struct value_type<UniformsWrapper>{
 
 template<>
 struct value_type<AttributesWrapper>{
-    using t = GLuint;
+    using t = std::pair<GLuint, bool>;
 };
 
 template <class WrapperType>
@@ -33,18 +33,18 @@ public:
 
     class Iterator : std::iterator<std::output_iterator_tag, value_type>{
     public:
-        Iterator(const value_type* actual_attribute);
+        Iterator(value_type* actual_attribute);
         value_type& operator*();
         value_type* operator->();
         Iterator& operator++();
-        friend bool operator==(const Iterator& a, const Iterator& b);
-        friend bool operator!=(const Iterator& a, const Iterator& b);
+        bool operator==(const Iterator& b);
+        bool operator!=(const Iterator& b);
     private:
         value_type* actual_attribute;
     };
 
-    Iterator begin() const;
-    Iterator end() const;
+    Iterator begin() ;
+    Iterator end();
 
 private:
     size_t get_size() const;
@@ -68,7 +68,8 @@ struct UniformsWrapper : public Wrapper<UniformsWrapper>{
     const value_type viewproj_matrix{0, "viewproj_matrix"};
 
     UniformsWrapper() = default;
-    UniformsWrapper(std::string_view extra1_name, std::string_view extra2_name, std::string_view extra3_name, std::string_view extra4_name)
+    UniformsWrapper(std::string_view extra1_name, std::string_view extra2_name, std::string_view extra3_name, std::string_view extra4_name);
+    UniformsWrapper(std::array<std::string_view, 4> extra_names);
 };
 
 #endif //CPP_WRAPPER_HPP

@@ -7,21 +7,27 @@
 
 
 #include <string_view>
+#include <array>
+
 #include "glad/glad.h"
+#include "Wrapper.hpp"
+#include "vec3.hpp"
+#include "mat4x4.hpp"
 
 struct Shader {
 private:
     GLuint id;
-    const UniformWrapper& uniforms{};
-    int build_shader(std::string_view code_path);
+    UniformsWrapper uniforms;
+
+    static int build_shader(std::string_view code_path);
     void get_uniforms_location();
 
     template<typename GLtype>
-    void _set_extra<GLtype>(int u_location, GLtype val) const;
+    void _set_extra(int u_location, GLtype val) const;
 public:
     void use() const;
 
-    Shader(std::string_view vs_path, std::string_view fs_path, const UniformsWrapper &uniforms = {});
+    Shader(std::string_view vs_path, std::string_view fs_path, std::array<std::string_view, 4> uniforms_extra_names);
     GLuint get_id() const;
 
     void set_camera(const glm::vec3& camera_pos) const;
@@ -30,7 +36,7 @@ public:
     void set_viewproj(const glm::mat4& m) const;
 
     template<typename GLtype>
-    void set_extra<GLtype>(int extra_suffix, GLtype value) const;
+    void set_extra(int extra_suffix, GLtype value) const;
 };
 
 

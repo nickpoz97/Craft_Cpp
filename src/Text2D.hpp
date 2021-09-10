@@ -15,9 +15,10 @@ class Text2D : public GameObject<Uv2DVertex>{
 private:
     using SuperClass = GameObject<Uv2DVertex>;
 
-    static std::vector<Uv2DVertex> gen_buffer(const glm::vec2& position, int n, std::string_view text);
+    static std::vector<Uv2DVertex> gen_buffer(const glm::vec2& position, float n, std::string_view text);
 public:
     Text2D(const glm::vec2& position, float n, std::string_view text);
+    void render_object() const;
 };
 
 

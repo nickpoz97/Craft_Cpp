@@ -8,7 +8,10 @@
 #include <gtc/type_ptr.hpp>
 #include "Shader.hpp"
 
-Shader::Shader(std::string_view vs_path, std::string_view fs_path, const UniformsWrapper &uniforms) : uniforms{uniforms}{
+Shader::Shader(std::string_view vs_path,
+               std::string_view fs_path,
+               std::array<std::string_view, 4> uniforms_extra_names) :
+    uniforms{uniforms_extra_names}{
     unsigned vs_id = build_shader(vs_path);
     unsigned fs_id = build_shader(fs_path);
 
@@ -40,9 +43,11 @@ int Shader::build_shader(std::string_view path) {
     std::string_view code_string{code_stream.str()};
 
     const char* code_c_string = code_string.data();
-    unsigned id = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(id, 1, &(code_c_string), NULL);
-    glCompileShader(id);
+    unsigned shader_id = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(shader_id, 1, &(code_c_string), NULL);
+    glCompileShader(shader_id);
+
+    return shader_id;
 }
 
 void Shader::get_uniforms_location() {

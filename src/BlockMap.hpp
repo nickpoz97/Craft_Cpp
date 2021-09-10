@@ -8,7 +8,6 @@
 #include <vec3.hpp>
 #include <map>
 #include "map_utils.hpp"
-#include "item.hpp"
 #include "TileBlock.hpp"
 
 using BaseMap = std::map<glm::ivec3, TileBlock, y_coord_comparator>;

@@ -10,7 +10,6 @@
 
 #include "vec3.hpp"
 
-// TODO verificare ItemType mancanti
 enum BlockType{
     EMPTY,
     GRASS,
@@ -78,8 +77,8 @@ struct Tiles {
     int frontFace;
     int backFace;
 
-    int get_face_val(unsigned index) const;
-    int count_visible_faces() const;
+    [[nodiscard]] int get_face_val(unsigned index) const;
+    [[nodiscard]] int count_visible_faces() const;
 };
 
 class TileBlock{
@@ -87,23 +86,22 @@ private:
     static const std::array<Tiles, 256> tiles;
     BlockType index;
 public:
-    BlockType getIndex() const;
+    [[nodiscard]] BlockType getIndex() const;
 
-    //TileBlock(int tile_index);
-    TileBlock(BlockType block_type);
+    explicit TileBlock(BlockType block_type);
     explicit TileBlock() = default;
     TileBlock(const TileBlock& other) = default;
     [[nodiscard]] const Tiles& get_tile_block() const;
-    int face_tile(unsigned index) const;
+    [[nodiscard]] int face_tile(unsigned index) const;
 
-    bool is_plant() const;
-    bool is_obstacle() const;
-    bool is_transparent() const;
-    bool is_destructable() const;
-    bool is_empty() const;
-    bool is_user_buildable() const;
+    [[nodiscard]] bool is_plant() const;
+    [[nodiscard]] bool is_obstacle() const;
+    [[nodiscard]] bool is_transparent() const;
+    [[nodiscard]] bool is_destructable() const;
+    [[nodiscard]] bool is_empty() const;
+    [[nodiscard]] bool is_user_buildable() const;
 
-    operator int() const;
+    explicit operator int() const;
 
     static constexpr std::array items{
             GRASS,

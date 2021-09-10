@@ -2,7 +2,6 @@
 // Created by ultimatenick on 07/08/21.
 //
 
-#include <unordered_set>
 #include "TileBlock.hpp"
 
 decltype(TileBlock::tiles) TileBlock::tiles{{
@@ -72,8 +71,6 @@ decltype(TileBlock::tiles) TileBlock::tiles{{
     {207, 207, 207, 207, 207, 207}, // 63
 }};
 
-TileBlock::TileBlock(int tile_index) : TileBlock{static_cast<BlockType>(tile_index)}{}
-
 const Tiles &TileBlock::get_tile_block() const {
     return tiles[static_cast<int>(index)];
 }
@@ -111,29 +108,28 @@ bool TileBlock::is_plant() const{
 
 bool TileBlock::is_obstacle() const{
     if (is_plant()) {
-        return 1;
+        return false;
     }
     switch (index) {
         case BlockType::EMPTY:
-        case BlockType::GLASS:
-        case BlockType::LEAVES:
-            return 1;
+        case BlockType::CLOUD:
+            return false;
         default:
-            return 0;
+            return true;
     }
 }
 
 bool TileBlock::is_transparent() const{
     if (is_plant()) {
-        return 1;
+        return true;
     }
     switch (index) {
         case BlockType::EMPTY:
         case BlockType::GLASS:
         case BlockType::LEAVES:
-            return 1;
+            return true;
         default:
-            return 0;
+            return false;
     }
 
 

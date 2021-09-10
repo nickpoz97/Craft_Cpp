@@ -3,14 +3,15 @@
 //
 
 #include <numeric>
-#include <noise.h>
 
+#include "noise.h"
 #include "Chunk.hpp"
 #include "Model.hpp"
 #include "CubicObject.hpp"
 
 Chunk::Chunk(const Model &model, const glm::vec2 &pq, bool init) : model{model}, pq{pq},
-                                                                   xz_boundaries{get_xz_boundaries(pq)}
+                                                                   xz_boundaries{get_xz_boundaries(pq)},
+                                                                   SuperClass{local_buffer}
 {};
 
 constexpr int Chunk::getSize() {
@@ -262,6 +263,33 @@ void Chunk::init() {
             }
         }
     }
+}
+
+bool Chunk::is_visible(const glm::mat4 &viewproj) const {
+    for(const auto& p : get_chunk_boundaries()){
+        glm::vec4 clip_point = viewproj * glm::vec4{(p + static_cast<float>(min_y)), 1};
+        float clip_w = clip_point.w;
+        clip_point = glm::abs(clip_point);
+
+        if(clip_point.x < clip_w && clip_point.y < clip_w && clip_point.z < clip_w){
+            return true;
+        }
+    }
+    return false;
+}
+
+std::array<glm::vec3, 8> Chunk::get_chunk_boundaries() const {
+    std::array<glm::vec3, 8> boundaries{};
+    auto it{boundaries.begin()};
+
+    for(const auto& p : xz_boundaries){
+        *(it++) = p + static_cast<float>(min_y);
+    }
+    for(const auto& p : xz_boundaries){
+        *(it++) = p + static_cast<float>(max_y);
+    }
+
+    return boundaries;
 }
 
 void Chunk::set_block(const glm::ivec3& position, const TileBlock& w) {

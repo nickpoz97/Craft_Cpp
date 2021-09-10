@@ -55,12 +55,10 @@ private:
 
     std::array<Block,2> blocks{};
 
-    enum class proj_type{PERSP, ORTHO_2D};
     glm::mat4 persp_proj{glm::perspective(glm::radians(fov), static_cast<float>(width) / (height), z_near, z_far)};
     glm::mat4 ortho_proj_2d{glm::ortho(0, width, 0, height, -1, 1)};
 
     Crosshair crosshair{*this};
-    glm::mat4 get_viewproj(proj_type pt) const;
     GLFWwindow * create_window(bool is_fullscreen);
 
     void update_proj_matrix();
@@ -70,6 +68,8 @@ private:
     void remove_distant_chunks();
     void update_chunk_map();
 public:
+    enum class proj_type{PERSP, ORTHO_2D};
+
     static constexpr float z_near = 0.125f;
     static constexpr float z_far = static_cast<float>(RENDER_CHUNK_RADIUS) * 32 + 64;
 
@@ -134,6 +134,7 @@ public:
     bool swap_pool();
 
     bool loop();
+    glm::mat4 get_viewproj(proj_type pt) const;
 };
 
 

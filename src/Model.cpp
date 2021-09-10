@@ -449,7 +449,7 @@ void Model::load_collision_chunks() {
         return;
     }
     const glm::ivec2& player_chunk = player->get_pq();
-    const int r = 1;
+    const int r = CREATE_CHUNK_RADIUS;
     for(int dp = -r ; dp <= r ; dp++){
         for(int dq = -r ; dq <= r ; dq++) {
             glm::vec2 pos{player_chunk.x + dp, player_chunk.x + dq};
@@ -480,7 +480,7 @@ void Model::load_visible_chunks() {
 }
 
 void Model::remove_distant_chunks() {
-    if(!player || chunks.size() < (MAX_CHUNKS / 4 * 3)){
+    if(!player || chunks.size() < MAX_CHUNKS){
         return;
     }
     glm::ivec2 player_pq = player->get_pq();

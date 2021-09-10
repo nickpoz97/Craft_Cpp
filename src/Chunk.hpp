@@ -43,6 +43,8 @@ private:
     void count_exposed_faces(const BlockMap& map, std::vector<bool> opaque, const glm::ivec3& o);
     decltype(local_buffer)::iterator generate_geometry(const std::vector<bool> &opaque, decltype(local_buffer)::iterator vertex_it, const glm::vec3& e,
                                                        const std::vector<char> &highest, const glm::vec3& v, TileBlock w);
+
+    std::array<glm::vec3, 8> get_chunk_boundaries() const;
 public:
 
     Chunk(const Model &model, const glm::vec2 &pq, bool init);
@@ -61,6 +63,7 @@ public:
 
     void set_block(const glm:ivec3& position, const TileBlock& w);
     bool is_visible(const Frustum& frustum) const;
+    bool is_visible(const glm::mat4 &viewproj) const;
     void update_buffer();
     bool is_dirty() const;
 

@@ -12,41 +12,57 @@
 #include "Wrapper.hpp"
 
 template<typename VertexType, std::enable_if_t<std::is_base_of_v<NormalVertex, VertexType>, bool> = true>
-struct N_NORMAL_ELEMENTS{
-    static constexpr GLuint v = decltype(VertexType::normal)::length();
-};
+constexpr int get_n_normal_elements(){
+    return decltype(VertexType::normal)::length();
+}
 
-template<typename VertexType, std::enable_if_t<std::is_base_of_v<Uv2DVertex, VertexType> ||
-        std::is_base_of_v<Uv3DVertex, VertexType>, bool> = true>
-struct N_UV_ELEMENTS{
-    static constexpr GLuint v = decltype(VertexType::uv)::length();
-};
+template<typename VertexType, std::enable_if_t<!std::is_base_of_v<NormalVertex, VertexType>, bool> = true>
+constexpr int get_n_normal_elements(){
+    return 0;
+}
+
+template<typename VertexType, std::enable_if_t<
+        std::is_base_of_v<Uv2DVertex, VertexType> || std::is_base_of_v<Uv3DVertex, VertexType>, bool> = true>
+constexpr int get_n_uv_elements(){
+    return decltype(VertexType::uv)::length();
+}
+
+template<typename VertexType, std::enable_if_t<
+        !std::is_base_of_v<Uv2DVertex, VertexType> && !std::is_base_of_v<Uv3DVertex, VertexType>, bool> = true>
+constexpr int get_n_uv_elements(){
+    return 0;
+}
 
 template<typename VertexType, std::enable_if_t<std::is_base_of_v<CubeVertex, VertexType>, bool> = true>
-struct N_AOLIGHT_ELEMENTS{
-    static constexpr GLuint v = decltype(VertexType::ao_light)::length();
-};
+constexpr int get_n_matrix_elements(){
+        return decltype(VertexType::transform)::length();
+}
 
-template<typename VertexType, std::enable_if_t<std::is_base_of_v<CubeVertex, VertexType>, bool> = true>
-struct N_MATRIX_ELEMENTS{
-    static constexpr GLuint v = decltype(VertexType::transform)::length();
-};
+template<typename VertexType, std::enable_if_t<!std::is_base_of_v<CubeVertex, VertexType>, bool> = true>
+constexpr int get_n_matrix_elements(){
+    return 0;
+}
 
 template<typename VertexType>
-struct N_POS_ELEMENTS{
-    static constexpr GLuint v = decltype(VertexType::position)::length();
-};
+constexpr int get_n_pos_elements(){
+    return decltype(VertexType::position)::length();
+}
 
 template<typename VertexType>
 class OpenglBuffer {
 private:
     GLuint id;
     static constexpr GLuint STRIDE = sizeof(VertexType);
-    const AttributesWrapper& attrib;
     void set_vao_attributes() const;
-    void _store_data(int size, GLfloat* data) const;
+    void _store_data(int size, const GLfloat *data) const;
 
     mutable size_t n_indices{};
+    static constexpr std::array<int,4> attributes_dimensions{
+        get_n_pos_elements<VertexType>(),
+        get_n_uv_elements<VertexType>(),
+        get_n_normal_elements<VertexType>(),
+        get_n_matrix_elements<VertexType>()
+    };
 public:
     OpenglBuffer();
     ~OpenglBuffer();
