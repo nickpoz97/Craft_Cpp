@@ -24,7 +24,7 @@ decltype(Sphere::uvs) Sphere::uvs{{
         {0, 1}, {0, 0.5}
 }};
 
-Sphere::Sphere(float r, int detail) : r{r}{
+Sphere::Sphere(float r, int detail) : SuperClass{}, r{r}{
     std::vector<Uv3DVertex> vertices(8 * pow(4, detail) * 24);
     auto it = vertices.begin();
 
@@ -35,14 +35,14 @@ Sphere::Sphere(float r, int detail) : r{r}{
         it = rec_gen_sphere(detail, actual_pos, actual_uvs, it);
     }
 
-    gpu_buffer.store_data(vertices);
+    update_buffer(vertices);
 }
 
 Sphere::iterator_type Sphere::rec_gen_sphere(int detail, const std::array<glm::vec3, 3> &actual_pos_triangle,
                                              const std::array<glm::vec2, 3> &actual_uvs_triangle,
                                              iterator_type it) {
     if(detail == 0){
-        it = store_vertices(actual_pos_triangle, actual_uvs_triangle, it);
+        it = fill_local_buffer(actual_pos_triangle, actual_uvs_triangle, it);
         return it;
     }
     const auto& a{actual_pos_triangle[0]};
@@ -68,8 +68,8 @@ Sphere::iterator_type Sphere::rec_gen_sphere(int detail, const std::array<glm::v
     return it;
 }
 
-Sphere::iterator_type Sphere::store_vertices(const std::array<glm::vec3, 3> &actual_pos_triangle, const std::array<glm::vec2, 3> &actual_uvs_triangle,
-                                             iterator_type it) {
+Sphere::iterator_type Sphere::fill_local_buffer(const std::array<glm::vec3, 3> &actual_pos_triangle, const std::array<glm::vec2, 3> &actual_uvs_triangle,
+                                                iterator_type it) const {
 
     auto pos_it {actual_pos_triangle.begin()};
     auto uvs_it {actual_uvs_triangle.begin()};
@@ -81,8 +81,4 @@ Sphere::iterator_type Sphere::store_vertices(const std::array<glm::vec3, 3> &act
     }
     // next pos on buffer
     return it;
-}
-
-void Sphere::render() const{
-    gpu_buffer.draw_triangles();
 }

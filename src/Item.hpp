@@ -12,9 +12,9 @@
 class Item : public RenderableEntity<CubeVertex>{
 public:
     using SuperClass = RenderableEntity<CubeVertex>;
-    Item(TileBlock w);
+    explicit Item(BlockType w);
 private:
-    std::vector<CubeVertex> gen_local_buffer(TileBlock w);
+    static std::vector<CubeVertex> gen_local_buffer(BlockType w);
 };
 
 

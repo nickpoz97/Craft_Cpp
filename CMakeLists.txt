@@ -13,6 +13,6 @@ include_directories(deps/glm)
 #include_directories(deps/fmt/include/)
 
 add_executable(app src/test_main.cpp src/TileBlock.cpp src/RenderableEntity.cpp src/OpenglBuffer.cpp deps/glad/src/glad.c
-        src/CubicObject.cpp src/Text2D.cpp src/Character.cpp src/Sphere.cpp)
+        src/CubicObject.cpp src/Text2D.cpp src/Character.cpp src/Sphere.cpp src/Item.cpp)
 add_subdirectory(deps/glfw)
 target_link_libraries(app ${CMAKE_DL_LIBS} glfw)
