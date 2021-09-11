@@ -8,8 +8,8 @@
 Character::Character(const glm::vec2 &position, float m, float n, char c){
     int w = c - 32;
 
-    float du = (w % 16) * a;
-    float dv = 1 - (w / 16) * b - b;
+    float du = static_cast<float>(w % 16) * a;
+    float dv = 1 - static_cast<float>(w / 16) * b - b;
 
     vertices = {{
         {position + glm::vec2{-n, -m}, glm::vec2{du, dv}},

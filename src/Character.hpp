@@ -7,7 +7,7 @@
 
 #include<array>
 
-#include "GameObject.hpp"
+#include "RenderableEntity.hpp"
 #include "Vertex.hpp"
 
 class Character{

@@ -71,16 +71,13 @@ decltype(TileBlock::tiles) TileBlock::tiles{{
     {207, 207, 207, 207, 207, 207}, // 63
 }};
 
-const Tiles &TileBlock::get_tile_block() const {
-    return tiles[static_cast<int>(index)];
-}
-
 int TileBlock::face_tile(unsigned face_index) const{
-    return tiles[static_cast<int>(index)].get_face_val(static_cast<int>(index));
+    return tiles[tile_index].get_face_val(face_index);
 }
 
 int Tiles::get_face_val(unsigned index) const{
-    return *(reinterpret_cast<const int*>(this) + (index % 6));
+    size_t size = sizeof(*this) / sizeof(int);
+    return (index <= size) ? *(reinterpret_cast<const int *>(this) + index) : 0;
 }
 
 int Tiles::count_visible_faces() const{
@@ -92,7 +89,7 @@ int Tiles::count_visible_faces() const{
 }
 
 bool TileBlock::is_plant() const{
-    switch (index) {
+    switch (tile_index) {
         case BlockType::TALL_GRASS:
         case BlockType::YELLOW_FLOWER:
         case BlockType::RED_FLOWER:
@@ -110,7 +107,7 @@ bool TileBlock::is_obstacle() const{
     if (is_plant()) {
         return false;
     }
-    switch (index) {
+    switch (tile_index) {
         case BlockType::EMPTY:
         case BlockType::CLOUD:
             return false;
@@ -123,7 +120,7 @@ bool TileBlock::is_transparent() const{
     if (is_plant()) {
         return true;
     }
-    switch (index) {
+    switch (tile_index) {
         case BlockType::EMPTY:
         case BlockType::GLASS:
         case BlockType::LEAVES:
@@ -136,7 +133,7 @@ bool TileBlock::is_transparent() const{
 }
 
 bool TileBlock::is_destructable() const{
-    switch (index) {
+    switch (tile_index) {
         case BlockType::EMPTY:
         case BlockType::CLOUD:
             return false;
@@ -146,18 +143,18 @@ bool TileBlock::is_destructable() const{
 }
 
 bool TileBlock::is_empty() const {
-    return index == BlockType::EMPTY;
+    return tile_index == BlockType::EMPTY;
 }
 
 TileBlock::operator int() const {
-    return static_cast<int>(index);
+    return static_cast<int>(tile_index);
 }
 
 BlockType TileBlock::getIndex() const {
-    return index;
+    return tile_index;
 }
 
-TileBlock::TileBlock(BlockType tile_index) : index{tile_index} {}
+TileBlock::TileBlock(BlockType tile_index) : tile_index{tile_index} {}
 
 bool TileBlock::is_user_buildable() const {
     return is_destructable();

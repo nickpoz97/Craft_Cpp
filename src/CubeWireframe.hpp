@@ -8,9 +8,9 @@
 #include <array>
 #include "CubicObject.hpp"
 
-class CubeWireframe : public GameObject<Standard3DVertex>{
+class CubeWireframe : public RenderableEntity<Standard3DVertex>{
 private:
-    using SuperClass = GameObject<Standard3DVertex>;
+    using SuperClass = RenderableEntity<Standard3DVertex>;
 
     static constexpr int N_VERTICES = 8;
     static constexpr int N_INDICES = 24;

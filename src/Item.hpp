@@ -7,11 +7,11 @@
 
 
 #include "Vertex.hpp"
-#include "GameObject.hpp"
+#include "RenderableEntity.hpp"
 
-class Item : public GameObject<CubeVertex>{
+class Item : public RenderableEntity<CubeVertex>{
 public:
-    using SuperClass = GameObject<CubeVertex>;
+    using SuperClass = RenderableEntity<CubeVertex>;
     Item(TileBlock w);
 private:
     std::vector<CubeVertex> gen_local_buffer(TileBlock w);

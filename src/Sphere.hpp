@@ -8,7 +8,10 @@
 #include <array>
 #include <vector>
 
-#include "CubicObject.hpp"
+#include "vec3.hpp"
+#include "vec2.hpp"
+#include "Vertex.hpp"
+#include "OpenglBuffer.hpp"
 
 class Sphere{
 private:

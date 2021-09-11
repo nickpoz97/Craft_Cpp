@@ -5,6 +5,7 @@
 #include <cmath>
 
 #include "Sphere.hpp"
+#include "costants.hpp"
 
 decltype(Sphere::triangles_indices) Sphere::triangles_indices{{
     {4, 3, 0}, {1, 4, 0},

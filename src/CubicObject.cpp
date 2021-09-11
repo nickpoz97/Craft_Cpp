@@ -2,44 +2,52 @@
 // Created by ultimatenick on 07/08/21.
 //
 
-#include <vec3.hpp>
 #include <numeric>
-#include <ext/matrix_transform.hpp>
+
+#include "vec3.hpp"
 #include "CubicObject.hpp"
 #include "costants.hpp"
+#include "trigonometric.hpp"
 
 template<unsigned n_faces>
-CubicObject<n_faces>::CubicObject(const BlockType &block_type, const std::array<bool, 6> &visible_faces, const glm::mat4& transform,
-                                  cube_vertex_iterator_t vertices_it) :
+CubicObject<n_faces>::CubicObject(const BlockType &block_type, const std::array<bool, 6> &visible_faces,
+                                  const glm::vec3 &center_position,
+                                  float asy_rotation, cube_vertex_iterator_t vertices_it) :
         begin{vertices_it},
         n_vertices{static_cast<size_t>(std::accumulate(visible_faces.begin(), visible_faces.end(), 0) * INDICES_FACE_COUNT)}{
     TileBlock tile_block{block_type};
 
-    auto pos_it = local_vertex_positions.begin();
-    auto uvs_it = uvs.begin();
-    auto nrm_it = normals.begin();
+    auto face_v_it = local_vertex_positions.begin();
+    auto face_uvs_it = uvs.begin();
+    auto face_nrm_it = normals.begin();
 
     for(auto face_ind_it = indices.begin() ; face_ind_it != indices.end() ; ++face_ind_it){
+        // obtain index of face
         int face_index = face_ind_it - indices.begin();
-        for(int face : *face_ind_it) {
-            float du = (tile_block.face_tile(face_index) % 16) * S;
-            float dv = (tile_block.face_tile(face_index) / 16) * S;
-
-            if (!visible_faces[face_index]) {
-                continue;
-            }
-
-            for (int i : *face_ind_it) {
-                vertices_it->position = N * (*pos_it++)[i];
-                vertices_it->normal = (*nrm_it++)[i];
-                vertices_it->uv = {
-                        du + (uvs_it->x ? B : A),
-                        dv + (uvs_it->y ? B : A)
-                };
-                vertices_it->transform = transform;
-                ++uvs_it;
-                ++vertices_it;
-            }
+        // test if face is visible
+        if (!visible_faces[face_index]) {
+            continue;
+        }
+        //obtain arrays of actual face elements
+        const auto& face_vertices = *(face_v_it++);
+        const glm::vec3& face_normal = *(face_nrm_it++);
+        const auto& face_uvs = *(face_uvs_it++);
+        // iterate through actual face indices
+        for(int i : *face_ind_it) {
+            auto& actual_vertex = *(vertices_it++);
+            // initialize texture coordinates
+            float du = static_cast<float>(tile_block.face_tile(face_index) % 16) * S;
+            float dv = static_cast<float>(tile_block.face_tile(face_index) / 16) * S;
+            // obtain local(cube or flower) coordinates
+            actual_vertex.position = N * face_vertices[i];
+            // obtain world coordinates (first rotation and then translation)
+            actual_vertex.position = center_position + rotate_asy(vertices_it->position, asy_rotation);
+            // assign normal
+            actual_vertex.normal = face_normal;
+            actual_vertex.uv = {
+                    du + (face_uvs[i].x ? B : A),
+                    dv + (face_uvs[i].y ? B : A)
+            };
         }
     }
 }
@@ -50,25 +58,96 @@ cube_vertex_iterator_t CubicObject<n_faces>::get_end() const {
 }
 
 template<unsigned int n_faces>
-glm::mat4 CubicObject<n_faces>::get_transform_matrix(const glm::vec3& position) {
-    glm::mat4 transform{1.0f};
-    transform = glm::translate(transform, position);
-    return transform;
+glm::vec3 CubicObject<n_faces>::rotate_asy(const glm::vec3 &v, float alpha) {
+    return {
+        glm::cos(alpha) * v.x + glm::sin(alpha) * v.z,
+        v.y,
+        -glm::sin(alpha) * v.x + glm::cos(alpha) * v.z,
+    };
 }
-
-template<unsigned int n_faces>
-glm::mat4 CubicObject<n_faces>::get_transform_matrix(const glm::vec3 &position, float rotation) {
-    return glm::rotate(get_transform_matrix(position), glm::radians(rotation), {0,1,0});
-}
-
-Plant::Plant(const BlockType &block_type, const std::array<bool, 6> &visible_faces, const glm::vec3 &position,
-             float rotation, cube_vertex_iterator_t vertices_it) :
-                super(block_type, visible_faces, get_transform_matrix(position, rotation), vertices_it)
-             {}
-
 
 Cube::Cube(const BlockType &block_type, const std::array<bool, 6> &visible_faces, const glm::vec3 &position,
            cube_vertex_iterator_t vertices_it) :
-                super(block_type, visible_faces, get_transform_matrix(position), vertices_it)
+                super(block_type, visible_faces, position, 0, vertices_it)
            {}
 
+template<>
+const CubicObject<6>::PositionsMatrix CubicObject<6>::local_vertex_positions{{
+    {{{-1, -1, -1}, {-1, -1, +1},
+    {-1, +1, -1}, {-1, +1, +1}}},
+    {{{+1, -1, -1}, {+1, -1, +1},
+    {+1, +1, -1}, {+1, +1, +1}}},
+    {{{-1, +1, -1}, {-1, +1, +1},
+    {+1, +1, -1}, {+1, +1, +1}}},
+    {{{-1, -1, -1}, {-1, -1, +1},
+    {+1, -1, -1}, {+1, -1, +1}}},
+    {{{-1, -1, -1}, {-1, +1, -1},
+    {+1, -1, -1}, {+1, +1, -1}}},
+    {{{-1, -1, +1}, {-1, +1, +1},
+    {+1, -1, +1}, {+1, +1, +1}}}
+}};
+
+template<>
+const CubicObject<6>::NormalMatrix CubicObject<6>::normals{{
+    {-1, 0, 0},
+    {+1, 0, 0},
+    {0, +1, 0},
+    {0, -1, 0},
+    {0, 0, -1},
+    {0, 0, +1}
+}};
+
+template<>
+const CubicObject<6>::IndicesMatrix CubicObject<6>::indices{{
+    {0, 3, 2, 0, 1, 3},
+    {0, 3, 1, 0, 2, 3},
+    {0, 3, 2, 0, 1, 3},
+    {0, 3, 1, 0, 2, 3},
+    {0, 3, 2, 0, 1, 3},
+    {0, 3, 1, 0, 2, 3}
+}};
+
+template<>
+const CubicObject<6>::UvsMatrix CubicObject<6>::uvs{{
+    {{{0, 0}, {1, 0}, {0, 1}, {1, 1}}},
+    {{{1, 0}, {0, 0}, {1, 1}, {0, 1}}},
+    {{{0, 1}, {0, 0}, {1, 1}, {1, 0}}},
+    {{{0, 0}, {0, 1}, {1, 0}, {1, 1}}},
+    {{{0, 0}, {0, 1}, {1, 0}, {1, 1}}},
+    {{{1, 0}, {1, 1}, {0, 0}, {0, 1}}}
+}};
+
+template<>
+const CubicObject<4>::PositionsMatrix CubicObject<4>::local_vertex_positions{{
+    {{{ 0, -1, -1}, { 0, -1, +1}, { 0, +1, -1}, { 0, +1, +1}}},
+    {{{ 0, -1, -1}, { 0, -1, +1}, { 0, +1, -1}, { 0, +1, +1}}},
+    {{{-1, -1,  0}, {-1, +1,  0}, {+1, -1,  0}, {+1, +1,  0}}},
+    {{{-1, -1,  0}, {-1, +1,  0}, {+1, -1,  0}, {+1, +1,  0}}}
+}};
+
+template<>
+const CubicObject<4>::NormalMatrix CubicObject<4>::normals{{
+    {-1, 0, 0},
+    {+1, 0, 0},
+    {0, 0, -1},
+    {0, 0, +1}
+}};
+
+template<>
+const CubicObject<4>::IndicesMatrix CubicObject<4>::indices{{
+    {-1, 0, 0},
+    {+1, 0, 0},
+    {0, 0, -1},
+    {0, 0, +1}
+}};
+
+template<>
+const CubicObject<4>::UvsMatrix CubicObject<4>::uvs{{
+    {{{0, 0}, {1, 0}, {0, 1}, {1, 1}}},
+    {{{1, 0}, {0, 0}, {1, 1}, {0, 1}}},
+    {{{0, 0}, {0, 1}, {1, 0}, {1, 1}}},
+    {{{1, 0}, {1, 1}, {0, 0}, {0, 1}}}
+}};
+
+template class CubicObject<6>;
+template class CubicObject<4>;

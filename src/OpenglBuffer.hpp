@@ -35,7 +35,7 @@ constexpr int get_n_uv_elements(){
 
 template<typename VertexType, std::enable_if_t<std::is_base_of_v<CubeVertex, VertexType>, bool> = true>
 constexpr int get_n_matrix_elements(){
-        return decltype(VertexType::transform)::length();
+        return 0; //decltype(VertexType::transform)::length();
 }
 
 template<typename VertexType, std::enable_if_t<!std::is_base_of_v<CubeVertex, VertexType>, bool> = true>

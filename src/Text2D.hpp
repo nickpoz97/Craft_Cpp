@@ -11,9 +11,9 @@
 #include <list>
 #include "Character.hpp"
 
-class Text2D : public GameObject<Uv2DVertex>{
+class Text2D : public RenderableEntity<Uv2DVertex>{
 private:
-    using SuperClass = GameObject<Uv2DVertex>;
+    using SuperClass = RenderableEntity<Uv2DVertex>;
 
     static std::vector<Uv2DVertex> gen_buffer(const glm::vec2& position, float n, std::string_view text);
 public:

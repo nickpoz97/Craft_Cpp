@@ -84,14 +84,13 @@ struct Tiles {
 class TileBlock{
 private:
     static const std::array<Tiles, 256> tiles;
-    BlockType index;
 public:
+    const BlockType tile_index{};
     [[nodiscard]] BlockType getIndex() const;
 
     explicit TileBlock(BlockType block_type);
     explicit TileBlock() = default;
     TileBlock(const TileBlock& other) = default;
-    [[nodiscard]] const Tiles& get_tile_block() const;
     [[nodiscard]] int face_tile(unsigned index) const;
 
     [[nodiscard]] bool is_plant() const;
