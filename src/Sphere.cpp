@@ -5,7 +5,7 @@
 #include <cmath>
 
 #include "Sphere.hpp"
-#include "costants.hpp"
+#include "ext/scalar_constants.hpp"
 
 decltype(Sphere::triangles_indices) Sphere::triangles_indices{{
     {4, 3, 0}, {1, 4, 0},
@@ -57,9 +57,9 @@ Sphere::iterator_type Sphere::rec_gen_sphere(int detail, const std::array<glm::v
     auto ac{0.5f * (a + c)};
     auto bc{0.5f * (b + c)};
 
-    auto uv_ab{glm::vec2{0, 1 - acosf(ab.y) / PI}};
-    auto uv_ac{glm::vec2{0, 1 - acosf(ac.y) / PI}};
-    auto uv_bc{glm::vec2{0, 1 - acosf(bc.y) / PI}};
+    auto uv_ab{glm::vec2{0, 1 - acosf(ab.y) / glm::pi<float>()}};
+    auto uv_ac{glm::vec2{0, 1 - acosf(ac.y) / glm::pi<float>()}};
+    auto uv_bc{glm::vec2{0, 1 - acosf(bc.y) / glm::pi<float>()}};
 
     it = rec_gen_sphere(detail - 1, {a, ab, ac}, {uv_a, uv_ab, uv_ac}, it);
     it = rec_gen_sphere(detail - 1, {b, bc, ab}, {uv_b, uv_bc, uv_ab}, it);

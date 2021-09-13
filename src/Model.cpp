@@ -84,13 +84,13 @@ void Model::delete_player() {
 
 // TODO to be tested
 bool Model::chunk_visible(const glm::ivec2 &pq) {
-    int x = pq.x * Chunk::getSize() - 1;
-    int z = pq.y * Chunk::getSize() - 1;
-    int d = Chunk::getSize() + 1;
+    int x = pq.x * Chunk::get_size() - 1;
+    int z = pq.y * Chunk::get_size() - 1;
+    int d = Chunk::get_size() + 1;
 
     const Chunk& c = get_chunk_at(pq);
-    int miny = c.getMinY();
-    int maxy = c.getMaxY();
+    int miny = c.get_min_y();
+    int maxy = c.get_max_y();
 
     std::array<glm::vec3, 8> points{{
             {x + 0, miny, z + 0},
@@ -120,7 +120,7 @@ constexpr glm::ivec2 Model::chunked(const glm::vec3& position) {
 
 int Model::highest_block(const glm::vec2& pq) {
     const Chunk& chunk = chunks.at(pq);
-    return chunk.getMaxY();
+    return chunk.get_max_y();
 }
 
 const std::unordered_map<glm::ivec2, Chunk> &Model::getChunks() const {
@@ -163,7 +163,7 @@ Chunk &Model::get_chunk_at(const glm::ivec2 &pq) {
 }
 
 constexpr int Model::chunked(int val) {
-    return glm::floor(glm::round(val) / Chunk::getSize());
+    return glm::floor(glm::round(val) / Chunk::get_size());
 }
 
 void Model::record_block(Block block) {
@@ -201,7 +201,7 @@ void Model::render_chunks() const {
     shader.set_timer(get_day_time());
     shader.set_extra(1, 2);
     shader.set_extra(2, light);
-    shader.set_extra(3, render_radius * Chunk::size);
+    shader.set_extra(3, render_radius * Chunk::SIZE);
     shader.set_extra(4, ortho);
 
     for(const auto& c : chunks){
@@ -472,7 +472,7 @@ void Model::load_visible_chunks() {
         for(int dq = -RENDER_CHUNK_RADIUS ; dq <= RENDER_CHUNK_RADIUS ; dq++ ){
             Chunk c{*this, {pq.x + dq, pq.y + dq}, false};
             if(c.is_visible(player->getFrustum()) && !chunks.contains(c.pq)){
-                c.init();
+                c.init_chunk();
                 chunks.insert({c.pq, c})
             }
         }

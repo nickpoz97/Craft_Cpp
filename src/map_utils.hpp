@@ -11,10 +11,10 @@
 
 std::size_t hash_int(int key);
 
-/*template<>
+template<>
 struct std::hash<glm::ivec3>{
     std::size_t operator()(const glm::ivec3& v) const;
-};*/
+};
 
 struct y_coord_comparator{
     bool operator()(const glm::vec3& a, const glm::vec3& b) const;

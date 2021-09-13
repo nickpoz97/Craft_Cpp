@@ -7,19 +7,20 @@
 #include "BlockMap.hpp"
 #include "Chunk.hpp"
 
-BlockMap::BlockMap(const glm::ivec2 &pq) : delta{pq.x * Chunk::size - 1, 0, pq.y * Chunk::size - 1}{}
+BlockMap::BlockMap(const glm::ivec2 &pq) : delta{pq.x * Chunk::SIZE - 1, 0, pq.y * Chunk::SIZE - 1}{}
 
 const glm::ivec3 &BlockMap::get_delta() const{
     return delta;
 }
 
-TileBlock BlockMap::get_tileBlock(const glm::ivec3 &key) const{
+TileBlock BlockMap::at(const glm::ivec3 &key) const{
     const auto block_it{find(key - delta)};
-    return (block_it == cend()) ? TileBlock{0} : block_it->second;
+    return (block_it == cend()) ? TileBlock{BlockType::EMPTY} : block_it->second;
 }
 
-void BlockMap::set_tileBlock(const glm::ivec3 &key, TileBlock tileBlock) {
-    operator[](key - delta) = tileBlock;
+void BlockMap::set_block(const glm::ivec3 &position, BlockType block_type) {
+    erase(position);
+    emplace(position - delta, block_type);
 }
 
 BlockMap::Iterator::Iterator(const const_iterator& it, const glm::ivec3& delta) : map_it{it}, delta{delta} {}
@@ -53,5 +54,4 @@ BlockMap::Iterator BlockMap::begin() const{
 BlockMap::Iterator BlockMap::end() const{
     return {cend(), delta};
 }
-
 

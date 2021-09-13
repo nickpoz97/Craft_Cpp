@@ -10,16 +10,17 @@
 #include "map_utils.hpp"
 #include "TileBlock.hpp"
 
-using BaseMap = std::map<glm::ivec3, TileBlock, y_coord_comparator>;
+using BaseMap = std::unordered_map<glm::ivec3, TileBlock>;
 
 class BlockMap : public BaseMap {
 private:
     glm::ivec3 delta;
 public:
     explicit BlockMap(const glm::ivec2 &pq);
-    TileBlock get_tileBlock(const glm::ivec3& key) const;
-    void set_tileBlock(const glm::ivec3& key, TileBlock tileBlock);
-    const glm::ivec3& get_delta() const;
+    TileBlock at(const glm::ivec3& key) const;
+    TileBlock operator[](const glm::ivec3& key) = delete;
+    void set_block(const glm::ivec3& position, BlockType block_type);
+    [[nodiscard]] const glm::ivec3& get_delta() const;
 
     using value_type = std::pair<glm::ivec3, TileBlock>;
     class Iterator : std::iterator<std::input_iterator_tag, value_type>{

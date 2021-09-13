@@ -11,26 +11,12 @@
 #include "costants.hpp"
 #include "Wrapper.hpp"
 
-decltype(Player::ao) Player::ao = {};
-decltype(Player::light) Player::light = {{
-    {0.8, 0.8, 0.8, 0.8},
-    {0.8, 0.8, 0.8, 0.8},
-    {0.8, 0.8, 0.8, 0.8},
-    {0.8, 0.8, 0.8, 0.8},
-    {0.8, 0.8, 0.8, 0.8},
-    {0.8, 0.8, 0.8, 0.8}
-}};
-Tiles Player::tiles{
-    226, 224, 241, 209, 225, 227
-};
-
 Player::Player(const Model &model, std::string_view name, int id, const glm::vec3 &position, const glm::vec2 &rotation)
         :
     actual_status{position, rotation, glfwGetTime()},
     former_status1{actual_status},
     former_status2{actual_status},
     model{model},
-    playerCube{tiles, ao, light},
     name{name},
     id{id},
     frustum{

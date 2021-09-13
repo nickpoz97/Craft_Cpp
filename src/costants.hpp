@@ -3,7 +3,6 @@
 //
 
 #ifndef CPP_COSTANTS_HPP
-static constexpr float PI = static_cast<float>(3.14159265359);
 static constexpr int MAX_CHUNKS = 500;
 static constexpr int CHUNK_SIZE = 32;
 

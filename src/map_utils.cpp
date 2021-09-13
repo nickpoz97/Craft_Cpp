@@ -14,9 +14,9 @@ std::size_t hash_int(int key) {
     return key;
 }
 
-/*std::size_t std::hash<glm::ivec3>::operator()(const glm::ivec3& v) const{
+std::size_t std::hash<glm::ivec3>::operator()(const glm::ivec3& v) const{
     return hash_int(v.x) ^ hash_int(v.y) ^ hash_int(v.z);
-}*/
+}
 
 std::size_t std::hash<glm::ivec2>::operator()(const glm::ivec2& v) const{
     return hash_int(v.x) ^ hash_int(v.y);
