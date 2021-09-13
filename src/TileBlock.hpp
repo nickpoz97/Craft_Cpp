@@ -84,12 +84,13 @@ struct Tiles {
 class TileBlock{
 private:
     static const std::array<Tiles, 256> tiles;
+    BlockType tile_index{};
 public:
-    const BlockType tile_index{};
     [[nodiscard]] BlockType getIndex() const;
 
     explicit TileBlock(BlockType block_type);
-    explicit TileBlock() = default;
+    TileBlock() = default;
+    TileBlock& operator=(const TileBlock& tileBlock) = default;
     TileBlock(const TileBlock& other) = default;
     [[nodiscard]] int face_tile(unsigned index) const;
 
@@ -160,5 +161,9 @@ public:
     };
 };
 
+struct Block{
+    glm::ivec3 position;
+    TileBlock w;
+};
 
 #endif //CPP_TILEBLOCK_HPP

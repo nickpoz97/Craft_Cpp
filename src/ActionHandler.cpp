@@ -14,10 +14,10 @@ void ActionHandler::on_left_click() {
     const auto& hit_tile_block {result.second};
 
     if(hit_pos.y > 0 && hit_pos.y < 256 && hit_tile_block.is_destructable()){
-        model_p->set_block(hit_pos, BlockType::EMPTY);
-        model_p->record_block(hit_pos, BlockType::EMPTY);
-        if(model_p->get_block(hit_pos + glm::ivec3{0,1,0}));{
-            model_p->set_block(hit_pos + glm::ivec3{0,1,0}, BlockType::EMPTY);
+        model_p->builder_block(hit_pos, BlockType::EMPTY);
+        //model_p->record_block(hit_pos, BlockType::EMPTY);
+        if(!model_p->get_block(hit_pos + glm::ivec3{0,1,0}).is_empty());{
+            model_p->builder_block(hit_pos + glm::ivec3{0,1,0}, BlockType::EMPTY);
         }
     }
 }
@@ -33,7 +33,7 @@ void ActionHandler::on_right_click() {
     if(hit_pos.y > 0 && hit_pos.y < 256 && hit_tile_block.is_destructable()){
         if(!player_p->insersects_block(2, hit_pos)){
             // using actual item index
-            model_p->set_block(hit_pos);
+            model_p->builder_block(hit_pos, BlockType::EMPTY);
             model_p->record_block(hit_pos);
         }
     }
@@ -46,7 +46,7 @@ void ActionHandler::on_middle_click() {
     const Block hit_block{player_p->hit_test(false)};
     const TileBlock& hit_tile {hit_block.second};
     if(hit_tile.is_user_buildable()){
-        model_p->set_actual_item(hit_tile);
+        model_p->set_actual_item(hit_tile.getIndex());
     }
 }
 

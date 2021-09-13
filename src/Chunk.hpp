@@ -75,5 +75,6 @@ public:
     static int chunked(int val);
 };
 
+int get_chunk_distance(const Chunk& c1, const Chunk& c2);
 
 #endif //CPP_CHUNK_HPP

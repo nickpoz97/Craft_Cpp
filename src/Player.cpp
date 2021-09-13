@@ -8,18 +8,20 @@
 #include "ext/matrix_transform.hpp"
 
 #include "Player.hpp"
-#include "frustum.hpp"
+#include "Model.hpp"
+//#include "frustum.hpp"
 #include "costants.hpp"
 #include "Wrapper.hpp"
 #include "Chunk.hpp"
 
-Player::Player(std::string_view name, int id, const glm::vec3 &position, const glm::vec2 &rotation)
+Player::Player(const Model &model, std::string_view name, int id, const glm::vec3 &position, const glm::vec2 &rotation)
         :
     actual_status{position, rotation, glfwGetTime()},
     former_status1{actual_status},
     former_status2{actual_status},
     name{name},
-    id{id}
+    id{id},
+    model{model}
     /*,
     frustum{
         model.getFov(),
@@ -128,19 +130,19 @@ const Status &Player::getActualStatus() const {
     return frustum;
 }*/
 
-Block Player::hit_test(bool previous, const Model& model) const {
+Block Player::hit_test(bool previous) const {
     Block result{};
     float best{};
 
-    for(const auto& pair : model.chunk_neighbors_pointers(get_pq())){
-        const Chunk& c = *(pair.second);
+    for(const auto& c_ref : model.chunk_neighbors_pointers(get_pq())){
+        const Chunk& c = *(c_ref);
 
-        auto kv_pair = ray_hit(c, previous, 8);
-        if(kv_pair.second.is_obstacle()){
-            auto distance = glm::distance(actual_status.position, kv_pair.first);
+        Block hit_block = ray_hit(c, previous, 8);
+        if(hit_block.w.is_obstacle()){
+            float distance = glm::distance(actual_status.position, glm::vec3{hit_block.position});
             if(best == 0.0f || distance < best){
                 best = distance;
-                result = kv_pair;
+                result = hit_block;
             }
         }
     }

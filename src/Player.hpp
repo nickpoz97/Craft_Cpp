@@ -7,9 +7,9 @@
 
 #include <string_view>
 
+#include "Model.hpp"
 #include "vec3.hpp"
 #include "Chunk.hpp"
-#include "Model.hpp"
 
 struct Status{
     glm::vec3 position;
@@ -33,6 +33,8 @@ private:
     Status former_status1;
     Status former_status2;
 
+    const Model& model;
+
     std::string_view name;
 
     int id;
@@ -46,7 +48,7 @@ public:
     //const Frustum &getFrustum() const;
 
 
-    Player(std::string_view name, int id, const glm::vec3 &position, const glm::vec2 &rotation);
+    Player(const Model &model, std::string_view name, int id, const glm::vec3 &position, const glm::vec2 &rotation);
     glm::vec3 get_camera_direction_vector() const;
     glm::vec3 get_motion_vector(int x_movement, int z_movement, bool is_flying) const;
     glm::vec3 get_up_vector() const;
@@ -59,7 +61,7 @@ public:
 
     void update_player(const Status& new_status, bool interpolate);
     void interpolate_player();
-    Block hit_test(bool previous, const Model& model) const;
+    Block hit_test(bool previous) const;
     Block ray_hit(const Chunk& c, bool previous, int max_distance, int step = 32) const;
     //HitResult hit_test_face();
     std::pair<bool, glm::vec3> collide(int height);

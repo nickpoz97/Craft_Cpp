@@ -5,15 +5,14 @@
 #ifndef CPP_MODEL_HPP
 #define CPP_MODEL_HPP
 
+#include <unordered_map>
 #include <GLFW/glfw3.h>
 //#include <memory>
-#include <unordered_map>
 
 #include "Chunk.hpp"
-#include "Player.hpp"
 #include "costants.hpp"
-
-using Block = std::pair<glm::ivec3, TileBlock>;
+#include "Shader.hpp"
+#include "Player.hpp"
 
 class Model {
 private:
@@ -52,7 +51,7 @@ private:
 
     int day_length;
 
-    std::array<Block, 2> blocks{};
+    //std::array<Block, 2> blocks{};
 
     glm::mat4 persp_proj{glm::perspective(glm::radians(fov), static_cast<float>(width) / (height), z_near, z_far)};
     glm::mat4 ortho_proj_2d{glm::ortho(0, width, 0, height, -1, 1)};
@@ -71,18 +70,20 @@ private:
 
     void update_chunk_map();
 
+    const Chunk & get_player_chunk() const;
+
 public:
+    //Model();
+
+    Model(const Shader &block_shader, const Shader &line_shader, const Shader &sky_shader, const Shader &text_shader);
+
     enum class proj_type {
-        PERSP, ORTHO_2D
+        PERSP, ORTHO_2D, ORTHO_3D
     };
 
     static constexpr float z_near = 0.125f;
+
     static constexpr float z_far = static_cast<float>(RENDER_CHUNK_RADIUS) * 32 + 64;
-
-    Model();
-
-    Model(const Shader &block_shader, const Shader &line_shader, const Shader &sky_shader,
-          const Shader &text_shader);
 
     ~Model();
 
@@ -112,15 +113,11 @@ public:
 
     int highest_block(const glm::vec2 &pq);
 
-    void set_block(const glm::ivec3 &pos, BlockType w);
+    void set_block(const glm::ivec3 &pos, BlockType w = BlockType::EMPTY);
 
-    void set_block(const glm::ivec3 &pos);
+    //void record_block(Block block);
 
-    void record_block(Block block);
-
-    void record_block(const glm::ivec3 &pos, const TileBlock &w);
-
-    void record_block(const glm::ivec3 &pos);
+    //void record_block(const glm::ivec3 &pos);
 
     TileBlock get_block(const glm::ivec3 position);
 
@@ -171,7 +168,7 @@ public:
 
     glm::mat4 get_viewproj(proj_type pt) const;
 
-    std::array<const Chunk *, 6> chunk_neighbors_pointers(const glm::ivec2 &pq);
+    std::array<const Chunk *, 6> chunk_neighbors_pointers(const glm::ivec2 &pq) const;
 };
 
 #endif //CPP_MODEL_HPP

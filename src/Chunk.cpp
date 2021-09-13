@@ -47,6 +47,7 @@ Chunk::operator bool() const {
     return !block_map.empty();
 }
 
+// TODO do not use model
 void Chunk::compute_chunk_geometry(const Model &model) {
     std::array<std::array<const BlockMap*,3>,3> neighbor_block_maps{};
 

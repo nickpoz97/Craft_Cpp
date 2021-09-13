@@ -15,7 +15,7 @@ const glm::ivec3 &BlockMap::get_delta() const{
 
 TileBlock BlockMap::at(const glm::ivec3 &key) const{
     const auto block_it{find(key - delta)};
-    return (block_it == cend()) ? TileBlock{BlockType::EMPTY} : block_it->second;
+    return (block_it == cend()) ? TileBlock{} : block_it->second;
 }
 
 void BlockMap::set_block(const glm::ivec3 &position, BlockType block_type) {

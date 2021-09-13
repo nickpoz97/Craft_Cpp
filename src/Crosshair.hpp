@@ -9,9 +9,9 @@
 #include "Model.hpp"
 #include "Shader.hpp"
 
-class Crosshair : public GameObject<Standard2DVertex>{
+class Crosshair : public RenderableEntity<Standard2DVertex>{
 private:
-    using SuperClass = GameObject<Standard2DVertex>;
+    using SuperClass = RenderableEntity<Standard2DVertex>;
     static std::array<Standard2DVertex, 4> get_ends_coordinates(const Model& model);
 public:
     Crosshair(const Model& model);

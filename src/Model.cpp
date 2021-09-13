@@ -6,8 +6,8 @@
 
 #include "glad/glad.h"
 #include "gtc/matrix_transform.hpp"
-#include "Model.hpp"
 #include "Player.hpp"
+#include "Model.hpp"
 #include "trigonometric.hpp"
 #include "Sphere.hpp"
 #include "CubeWireframe.hpp"
@@ -122,7 +122,7 @@ const std::unordered_map<glm::ivec2, Chunk> &Model::getChunks() const {
 }
 
 void Model::set_block(const glm::ivec3 &pos, BlockType w) {
-    glm::ivec2 pq = chunked(pos);
+    glm::ivec2 pq = Chunk::chunked(pos);
     int p = pq.x;
     int q = pq.y;
 
@@ -132,10 +132,10 @@ void Model::set_block(const glm::ivec3 &pos, BlockType w) {
             if (dx == 0 && dz == 0) {
                 continue;
             }
-            if (dx && chunked(pos.x + dx) == p) {
+            if (dx && Chunk::chunked(pos.x + dx) == p) {
                 continue;
             }
-            if (dz && chunked(pos.z + dz) == q) {
+            if (dz && Chunk::chunked(pos.z + dz) == q) {
                 continue;
             }
             get_chunk_at({p + dx, q + dz}).set_block({pos.x, pos.y, pos.z}, BlockType::EMPTY);
@@ -143,30 +143,30 @@ void Model::set_block(const glm::ivec3 &pos, BlockType w) {
     }
 }
 
-Chunk &Model::get_chunk_at(const glm::ivec2 &pq) {
-    if (!chunks.contains(pq)) {
-        const auto &inserted_pair = chunks.emplace(pq, Chunk{pq}).first;
-        return inserted_pair->second;
-    }
-    return chunks.at(pq);
+Chunk &Model::get_chunk_at(const glm::ivec2 &pq){
+    // need to create new chunk if not present
+    // inserted pair is an iterator to the already present element or the new one
+    const auto &inserted_pair{chunks.try_emplace(pq, Chunk{pq, false}).first};
+    // Chunk object is returned
+    return inserted_pair->second;
 }
 
-void Model::record_block(Block block) {
+/*void Model::record_block(Block block) {
     blocks[1] = blocks[0];
     blocks[0] = block;
-}
+}*/
 
 TileBlock Model::get_block(const glm::ivec3 position) {
-    auto result = chunks.find(chunked(position));
-    return (result != chunks.end()) ? result->second : TileBlock{};
+    const Chunk& chunk = get_chunk_at(Chunk::chunked(position));
+    return (chunk) ? chunk.get_block(position) : TileBlock{};
 }
 
-void Model::builder_block(const glm::ivec3 &pos, BlockType w)  {
+void Model::builder_block(const glm::ivec3 &pos, BlockType w = BlockType::EMPTY)  {
     if (pos.y <= 0 || pos.y >= 256) {
         return;
     }
     if (get_block(pos).is_destructable() && w != BlockType::CLOUD) {
-        set_block(pos, TileBlock{});
+        set_block(pos, w);
     }
 }
 
@@ -186,12 +186,15 @@ void Model::render_chunks() const {
     shader.set_timer(get_day_time());
     shader.set_extra(1, 2);
     shader.set_extra(2, light);
-    shader.set_extra(3, render_radius * Chunk::SIZE);
+    shader.set_extra(3, RENDER_CHUNK_RADIUS * Chunk::SIZE);
     shader.set_extra(4, ortho);
 
-    for(const auto& c : chunks){
-        if(c.is_visible(player->getFrustum()) && get_chunk_distance(player_pq, c.pq) < RENDER_CHUNK_RADIUS){
-            c.render();
+    for(const auto& pq_c : chunks){
+        const Chunk& c = pq_c.second;
+        proj_type pt = ortho ? proj_type::ORTHO_3D : proj_type::PERSP;
+
+        if(c.is_visible(get_viewproj(pt)) && get_chunk_distance(get_player_chunk(), c) < RENDER_CHUNK_RADIUS){
+            c.render_object();
         }
     }
 }
@@ -210,7 +213,7 @@ void Model::render_sky() const {
     shader.set_sampler(2);
     shader.set_timer(get_day_time());
     // TODO switch to render object
-    sky.render();
+    sky.render_object();
 }
 
 glm::mat4 Model::get_viewproj(proj_type pt) const {
@@ -220,6 +223,7 @@ glm::mat4 Model::get_viewproj(proj_type pt) const {
             {0, 1, 0})
     };
 
+    // TODO insert ORTO_3D
     switch (pt) {
         case proj_type::PERSP:
             return persp_proj * view;
@@ -277,17 +281,9 @@ void Model::render_item() {
     Item{actual_item}.render_object();
 }
 
-void Model::record_block(const glm::ivec3 &pos, const TileBlock &w) {
-    record_block(Block{pos, w});
-}
-
-void Model::set_block(const glm::ivec3 &pos) {
-    set_block(pos, actual_item);
-}
-
-void Model::record_block(const glm::ivec3 &pos) {
+/*void Model::record_block(const glm::ivec3 &pos) {
     record_block(pos, actual_item);
-}
+}*/
 
 void Model::set_actual_item(BlockType item_type) {
     actual_item = TileBlock{item_type};
@@ -309,11 +305,11 @@ void Model::set_prev_item() {
     actual_item = TileBlock::items[new_index];
 }
 
-Model::Model() : Model({"block_vertex.vs", "block_fragment.fs"},
+/*Model::Model() : Model({"block_vertex.vs", "block_fragment.fs"},
                        {"line_vertex.vs", "line_fragment.fs"},
                        {"sky_vertex.vs", "sky_fragment.fs"},
                        {"text_vertex.vs", "text_fragment.fs"})
-{}
+{}*/
 
 GLFWwindow * Model::create_window(bool is_fullscreen) {
     GLFWmonitor *monitor = nullptr;
@@ -415,7 +411,7 @@ void Model::render_scene() {
 
         std::string_view s{
             fmt::format("(%d, %d) (%.2f, %.2f, %.2f) n_chunks: %d, hour: %d%cm",
-                        p, q, x, y, z, chunks.size(), hour, am_pm);
+                        p, q, x, y, z, chunks.size(), hour, am_pm)
         };
 
         render_text(ALIGN_LEFT, {tx, ty}, ts, s);
@@ -437,8 +433,8 @@ void Model::load_collision_chunks() {
     const int r = CREATE_CHUNK_RADIUS;
     for(int dp = -r ; dp <= r ; dp++){
         for(int dq = -r ; dq <= r ; dq++) {
-            glm::vec2 pos{player_chunk.x + dp, player_chunk.x + dq};
-            if(!chunks.contains(pos)) { chunks.emplace(Chunk{*this, pos, true}, false);}
+            glm::vec2 pq_coordinate{player_chunk.x + dp, player_chunk.x + dq};
+            chunks.try_emplace(pq_coordinate, Chunk{pq_coordinate, true});
         }
     }
 }
@@ -455,11 +451,14 @@ void Model::load_visible_chunks() {
     glm::ivec2 pq = player->get_pq();
     for(int dp = -RENDER_CHUNK_RADIUS ; dp <= RENDER_CHUNK_RADIUS ; dp++ ){
         for(int dq = -RENDER_CHUNK_RADIUS ; dq <= RENDER_CHUNK_RADIUS ; dq++ ){
-            Chunk c{*this, {pq.x + dq, pq.y + dq}, false}
-            (<#initializer#>, false);
-            if(c.is_visible(player->getFrustum()) && !chunks.contains(c.pq)){
-                c.init_chunk();
-                chunks.insert({c.pq, c})
+            proj_type pt = ortho ? proj_type::ORTHO_3D : proj_type::PERSP;
+            // build chunk and check if it is in a visible position
+            Chunk c{{pq.x + dq, pq.y + dq}, false};
+            if(c.is_visible(get_viewproj(pt))){
+                // check if chunk was not already in the map
+                bool inserted = chunks.insert({c.pq, c}).second;
+                // if abstent -> init it
+                if(inserted) {c.init_chunk();}
             }
         }
     }
@@ -472,7 +471,7 @@ void Model::remove_distant_chunks() {
     glm::ivec2 player_pq = player->get_pq();
     // position-chunk pair
     for(const auto& pq_c_pair : chunks){
-        if(get_chunk_distance(player_pq, pq_c_pair.first) > DELETE_CHUNK_RADIUS){
+        if(get_chunk_distance(get_player_chunk(), pq_c_pair.second) > DELETE_CHUNK_RADIUS){
             // every modification of chunk is lost
             chunks.erase(pq_c_pair.first);
         }
@@ -501,7 +500,7 @@ bool Model::loop() {
     return swap_pool();
 }
 
-std::array<const Chunk*, 6> Model::chunk_neighbors_pointers(const glm::ivec2& pq) {
+std::array<const Chunk*, 6> Model::chunk_neighbors_pointers(const glm::ivec2& pq) const{
     std::array<const Chunk*, 6> neighbors{};
     auto it  = neighbors.begin();
 
@@ -510,4 +509,8 @@ std::array<const Chunk*, 6> Model::chunk_neighbors_pointers(const glm::ivec2& pq
             *(it++) = & chunks.at({pq.x - dp, pq.y - dq});
         }
     }
+}
+
+const Chunk & Model::get_player_chunk() const {
+    return get_chunk_at(player->get_pq());
 }
