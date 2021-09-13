@@ -9,9 +9,9 @@
 #include "Model.hpp"
 #include "CubicObject.hpp"
 
-Chunk::Chunk(const Model &model, const glm::vec2 &pq, bool init) : model{model}, pq{pq},
-                                                                   xz_boundaries{get_xz_boundaries(pq)},
-                                                                   SuperClass{local_buffer}
+Chunk::Chunk(const glm::vec2 &pq_coordinates, bool init) : block_map{pq_coordinates}, pq{pq_coordinates},
+                                                           xz_boundaries{get_xz_boundaries(pq_coordinates)},
+                                                           SuperClass{local_buffer}
 {
     if(init){init_chunk();}
 };
@@ -47,7 +47,7 @@ Chunk::operator bool() const {
     return !block_map.empty();
 }
 
-void Chunk::compute_chunk_geometry() {
+void Chunk::compute_chunk_geometry(const Model &model) {
     std::array<std::array<const BlockMap*,3>,3> neighbor_block_maps{};
 
     for (int dp = -1; dp <= 1; dp++) {
@@ -203,8 +203,8 @@ std::array<glm::vec3, 4> Chunk::get_xz_boundaries(const glm::vec2 &pq) {
     return false;
 }*/
 
-void Chunk::update_buffer() {
-    compute_chunk_geometry();
+void Chunk::update_buffer(const Model &model) {
+    compute_chunk_geometry(model);
     SuperClass::update_buffer(local_buffer);
     dirty = false;
 }
@@ -234,20 +234,19 @@ void Chunk::init_chunk() {
             }
             for(int y = 0 ; y < h ; y++){
                 // TODO check if borders are empty
-                block_map.set_block({x, y, z}, TileBlock{static_cast<BlockType>(w * on_edge_flag)});
+                block_map.set_block({x, y, z}, static_cast<BlockType>(w * on_edge_flag));
             }
             if(w == BlockType::GRASS){
                 if(SHOW_PLANTS){
                     // grass
                     if (simplex2(-x * 0.1, z * 0.1, 4, 0.8, 2) > 0.6) {
-                        block_map.set_block({x, h, z},
-                                            TileBlock{static_cast<BlockType>(BlockType::TALL_GRASS * on_edge_flag)});
+                        block_map.set_block({x, h, z},static_cast<BlockType>(BlockType::TALL_GRASS * on_edge_flag));
                     }
                     // flowers
                     if (simplex2(x * 0.05, -z * 0.05, 4, 0.8, 2) > 0.7) {
                         // w_f max == 23
                         int w_f = 18 + simplex2(x * 0.1, z * 0.1, 4, 0.8, 2) * 7;
-                        block_map.set_block({x, h, z}, TileBlock{static_cast<BlockType>(w_f * on_edge_flag)});
+                        block_map.set_block({x, h, z}, static_cast<BlockType>(w_f * on_edge_flag));
                     }
                 }
                 bool ok = SHOW_TREES && !(dx - 4 < 0 || dz - 4 < 0 || dx + 4 >= CHUNK_SIZE || dz + 4 >= CHUNK_SIZE);
@@ -260,13 +259,13 @@ void Chunk::init_chunk() {
                                 int d = (ox * ox) + (oz * oz) +
                                         (y - (h + 4)) * (y - (h + 4));
                                 if (d < 11) {
-                                    block_map.set_block({x + ox, y, z + oz}, TileBlock{BlockType::LEAVES});
+                                    block_map.set_block({x + ox, y, z + oz}, BlockType::LEAVES);
                                 }
                             }
                         }
                     }
                     for (int y = h; y < h + 7; y++) {
-                        block_map.set_block({x, y, z}, TileBlock{BlockType::WOOD});
+                        block_map.set_block({x, y, z},BlockType::WOOD);
                     }
                 }
                 if (SHOW_CLOUDS) {
@@ -274,7 +273,7 @@ void Chunk::init_chunk() {
                         if (simplex3(
                                 x * 0.01, y * 0.1, z * 0.01, 8, 0.5, 2) > 0.75)
                         {
-                            block_map.set_block({x, y, z}, TileBlock{BlockType::CLOUD});
+                            block_map.set_block({x, y, z}, BlockType::CLOUD);
                         }
                     }
                 }
@@ -310,7 +309,25 @@ std::array<glm::vec3, 8> Chunk::get_chunk_boundaries() const {
     return boundaries;
 }
 
-void Chunk::set_block(const glm::ivec3& position, const TileBlock& w) {
+void Chunk::set_block(const glm::ivec3& position, BlockType w) {
     block_map.set_block(position, w);
     dirty = true;
 }
+
+int get_chunk_distance(const Chunk& c1, const Chunk& c2) {
+    auto delta = c1.pq - c2.pq;
+    return glm::max(glm::abs(delta.x), glm::abs(delta.y));
+}
+
+int Chunk::chunked(int val) {
+    return glm::floor(glm::round(val) / Chunk::SIZE);
+}
+
+glm::ivec2 Chunk::chunked(const glm::vec3& position) {
+    return {
+            chunked(static_cast<int>(position.x)),
+            chunked(static_cast<int>(position.z))
+    };
+}
+
+

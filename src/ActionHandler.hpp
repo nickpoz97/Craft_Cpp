@@ -17,15 +17,10 @@ private:
     static inline bool initialized{false};
     static inline bool members_set{false};
 
-    static inline double scroll_pos = 0;
-    static inline double delta_y = 0;
-
-    static inline glm::vec2 former_cursor_pos{};
-
     static void on_right_click();
     static void on_left_click();
     static void on_middle_click();
-    static glm::vec3 compute_motion(double delta_t, int x_movement, int z_movement);
+    static glm::vec3 compute_motion(double delta_t);
 
     static void on_key(GLFWwindow *window, int key, int scancode, int action, int mods);
     static void on_scroll(GLFWwindow *window, double xdelta, double ydelta);

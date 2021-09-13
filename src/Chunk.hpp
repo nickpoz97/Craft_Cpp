@@ -13,15 +13,13 @@
 #include "RenderableEntity.hpp"
 #include "Vertex.hpp"
 #include "costants.hpp"
-//#include "Model.hpp"
+#include "Model.hpp"
 
 class Chunk : public RenderableEntity<CubeVertex>{
 private:
     using SuperClass = RenderableEntity<CubeVertex>;
 
     std::vector<CubeVertex> local_buffer{};
-
-    const Model& model;
 
     int min_y{};
     int max_y{};
@@ -51,7 +49,7 @@ private:
 
     std::array<glm::vec3, 8> get_chunk_boundaries() const;
 public:
-    Chunk(const Model &model, const glm::vec2 &pq, bool init);
+    Chunk(const glm::vec2 &pq_coordinates, bool init);
     const glm::ivec2 pq;
     static constexpr int SIZE = CHUNK_SIZE;
 
@@ -62,15 +60,19 @@ public:
     explicit operator bool() const;
 
     void _compute_chunk_geometry(const std::array<std::array<const BlockMap *, 3>, 3> &neighbors_block_maps);
-    void compute_chunk_geometry();
+    void compute_chunk_geometry(const Model &model);
 
-    void set_block(const glm::ivec3& position, const TileBlock& w);
+    void set_block(const glm::ivec3& position, BlockType w);
     //bool is_visible(const Frustum& frustum) const;
     bool is_visible(const glm::mat4 &viewproj) const;
-    void update_buffer();
+    void update_buffer(const Model &model);
     bool is_dirty() const;
 
     void init_chunk();
+    friend int get_chunk_distance(const Chunk& c1, const Chunk& c2);
+
+    static glm::ivec2 chunked(const glm::vec3& position);
+    static int chunked(int val);
 };
 
 

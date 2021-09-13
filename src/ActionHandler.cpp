@@ -107,6 +107,8 @@ void ActionHandler::initialize(Model* model_address){
 }
 
 void ActionHandler::on_scroll(GLFWwindow *window, double xdelta, double ydelta) {
+    static double scroll_pos{};
+
     scroll_pos += ydelta;
 
     if(scroll_pos < -SCROLL_TRESHOLD){
@@ -149,15 +151,15 @@ void ActionHandler::on_mouse_button(GLFWwindow *window, int button, int action, 
 }
 
 void ActionHandler::handle_movement(double delta_t) {
+    static double delta_y{};
+
     if(!initialized){
         return;
     }
-    int x_movement{}, z_movement{};
-
     model_p->set_ortho(glfwGetKey(model_p->get_window(), 'F') ? 64 : 0);
     model_p->set_fov(glfwGetKey(model_p->get_window(), GLFW_KEY_LEFT_SHIFT) ? 15 : 65);
 
-    glm::vec3 motion_vector = compute_motion(delta_t, x_movement, z_movement);
+    glm::vec3 motion_vector = compute_motion(delta_t);
 
     if(glfwGetKey(model_p->get_window(), GLFW_KEY_SPACE)){
         if(model_p->is_flying()){
@@ -192,7 +194,9 @@ void ActionHandler::handle_movement(double delta_t) {
     }
 }
 
-glm::vec3 ActionHandler::compute_motion(double delta_t, int x_movement, int z_movement) {
+glm::vec3 ActionHandler::compute_motion(double delta_t) {
+    int x_movement{}, z_movement{};
+
     if (glfwGetKey(model_p->get_window(), 'W')) { z_movement--; }
     if (glfwGetKey(model_p->get_window(), 'S')) { z_movement++; }
     if (glfwGetKey(model_p->get_window(), 'A')) { x_movement--; }
@@ -217,6 +221,8 @@ void ActionHandler::set_callbacks(GLFWwindow* window) {
 }
 
 void ActionHandler::handle_mouse_input() {
+    static glm::vec2 former_cursor_pos{};
+
     int exclusive = glfwGetInputMode(model_p->get_window(), GLFW_CURSOR) == GLFW_CURSOR_DISABLED;
 
     if(exclusive && former_cursor_pos != glm::vec2{} && initialized){

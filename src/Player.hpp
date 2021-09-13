@@ -6,10 +6,10 @@
 #define CPP_PLAYER_HPP
 
 #include <string_view>
-#include <vec3.hpp>
 
+#include "vec3.hpp"
+#include "Chunk.hpp"
 #include "Model.hpp"
-#include "frustum.hpp"
 
 struct Status{
     glm::vec3 position;
@@ -21,11 +21,11 @@ struct Status{
     friend Status operator*(const Status& a, float p);
 };
 
-struct HitResult{
+/*struct HitResult{
     Face face;
     glm::vec3 position;
     bool is_happened;
-};
+};*/
 
 class Player {
 private:
@@ -33,24 +33,22 @@ private:
     Status former_status1;
     Status former_status2;
 
-    const Model& model;
-
     std::string_view name;
 
     int id;
 
-    Frustum frustum;
+    //Frustum frustum;
 
 public:
     const Status &getActualStatus() const;
     const glm::vec3& get_position() const;
     const glm::vec2& get_rotation() const;
-    const Frustum &getFrustum() const;
+    //const Frustum &getFrustum() const;
 
 
-    Player(const Model &model, std::string_view name, int id, const glm::vec3 &position, const glm::vec2 &rotation);
+    Player(std::string_view name, int id, const glm::vec3 &position, const glm::vec2 &rotation);
     glm::vec3 get_camera_direction_vector() const;
-    glm::vec3 get_motion_vector(int x_movement, int z_movement) const;
+    glm::vec3 get_motion_vector(int x_movement, int z_movement, bool is_flying) const;
     glm::vec3 get_up_vector() const;
     glm::vec3 get_right_vector() const;
 
@@ -61,12 +59,12 @@ public:
 
     void update_player(const Status& new_status, bool interpolate);
     void interpolate_player();
-    Block hit_test(bool previous) const;
+    Block hit_test(bool previous, const Model& model) const;
     Block ray_hit(const Chunk& c, bool previous, int max_distance, int step = 32) const;
-    HitResult hit_test_face();
+    //HitResult hit_test_face();
     std::pair<bool, glm::vec3> collide(int height);
     bool insersects_block(int height, const glm::ivec3& block_pos) const;
-    glm::ivec2 get_pq();
+    glm::ivec2 get_pq() const;
 };
 
 

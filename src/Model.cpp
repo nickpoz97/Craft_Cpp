@@ -17,6 +17,7 @@
 #include "ActionHandler.hpp"
 #include "fmt/format.h"
 #include "Shader.hpp"
+#include "Chunk.hpp"
 
 float Model::get_day_time() const {
     if (day_length <= 0) {
@@ -84,9 +85,9 @@ void Model::delete_player() {
 
 // TODO to be tested
 bool Model::chunk_visible(const glm::ivec2 &pq) {
-    int x = pq.x * Chunk::get_size() - 1;
-    int z = pq.y * Chunk::get_size() - 1;
-    int d = Chunk::get_size() + 1;
+    int x = pq.x * Chunk::SIZE - 1;
+    int z = pq.y * Chunk::SIZE - 1;
+    int d = Chunk::SIZE + 1;
 
     const Chunk& c = get_chunk_at(pq);
     int miny = c.get_min_y();
@@ -111,13 +112,6 @@ bool Model::chunk_visible(const glm::ivec2 &pq) {
     return false;
 }
 
-constexpr glm::ivec2 Model::chunked(const glm::vec3& position) {
-    return {
-        chunked(position.x),
-        chunked(position.z)
-    };
-}
-
 int Model::highest_block(const glm::vec2& pq) {
     const Chunk& chunk = chunks.at(pq);
     return chunk.get_max_y();
@@ -127,12 +121,7 @@ const std::unordered_map<glm::ivec2, Chunk> &Model::getChunks() const {
     return chunks;
 }
 
-int Model::get_chunk_distance(const glm::ivec2 &pq1, const glm::ivec2 &pq2) {
-        auto delta = pq1 - pq2;
-        return glm::max(glm::abs(delta.x), glm::abs(delta.y));
-}
-
-void Model::set_block(const glm::ivec3 &pos, const TileBlock &w) {
+void Model::set_block(const glm::ivec3 &pos, BlockType w) {
     glm::ivec2 pq = chunked(pos);
     int p = pq.x;
     int q = pq.y;
@@ -149,21 +138,17 @@ void Model::set_block(const glm::ivec3 &pos, const TileBlock &w) {
             if (dz && chunked(pos.z + dz) == q) {
                 continue;
             }
-            get_chunk_at({p + dx, q + dz}).set_block({pos.x, pos.y, pos.z}, TileBlock{0});
+            get_chunk_at({p + dx, q + dz}).set_block({pos.x, pos.y, pos.z}, BlockType::EMPTY);
         }
     }
 }
 
 Chunk &Model::get_chunk_at(const glm::ivec2 &pq) {
     if (!chunks.contains(pq)) {
-        const auto &inserted_pair = chunks.emplace(pq, Chunk{*this, pq}, false).first;
+        const auto &inserted_pair = chunks.emplace(pq, Chunk{pq}).first;
         return inserted_pair->second;
     }
-    return chunks[pq]
-}
-
-constexpr int Model::chunked(int val) {
-    return glm::floor(glm::round(val) / Chunk::get_size());
+    return chunks.at(pq);
 }
 
 void Model::record_block(Block block) {
@@ -304,8 +289,8 @@ void Model::record_block(const glm::ivec3 &pos) {
     record_block(pos, actual_item);
 }
 
-void Model::set_actual_item(TileBlock item) {
-    actual_item = item;
+void Model::set_actual_item(BlockType item_type) {
+    actual_item = TileBlock{item_type};
 }
 
 void Model::switch_flying() {
@@ -453,7 +438,7 @@ void Model::load_collision_chunks() {
     for(int dp = -r ; dp <= r ; dp++){
         for(int dq = -r ; dq <= r ; dq++) {
             glm::vec2 pos{player_chunk.x + dp, player_chunk.x + dq};
-            if(!chunks.contains(pos)) {chunks.emplace(pos, Chunk{*this, pos, true});}
+            if(!chunks.contains(pos)) { chunks.emplace(Chunk{*this, pos, true}, false);}
         }
     }
 }
@@ -470,7 +455,8 @@ void Model::load_visible_chunks() {
     glm::ivec2 pq = player->get_pq();
     for(int dp = -RENDER_CHUNK_RADIUS ; dp <= RENDER_CHUNK_RADIUS ; dp++ ){
         for(int dq = -RENDER_CHUNK_RADIUS ; dq <= RENDER_CHUNK_RADIUS ; dq++ ){
-            Chunk c{*this, {pq.x + dq, pq.y + dq}, false};
+            Chunk c{*this, {pq.x + dq, pq.y + dq}, false}
+            (<#initializer#>, false);
             if(c.is_visible(player->getFrustum()) && !chunks.contains(c.pq)){
                 c.init_chunk();
                 chunks.insert({c.pq, c})
@@ -513,4 +499,15 @@ bool Model::loop() {
     render_scene();
 
     return swap_pool();
+}
+
+std::array<const Chunk*, 6> Model::chunk_neighbors_pointers(const glm::ivec2& pq) {
+    std::array<const Chunk*, 6> neighbors{};
+    auto it  = neighbors.begin();
+
+    for(int dp = -1 ; dp <= 1 ; dp++){
+        for(int dq = -1 ; dq <= 1 ; dq++){
+            *(it++) = & chunks.at({pq.x - dp, pq.y - dq});
+        }
+    }
 }
