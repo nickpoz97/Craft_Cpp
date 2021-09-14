@@ -54,7 +54,7 @@ struct AttributesWrapper : public Wrapper<AttributesWrapper> {
     value_type position{};
     value_type normal{};
     value_type uv{};
-    value_type model_matrix{};
+    //value_type model_matrix{};
 };
 
 struct UniformsWrapper : public Wrapper<UniformsWrapper>{

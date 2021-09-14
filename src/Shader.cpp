@@ -61,7 +61,7 @@ void Shader::set_camera(const glm::vec3 &camera_pos) const {
 }
 
 void Shader::set_sampler(int sampler) const{
-    glUniform1i(static_cast<GLint>(uniforms.camera.first), sampler);
+    glUniform1i(static_cast<GLint>(uniforms.sampler.first), sampler);
 }
 
 void Shader::set_timer(float timer) const{
