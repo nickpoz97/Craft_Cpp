@@ -13,11 +13,11 @@
 #include "RenderableEntity.hpp"
 #include "Vertex.hpp"
 #include "costants.hpp"
-#include "Model.hpp"
 
 class Chunk : public RenderableEntity<CubeVertex>{
 private:
     using SuperClass = RenderableEntity<CubeVertex>;
+    using neighbors_pointers = std::array<std::array<const BlockMap*,3>,3>;
 
     std::vector<CubeVertex> local_buffer{};
 
@@ -59,13 +59,12 @@ public:
     TileBlock get_block(const glm::ivec3& block_pos) const;
     explicit operator bool() const;
 
-    void _compute_chunk_geometry(const std::array<std::array<const BlockMap *, 3>, 3> &neighbors_block_maps);
-    void compute_chunk_geometry(const Model &model);
+    void compute_chunk_geometry(const neighbors_pointers &neighbors_block_maps);
 
     void set_block(const glm::ivec3& position, BlockType w);
     //bool is_visible(const Frustum& frustum) const;
     bool is_visible(const glm::mat4 &viewproj) const;
-    void update_buffer(const Model &model);
+    void update_buffer(const neighbors_pointers &np);
     bool is_dirty() const;
 
     void init_chunk();

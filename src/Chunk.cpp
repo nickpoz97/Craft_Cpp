@@ -4,9 +4,8 @@
 
 #include <numeric>
 
-#include "noise.h"
 #include "Chunk.hpp"
-#include "Model.hpp"
+#include "noise.hpp"
 #include "CubicObject.hpp"
 
 Chunk::Chunk(const glm::vec2 &pq_coordinates, bool init) : block_map{pq_coordinates}, pq{pq_coordinates},
@@ -47,24 +46,7 @@ Chunk::operator bool() const {
     return !block_map.empty();
 }
 
-// TODO do not use model
-void Chunk::compute_chunk_geometry(const Model &model) {
-    std::array<std::array<const BlockMap*,3>,3> neighbor_block_maps{};
-
-    for (int dp = -1; dp <= 1; dp++) {
-        for (int dq = -1; dq <= 1; dq++) {
-            const Chunk& other = *this;
-            if(dq || dp){
-                other = model.get_chunk_at(pq + glm::ivec2{dp, dq});
-            }
-            neighbor_block_maps[dp + 1][dq + 1] = (other) ? &(other.block_map) : nullptr;
-        }
-    }
-
-    _compute_chunk_geometry(neighbor_block_maps);
-}
-
-void Chunk::_compute_chunk_geometry(const std::array<std::array<const BlockMap *, 3>, 3> &neighbors_block_maps) {
+void Chunk::compute_chunk_geometry(const neighbors_pointers &neighbors_block_maps) {
     opaque_matrix_type opaque{};
     height_matrix_type highest{};
 
@@ -204,8 +186,8 @@ std::array<glm::vec3, 4> Chunk::get_xz_boundaries(const glm::vec2 &pq) {
     return false;
 }*/
 
-void Chunk::update_buffer(const Model &model) {
-    compute_chunk_geometry(model);
+void Chunk::update_buffer(const neighbors_pointers &np) {
+    compute_chunk_geometry(np);
     SuperClass::update_buffer(local_buffer);
     dirty = false;
 }

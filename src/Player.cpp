@@ -1,6 +1,7 @@
 //
 // Created by ultimatenick on 07/08/21.
 //
+#define GLFW_INCLUDE_NONE
 
 #include "GLFW/glfw3.h"
 #include <cmath>
@@ -8,20 +9,17 @@
 #include "ext/matrix_transform.hpp"
 
 #include "Player.hpp"
-#include "Model.hpp"
 //#include "frustum.hpp"
-#include "costants.hpp"
 #include "Wrapper.hpp"
 #include "Chunk.hpp"
 
-Player::Player(const Model &model, std::string_view name, int id, const glm::vec3 &position, const glm::vec2 &rotation)
+Player::Player(std::string_view name, int id, const glm::vec3 &position, const glm::vec2 &rotation)
         :
     actual_status{position, rotation, glfwGetTime()},
     former_status1{actual_status},
     former_status2{actual_status},
     name{name},
-    id{id},
-    model{model}
+    id{id}
     /*,
     frustum{
         model.getFov(),
@@ -130,25 +128,6 @@ const Status &Player::getActualStatus() const {
     return frustum;
 }*/
 
-Block Player::hit_test(bool previous) const {
-    Block result{};
-    float best{};
-
-    for(const auto& c_ref : model.chunk_neighbors_pointers(get_pq())){
-        const Chunk& c = *(c_ref);
-
-        Block hit_block = ray_hit(c, previous, 8);
-        if(hit_block.w.is_obstacle()){
-            float distance = glm::distance(actual_status.position, glm::vec3{hit_block.position});
-            if(best == 0.0f || distance < best){
-                best = distance;
-                result = hit_block;
-            }
-        }
-    }
-    return result;
-}
-
 Block Player::ray_hit(const Chunk& c, bool previous, int max_distance, int step) const {
 
     const glm::vec3& ray{get_camera_direction_vector()};
@@ -158,7 +137,8 @@ Block Player::ray_hit(const Chunk& c, bool previous, int max_distance, int step)
 
     for(int i = 0 ; i < max_distance ; i++){
         test_pos += ray;
-        test_pos_rounded = glm::round(test_pos);
+        // TODO check if truncation is better than rounding
+        test_pos_rounded = test_pos;
         if(previous_pos == test_pos_rounded){
             continue;
         }
@@ -202,41 +182,9 @@ Block Player::ray_hit(const Chunk& c, bool previous, int max_distance, int step)
     return{{},{}, false};
 }*/
 
-std::pair<bool, glm::vec3> Player::collide(int height) {
-    const glm::vec3& position{actual_status.position};
-    glm::ivec2 pq{Chunk::chunked(position)};
-    const Chunk& c{model.get_chunk_at(pq)};
-    glm::vec3 collision_point{};
-    bool result{};
-
-    const glm::ivec3 int_pos{glm::round(position)};
-    const glm::vec3 decimal_dif_pos(position - static_cast<glm::vec3>(int_pos));
-    float pad = 0.25;
-
-    // TODO check (+1 -> value > pad) and (-1 -> value < pad)
-    glm::ivec3 signs{glm::step(pad, decimal_dif_pos) - glm::step(pad, -decimal_dif_pos)};
-    std::array<glm::vec3, 3> block_pos{{
-        {int_pos.x + (signs.x) * 1, int_pos.y, int_pos.z},
-        {int_pos.x, int_pos.y + (signs.y) * 1, int_pos.z},
-        {int_pos.x, int_pos.y, int_pos.z + (signs.z) * 1},
-    }};
-
-    for(int y_step = 0; y_step < height ; ++y_step){
-        glm::bvec3 enable{
-            c.get_block(block_pos[0] + glm::vec3{signs.x, 0, 0} * pad).is_obstacle(),
-            c.get_block(block_pos[1] + glm::vec3{0, signs.y, 0} * pad).is_obstacle(),
-            c.get_block(block_pos[2] + glm::vec3{0, 0, signs.z} * pad).is_obstacle()
-        };
-
-        collision_point.x = (enable.x) ? int_pos.x + signs.x * pad : collision_point.x;
-        collision_point.y = (enable.y) ? (result=1, int_pos.x) + signs.x * pad : collision_point.y;
-        collision_point.z = (enable.z) ? int_pos.x + signs.x * pad : collision_point.z;
-    }
-    return {result, collision_point};
-}
-
 bool Player::insersects_block(int height, const glm::ivec3& block_pos) const {
-    const glm::ivec3 int_pos{glm::round(actual_status.position)};
+    // TODO check if truncation is better than rounding
+    const glm::ivec3 int_pos{actual_status.position};
 
     for(int i = 0 ; i < height ; i++){
         if(int_pos == (block_pos - glm::ivec3{0,i,0})){

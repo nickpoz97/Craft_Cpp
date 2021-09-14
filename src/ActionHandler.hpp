@@ -5,10 +5,12 @@
 #ifndef CPP_ACTIONHANDLER_HPP
 #define CPP_ACTIONHANDLER_HPP
 
+#define GLFW_INCLUDE_NONE
 
+#include "Model.hpp"
 #include "Player.hpp"
+#include "GLFW/glfw3.h"
 
-// TODO check if everything works (semi singleton used)
 class ActionHandler {
 private:
     static inline Player* player_p{nullptr};

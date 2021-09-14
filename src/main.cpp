@@ -1,3 +1,6 @@
+#define GLFW_INCLUDE_NONE
+#define STB_IMAGE_IMPLEMENTATION
+
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -47,6 +50,7 @@ int main() {
             break;
         }
     }
+
 
     return 0;
 }

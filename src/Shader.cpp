@@ -75,16 +75,16 @@ void Shader::set_extra(int extra_suffix, GLtype value) const{
     }
     switch (extra_suffix) {
         case 1:
-            _set_extra(uniforms.extra1, value);
+            _set_extra(uniforms.extra1.first, value);
         break;
         case 2:
-            _set_extra(uniforms.extra2, value);
+            _set_extra(uniforms.extra2.first, value);
         break;
         case 3:
-            _set_extra(uniforms.extra3, value);
+            _set_extra(uniforms.extra3.first, value);
         break;
         case 4:
-            _set_extra(uniforms.extra4, value);
+            _set_extra(uniforms.extra4.first, value);
         break;
     }
 }
@@ -102,3 +102,6 @@ template<>
 void Shader::_set_extra<int>(int u_location, int val) const{
     glUniform1i(u_location, val);
 }
+
+template void Shader::set_extra(int extra_suffix, float value) const;
+template void Shader::set_extra(int extra_suffix, int value) const;

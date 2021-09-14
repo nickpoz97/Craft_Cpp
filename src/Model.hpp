@@ -5,29 +5,36 @@
 #ifndef CPP_MODEL_HPP
 #define CPP_MODEL_HPP
 
-#include <unordered_map>
-#include <GLFW/glfw3.h>
-//#include <memory>
+#define GLFW_INCLUDE_NONE
 
+#include <unordered_map>
+#include <memory>
+
+#include "glad/glad.h"
+#include "GLFW/glfw3.h"
 #include "Chunk.hpp"
+#include "Sphere.hpp"
+#include "glad/glad.h"
 #include "costants.hpp"
 #include "Shader.hpp"
 #include "Player.hpp"
+#include "Crosshair.hpp"
 
 class Model {
 private:
+    // TODO set uniforms extra names
     struct ShaderWrapper {
         const Shader &block_shader{
                 "block_vertex.vs", "block_fragment.fs", {"sky_sampler", "daylight", "fog_distance", "ortho"}
         };
         const Shader &line_shader{
-                "line_vertex.vs", "line_fragment.fs"
+                "line_vertex.vs", "line_fragment.fs",{}
         };
         const Shader &sky_shader{
-                "sky_vertex.vs", "sky_fragment.fs"
+                "sky_vertex.vs", "sky_fragment.fs",{}
         };
         const Shader &text_shader{
-                "text_vertex.vs", "text_fragment.fs"
+                "text_vertex.vs", "text_fragment.fs",{}
         };
     };
 
@@ -42,9 +49,9 @@ private:
     int height;
     double previous_timestamp{};
 
-    TileBlock &actual_item{TileBlock::items[0]};
+    BlockType actual_item{TileBlock::items[0]};
     int scale;
-    int ortho;
+    int ortho{};
 
     float fov;
     bool flying{false};
@@ -53,14 +60,14 @@ private:
 
     //std::array<Block, 2> blocks{};
 
-    glm::mat4 persp_proj{glm::perspective(glm::radians(fov), static_cast<float>(width) / (height), z_near, z_far)};
-    glm::mat4 ortho_proj_2d{glm::ortho(0, width, 0, height, -1, 1)};
+    glm::mat4 persp_proj{};
+    glm::mat4 ortho_proj_2d{};
 
-    Crosshair crosshair{*this};
+    Crosshair crosshair;
 
     GLFWwindow *create_window(bool is_fullscreen);
 
-    void update_proj_matrix();
+    void update_proj_matrices();
 
     void load_collision_chunks();
 
@@ -72,8 +79,10 @@ private:
 
     const Chunk & get_player_chunk() const;
 
+    bool test_point_visibility(const glm::vec3& point) const;
+    static Crosshair get_crosshair(int width, int height, int scale);
 public:
-    //Model();
+    Model();
 
     Model(const Shader &block_shader, const Shader &line_shader, const Shader &sky_shader, const Shader &text_shader);
 
@@ -91,7 +100,7 @@ public:
 
     float get_daylight() const;
 
-    int get_scale_factor() const;
+    static int get_scale_factor(int width, int height);
 
     void switch_flying();
 
@@ -108,8 +117,7 @@ public:
     void set_player(const glm::vec3 &position, const glm::vec2 &rotation, std::string_view name, int id);
 
     Chunk &get_chunk_at(const glm::ivec2 &pq);
-
-    bool chunk_visible(const glm::ivec2 &pq);
+    const Chunk &get_chunk_at(const glm::ivec2 &pq) const;
 
     int highest_block(const glm::vec2 &pq);
 
@@ -169,6 +177,8 @@ public:
     glm::mat4 get_viewproj(proj_type pt) const;
 
     std::array<const Chunk *, 6> chunk_neighbors_pointers(const glm::ivec2 &pq) const;
+    Block player_hit_test(bool previous) const;
+    std::pair<bool, glm::vec3> collide(int height, const std::unordered_map<glm::ivec2, Chunk> &chunk_map);
 };
 
 #endif //CPP_MODEL_HPP

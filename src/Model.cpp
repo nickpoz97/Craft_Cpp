@@ -5,6 +5,7 @@
 #include <cmath>
 
 #include "glad/glad.h"
+#include "GLFW/glfw3.h"
 #include "gtc/matrix_transform.hpp"
 #include "Player.hpp"
 #include "Model.hpp"
@@ -42,18 +43,10 @@ float Model::get_daylight() const {
     }
 }
 
-Sphere Model::sky{1,3};
+const Sphere Model::sky{1,3};
 
-int Model::get_scale_factor() const {
-    int window_width, window_height;
-    int buffer_width, buffer_height;
-
-    // screen coordinates
-    glfwGetWindowSize(window, &window_width, &window_height);
-    // sizes in pixels
-    glfwGetFramebufferSize(window, &buffer_width, &buffer_height);
-
-    int result = buffer_width / window_width;
+int Model::get_scale_factor(int width, int height) {
+    int result = width / height;
     result = std::max(1, result);
     result = std::min(2, result);
     return result;
@@ -76,40 +69,11 @@ int Model::getScale() const {
 }
 
 void Model::set_player(const glm::vec3& position, const glm::vec2& rotation, std::string_view name, int id) {
-    player.reset(new Player{*this, name, id, position, rotation});
+    player.reset(new Player{name, id, position, rotation});
 }
 
 void Model::delete_player() {
     player.reset(nullptr);
-}
-
-// TODO to be tested
-bool Model::chunk_visible(const glm::ivec2 &pq) {
-    int x = pq.x * Chunk::SIZE - 1;
-    int z = pq.y * Chunk::SIZE - 1;
-    int d = Chunk::SIZE + 1;
-
-    const Chunk& c = get_chunk_at(pq);
-    int miny = c.get_min_y();
-    int maxy = c.get_max_y();
-
-    std::array<glm::vec3, 8> points{{
-            {x + 0, miny, z + 0},
-            {x + d, miny, z + 0},
-            {x + 0, miny, z + d},
-            {x + d, miny, z + d},
-            {x + 0, maxy, z + 0},
-            {x + d, maxy, z + 0},
-            {x + 0, maxy, z + d},
-            {x + d, maxy, z + d}
-    }};
-
-    for(const auto& p : points){
-        if(player->getFrustum().is_inside(p)){
-            return true;
-        }
-    }
-    return false;
 }
 
 int Model::highest_block(const glm::vec2& pq) {
@@ -212,7 +176,6 @@ void Model::render_sky() const {
     shader.set_viewproj(get_viewproj(proj_type::PERSP));
     shader.set_sampler(2);
     shader.set_timer(get_day_time());
-    // TODO switch to render object
     sky.render_object();
 }
 
@@ -238,14 +201,14 @@ void Model::render_wireframe() {
     if(!player){
         return;
     }
-    std::pair<glm::ivec3, TileBlock> hit_info = player->hit_test(false);
-    if(hit_info.second.is_obstacle()){
-        Shader& s = shaders.line_shader;
+    Block hit_block = player_hit_test(false);
+    if(hit_block.w.is_obstacle()){
+        const Shader& s = shaders.line_shader;
         glLineWidth(1);
         glEnable(GL_COLOR_LOGIC_OP);
         s.use();
         s.set_viewproj(get_viewproj(proj_type::PERSP));
-        CubeWireframe{hit_info.first}.render_lines();
+        CubeWireframe{hit_block.position}.render_lines();
         glDisable(GL_COLOR_LOGIC_OP);
     }
 }
@@ -286,7 +249,7 @@ void Model::render_item() {
 }*/
 
 void Model::set_actual_item(BlockType item_type) {
-    actual_item = TileBlock{item_type};
+    actual_item = item_type;
 }
 
 void Model::switch_flying() {
@@ -294,22 +257,22 @@ void Model::switch_flying() {
 }
 
 void Model::set_next_item() {
-    actual_item = TileBlock::items[(actual_item.getIndex() + 1) % TileBlock::items.size()];
+    actual_item = TileBlock::items[(actual_item + 1) % TileBlock::items.size()];
 }
 
 void Model::set_prev_item() {
-    int new_index = actual_item.getIndex() - 1;
+    int new_index = actual_item - 1;
     if(new_index < 0) {
-        new_index = static_cast<int>(TileBlock::items.size()) - 1;
+        new_index = TileBlock::items.size() - 1;
     }
     actual_item = TileBlock::items[new_index];
 }
 
-/*Model::Model() : Model({"block_vertex.vs", "block_fragment.fs"},
-                       {"line_vertex.vs", "line_fragment.fs"},
-                       {"sky_vertex.vs", "sky_fragment.fs"},
-                       {"text_vertex.vs", "text_fragment.fs"})
-{}*/
+Model::Model() : Model({"block_vertex.vs", "block_fragment.fs", {}},
+                       {"line_vertex.vs", "line_fragment.fs", {}},
+                       {"sky_vertex.vs", "sky_fragment.fs", {}},
+                       {"text_vertex.vs", "text_fragment.fs", {}})
+{}
 
 GLFWwindow * Model::create_window(bool is_fullscreen) {
     GLFWmonitor *monitor = nullptr;
@@ -348,7 +311,8 @@ Player *Model::get_player() const{
 Model::Model(const Shader &block_shader, const Shader &line_shader, const Shader &sky_shader, const Shader &text_shader) :
     shaders{block_shader, line_shader, sky_shader, text_shader},
     width{WINDOW_WIDTH},
-    height{WINDOW_HEIGTH}
+    height{WINDOW_HEIGTH},
+    crosshair{WINDOW_WIDTH, WINDOW_HEIGTH, get_scale_factor(WINDOW_WIDTH, WINDOW_HEIGTH)}
     {
     glfwSetTime(day_length / 3.0);
     window = create_window(FULLSCREEN);
@@ -363,13 +327,14 @@ Model::Model(const Shader &block_shader, const Shader &line_shader, const Shader
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         ActionHandler::set_callbacks(window);
     }
+    update_proj_matrices();
 }
 
 void Model::update_window_size() {
-    scale = get_scale_factor();
+    scale = get_scale_factor(0, 0);
     glfwGetFramebufferSize(window, &width, &height);
     glViewport(0, 0, width, height);
-    update_proj_matrix();
+    update_proj_matrices();
 }
 
 void Model::handle_input(double dt) {
@@ -426,9 +391,6 @@ bool Model::swap_pool() {
 
 // build chunks around the player to test collisions
 void Model::load_collision_chunks() {
-    if(!Player){
-        return;
-    }
     const glm::ivec2& player_chunk = player->get_pq();
     const int r = CREATE_CHUNK_RADIUS;
     for(int dp = -r ; dp <= r ; dp++){
@@ -439,15 +401,12 @@ void Model::load_collision_chunks() {
     }
 }
 
-void Model::update_proj_matrix() {
+void Model::update_proj_matrices() {
     persp_proj = glm::perspective(glm::radians(fov), static_cast<float>(width) / (height), z_near, z_far);
     ortho_proj_2d = glm::ortho(0, width, 0, height, -1, 1);
 }
 
 void Model::load_visible_chunks() {
-    if(!player){
-        return;
-    }
     glm::ivec2 pq = player->get_pq();
     for(int dp = -RENDER_CHUNK_RADIUS ; dp <= RENDER_CHUNK_RADIUS ; dp++ ){
         for(int dq = -RENDER_CHUNK_RADIUS ; dq <= RENDER_CHUNK_RADIUS ; dq++ ){
@@ -465,7 +424,7 @@ void Model::load_visible_chunks() {
 }
 
 void Model::remove_distant_chunks() {
-    if(!player || chunks.size() < MAX_CHUNKS){
+    if(chunks.size() < MAX_CHUNKS){
         return;
     }
     glm::ivec2 player_pq = player->get_pq();
@@ -509,8 +468,81 @@ std::array<const Chunk*, 6> Model::chunk_neighbors_pointers(const glm::ivec2& pq
             *(it++) = & chunks.at({pq.x - dp, pq.y - dq});
         }
     }
+
+    return neighbors;
 }
 
 const Chunk & Model::get_player_chunk() const {
     return get_chunk_at(player->get_pq());
+}
+
+const Chunk &Model::get_chunk_at(const glm::ivec2 &pq) const {
+    return chunks.at(pq);
+}
+
+Block Model::player_hit_test(bool previous) const {
+    Block result{};
+    float best{};
+
+    for(const auto& c_ref : chunk_neighbors_pointers(player->get_pq())){
+        const Chunk& c = *(c_ref);
+
+        Block hit_block = player->ray_hit(c, previous, 8);
+        if(hit_block.w.is_obstacle()){
+            float distance = glm::distance(player->get_position(), glm::vec3{hit_block.position});
+            if(best == 0.0f || distance < best){
+                best = distance;
+                result = hit_block;
+            }
+        }
+    }
+    return result;
+}
+
+std::pair<bool, glm::vec3> Model::collide(int height, const std::unordered_map<glm::ivec2, Chunk> &chunk_map) {
+    const glm::vec3& position{player->get_position()};
+    glm::ivec2 pq{Chunk::chunked(position)};
+    const Chunk& c{chunk_map.at(pq)};
+    glm::vec3 collision_point{};
+    bool result{};
+
+    // TODO check if truncation is better than rounding
+    const glm::ivec3 int_pos{position};
+    const glm::vec3 decimal_dif_pos(position - static_cast<glm::vec3>(int_pos));
+    float pad = 0.25;
+
+    // TODO check (+1 -> value > pad) and (-1 -> value < pad)
+    glm::ivec3 signs{glm::step(pad, decimal_dif_pos) - glm::step(pad, -decimal_dif_pos)};
+    std::array<glm::vec3, 3> block_pos{{
+                                               {int_pos.x + (signs.x) * 1, int_pos.y, int_pos.z},
+                                               {int_pos.x, int_pos.y + (signs.y) * 1, int_pos.z},
+                                               {int_pos.x, int_pos.y, int_pos.z + (signs.z) * 1},
+                                       }};
+
+    for(int y_step = 0; y_step < height ; ++y_step){
+        glm::bvec3 enable{
+                c.get_block(block_pos[0] + glm::vec3{signs.x, 0, 0} * pad).is_obstacle(),
+                c.get_block(block_pos[1] + glm::vec3{0, signs.y, 0} * pad).is_obstacle(),
+                c.get_block(block_pos[2] + glm::vec3{0, 0, signs.z} * pad).is_obstacle()
+        };
+
+        collision_point.x = (enable.x) ? int_pos.x + signs.x * pad : collision_point.x;
+        collision_point.y = (enable.y) ? (result=1, int_pos.x) + signs.x * pad : collision_point.y;
+        collision_point.z = (enable.z) ? int_pos.x + signs.x * pad : collision_point.z;
+    }
+    return {result, collision_point};
+}
+
+bool Model::test_point_visibility(const glm::vec3& point) const{
+    proj_type pt = ortho ? proj_type::ORTHO_3D : proj_type::PERSP;
+    glm::vec4 clip_coords = get_viewproj(pt) * glm::vec4{point, 1.0};
+
+    glm::vec4 abs_cc = glm::abs(clip_coords);
+    float w_coord = clip_coords.w;
+
+    return abs_cc.x < w_coord && abs_cc.y < w_coord && abs_cc.z < w_coord;
+}
+
+Crosshair Model::get_crosshair(int width, int height, int scale) {
+    return Crosshair(width, height, scale);
 }

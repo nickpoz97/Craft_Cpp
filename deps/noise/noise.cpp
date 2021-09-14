@@ -24,9 +24,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <math.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cmath>
+#include <cstdlib>
+#include <cstring>
+
+#include "noise.hpp"
 
 #define F2 0.3660254037844386f
 #define G2 0.21132486540518713f

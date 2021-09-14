@@ -4,16 +4,20 @@
 
 #include "Crosshair.hpp"
 #include "Shader.hpp"
+#include "Vertex.hpp"
 
-Crosshair::Crosshair(const Model &model) : SuperClass(get_ends_coordinates(model)) {};
+Crosshair::Crosshair(int width, int height, int scale) : SuperClass(get_ends_coordinates(width, height, scale)) {};
 
-std::array<Standard2DVertex, 4> Crosshair::get_ends_coordinates(const Model& model) {
-    glm::ivec2 position{model.getWidth() / 2, model.getHeight() / 2};
-    int p{10 * model.getScale()};
+std::vector<Standard2DVertex> Crosshair::get_ends_coordinates(int width, int height, int scale) {
+    glm::ivec2 position{width / 2, height / 2};
+    int p{10 * scale};
 
-    return {{glm::ivec2{position.x, position.y - p},
-             glm::ivec2{position.x, position.y + p},
-             glm::ivec2{position.x - p, position.y},
-             glm::ivec2{position.x + p, position.y}
-    }};
+    Standard2DVertex st{{2,3}};
+
+    return {
+        Standard2DVertex{{position.x, position.y - p}},
+        Standard2DVertex{{position.x, position.y + p}},
+        Standard2DVertex{{position.x - p, position.y}},
+        Standard2DVertex{{position.x + p, position.y}}
+    };
 }

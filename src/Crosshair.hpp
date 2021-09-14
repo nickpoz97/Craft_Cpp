@@ -5,16 +5,16 @@
 #ifndef CPP_CROSSHAIR_HPP
 #define CPP_CROSSHAIR_HPP
 
-
-#include "Model.hpp"
+#include "RenderableEntity.hpp"
+#include "Vertex.hpp"
 #include "Shader.hpp"
 
 class Crosshair : public RenderableEntity<Standard2DVertex>{
 private:
     using SuperClass = RenderableEntity<Standard2DVertex>;
-    static std::array<Standard2DVertex, 4> get_ends_coordinates(const Model& model);
+    static std::vector<Standard2DVertex> get_ends_coordinates(int width, int height, int scale);
 public:
-    Crosshair(const Model& model);
+    Crosshair(int width, int height, int scale);
     void render_object() = delete;
 };
 

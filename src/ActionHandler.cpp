@@ -2,21 +2,25 @@
 // Created by ultimatenick on 04/09/21.
 //
 
-#include <trigonometric.hpp>
+#define GLFW_INCLUDE_NONE
+
+#include "trigonometric.hpp"
 #include "ActionHandler.hpp"
+#include "Model.hpp"
+#include "GLFW/glfw3.h"
 
 void ActionHandler::on_left_click() {
     if(!initialized){
         return;
     }
-    Block result = player_p->hit_test(false);
-    const auto& hit_pos {result.first};
-    const auto& hit_tile_block {result.second};
+    Block result = model_p->player_hit_test(false);
+    const auto& hit_pos {result.position};
+    const auto& hit_tile_block {result.w};
 
     if(hit_pos.y > 0 && hit_pos.y < 256 && hit_tile_block.is_destructable()){
         model_p->builder_block(hit_pos, BlockType::EMPTY);
         //model_p->record_block(hit_pos, BlockType::EMPTY);
-        if(!model_p->get_block(hit_pos + glm::ivec3{0,1,0}).is_empty());{
+        if(!model_p->get_block(hit_pos + glm::ivec3{0,1,0}).is_empty()){
             model_p->builder_block(hit_pos + glm::ivec3{0,1,0}, BlockType::EMPTY);
         }
     }
@@ -26,15 +30,15 @@ void ActionHandler::on_right_click() {
     if(!initialized){
         return;
     }
-    Block result = player_p->hit_test(false);
-    const auto& hit_pos {result.first};
-    const auto& hit_tile_block {result.second};
+    Block result = model_p->player_hit_test(false);
+    const auto& hit_pos {result.position};
+    const auto& hit_tile_block {result.w};
 
     if(hit_pos.y > 0 && hit_pos.y < 256 && hit_tile_block.is_destructable()){
         if(!player_p->insersects_block(2, hit_pos)){
             // using actual item index
             model_p->builder_block(hit_pos, BlockType::EMPTY);
-            model_p->record_block(hit_pos);
+            //model_p->record_block(hit_pos);
         }
     }
 }
@@ -43,10 +47,10 @@ void ActionHandler::on_middle_click() {
     if(!initialized){
         return;
     }
-    const Block hit_block{player_p->hit_test(false)};
-    const TileBlock& hit_tile {hit_block.second};
-    if(hit_tile.is_user_buildable()){
-        model_p->set_actual_item(hit_tile.getIndex());
+    const Block hit_block{model_p->player_hit_test(false)};
+    const TileBlock& hit_tile_block {hit_block.w};
+    if(hit_tile_block.is_user_buildable()){
+        model_p->set_actual_item(hit_tile_block.getIndex());
     }
 }
 
@@ -182,7 +186,7 @@ void ActionHandler::handle_movement(double delta_t) {
         delta_y = model_p->is_flying() ? 0 : glm::max(delta_y - ut * 25, -250.0);
         player_p->update_player_position(motion_vector + glm::vec3{0, delta_y * ut, 0});
 
-        auto collision_result = player_p->collide(2);
+        auto collision_result = model_p->collide(2, model_p->getChunks());
         player_p->update_player_position(collision_result.second);
         if(collision_result.first){
             delta_y = 0;
@@ -206,7 +210,7 @@ glm::vec3 ActionHandler::compute_motion(double delta_t) {
     if (glfwGetKey(model_p->get_window(), GLFW_KEY_UP)) player_p->increment_player_rotation({0, delta_t});
     if (glfwGetKey(model_p->get_window(), GLFW_KEY_DOWN)) player_p->increment_player_rotation({0, -delta_t});
 
-    glm::vec3 motion_vector{player_p->get_motion_vector(x_movement, z_movement)};
+    glm::vec3 motion_vector{player_p->get_motion_vector(x_movement, z_movement, model_p->is_flying())};
     return motion_vector;
 }
 

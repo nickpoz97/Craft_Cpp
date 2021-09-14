@@ -19,7 +19,7 @@ private:
 public:
     explicit RenderableEntity(const std::vector<VertexType>& local_buffer);
     explicit RenderableEntity() = default;
-    template<size_t n_values> explicit RenderableEntity(const std::array<VertexType, n_values>& local_buffer);
+    //template<size_t n_values> explicit RenderableEntity(const std::array<VertexType, n_values>& local_buffer);
     void update_buffer(const std::vector<VertexType>& local_buffer);
     void render_object() const;
     void render_lines() const;
