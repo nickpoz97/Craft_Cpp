@@ -23,6 +23,9 @@ Shader::Shader(std::string_view vs_path,
     glDeleteProgram(fs_id);
 
     get_uniforms_location();
+
+    // set PI constant
+    glUniform1f(static_cast<GLint>(uniforms.PI.first), glm::pi<float>());
 }
 
 GLuint Shader::get_id() const {
@@ -65,7 +68,7 @@ void Shader::set_sampler(int sampler) const{
 }
 
 void Shader::set_timer(float timer) const{
-    glUniform1i(static_cast<GLint>(uniforms.timer.first), timer);
+    glUniform1f(static_cast<GLint>(uniforms.timer.first), timer);
 }
 
 template<typename GLtype>
