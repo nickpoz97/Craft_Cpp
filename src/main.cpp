@@ -10,7 +10,7 @@
 static int load_texture(std::string_view path, GLint clamp_type = GL_REPEAT);
 
 int main() {
-    if(!glfwInit()){
+    /*if(!glfwInit()){
         std::cerr << "glfw not initialized" << '\n';
         return -1;
     }
@@ -51,7 +51,7 @@ int main() {
         }
     }
 
-
+*/
     return 0;
 }
 

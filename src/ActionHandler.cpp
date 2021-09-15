@@ -160,8 +160,9 @@ void ActionHandler::handle_movement(double delta_t) {
     if(!initialized){
         return;
     }
-    model_p->set_ortho(glfwGetKey(model_p->get_window(), 'F') ? 64 : 0);
-    model_p->set_fov(glfwGetKey(model_p->get_window(), GLFW_KEY_LEFT_SHIFT) ? 15 : 65);
+    int ortho = (glfwGetKey(model_p->get_window(), 'F') ? 64 : 0);
+    int fov = (glfwGetKey(model_p->get_window(), GLFW_KEY_LEFT_SHIFT) ? 15 : 65);
+    model_p->set_perspective_properties(fov, ortho);
 
     glm::vec3 motion_vector = compute_motion(delta_t);
 

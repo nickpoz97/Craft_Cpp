@@ -10,8 +10,7 @@
 
 Shader::Shader(std::string_view vs_path,
                std::string_view fs_path,
-               std::array<std::string_view, 4> uniforms_extra_names) :
-    uniforms{uniforms_extra_names}{
+               std::array<std::string_view, 4> uniforms_extra_names){
     unsigned vs_id = build_shader(vs_path);
     unsigned fs_id = build_shader(fs_path);
 
@@ -25,7 +24,7 @@ Shader::Shader(std::string_view vs_path,
     get_uniforms_location();
 
     // set PI constant
-    glUniform1f(static_cast<GLint>(uniforms.PI.first), glm::pi<float>());
+    glUniform1f(static_cast<GLint>(uniforms.PI.id), glm::pi<float>());
 }
 
 GLuint Shader::get_id() const {
@@ -55,56 +54,40 @@ int Shader::build_shader(std::string_view path) {
 
 void Shader::get_uniforms_location() {
     for(auto& u : uniforms){
-        u.first = glGetUniformLocation(id, u.second.data());
+        u.id = glGetUniformLocation(id, u.name.data());
     }
 }
 
 void Shader::set_camera(const glm::vec3 &camera_pos) const {
-    glUniform3fv(static_cast<GLint>(uniforms.camera.first), 1, glm::value_ptr(camera_pos));
+    glUniform3fv(static_cast<GLint>(uniforms.camera.id), 1, glm::value_ptr(camera_pos));
 }
 
 void Shader::set_sampler(int sampler) const{
-    glUniform1i(static_cast<GLint>(uniforms.sampler.first), sampler);
+    glUniform1i(static_cast<GLint>(uniforms.sampler.id), sampler);
 }
 
 void Shader::set_timer(float timer) const{
-    glUniform1f(static_cast<GLint>(uniforms.timer.first), timer);
+    glUniform1f(static_cast<GLint>(uniforms.timer.id), timer);
 }
 
 template<typename GLtype>
-void Shader::set_extra(int extra_suffix, GLtype value) const{
-    if(extra_suffix < 1 || extra_suffix > 4){
-        return;
-    }
-    switch (extra_suffix) {
-        case 1:
-            _set_extra(uniforms.extra1.first, value);
-        break;
-        case 2:
-            _set_extra(uniforms.extra2.first, value);
-        break;
-        case 3:
-            _set_extra(uniforms.extra3.first, value);
-        break;
-        case 4:
-            _set_extra(uniforms.extra4.first, value);
-        break;
-    }
+void Shader::set_extra_uniform(std::string_view uniform_name, GLtype value) const{
+    _set_extra_uniform(glGetUniformLocation(id, uniform_name.data()), value);
 }
 
 void Shader::set_viewproj(const glm::mat4& m) const{
-    glUniformMatrix4fv(uniforms.viewproj_matrix.first, 1, GL_FALSE, glm::value_ptr(m));
+    glUniformMatrix4fv(uniforms.viewproj_matrix.id, 1, GL_FALSE, glm::value_ptr(m));
 }
 
 template<>
-void Shader::_set_extra<float>(int u_location, float val) const{
+void Shader::_set_extra_uniform<float>(int u_location, float val) const{
     glUniform1f(u_location, val);
 }
 
 template<>
-void Shader::_set_extra<int>(int u_location, int val) const{
+void Shader::_set_extra_uniform<int>(int u_location, int val) const{
     glUniform1i(u_location, val);
 }
 
-template void Shader::set_extra(int extra_suffix, float value) const;
-template void Shader::set_extra(int extra_suffix, int value) const;
+template void Shader::set_extra_uniform(std::string_view id, float value) const;
+template void Shader::set_extra_uniform(std::string_view id, int value) const;

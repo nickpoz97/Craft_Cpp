@@ -15,6 +15,7 @@ class ActionHandler {
 private:
     static inline Player* player_p{nullptr};
     static inline Model* model_p{nullptr};
+    static inline GameView* game_view_p{nullptr};
 
     static inline bool initialized{false};
     static inline bool members_set{false};

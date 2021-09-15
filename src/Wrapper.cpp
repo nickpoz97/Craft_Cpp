@@ -48,18 +48,5 @@ typename Wrapper<WrapperType>::Iterator Wrapper<WrapperType>::end() {
     return {reinterpret_cast<value_type*>(this) + (get_size() / sizeof(value_type))};
 }
 
-UniformsWrapper::UniformsWrapper(std::string_view extra1_name,
-                                 std::string_view extra2_name,
-                                 std::string_view extra3_name,
-                                 std::string_view extra4_name) :
-                                 extra1{0, extra1_name},
-                                 extra2{0, extra1_name},
-                                 extra3{0, extra1_name},
-                                 extra4{0, extra1_name}
-                                 {}
-
-UniformsWrapper::UniformsWrapper(std::array<std::string_view, 4> extra_names) :
-    UniformsWrapper{extra_names[0], extra_names[1], extra_names[2], extra_names[3]}{}
-
 template class Wrapper<AttributesWrapper>;
 template class Wrapper<UniformsWrapper>;

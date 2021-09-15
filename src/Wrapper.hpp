@@ -18,7 +18,12 @@ struct UniformsWrapper;
 
 template<>
 struct wrapper_value<UniformsWrapper>{
-    using t = std::pair<GLuint, std::string_view>;
+    struct Uniform{
+        GLuint id;
+        std::string_view name;
+    };
+
+    using t = Uniform;
 };
 
 template<>
@@ -61,16 +66,8 @@ struct UniformsWrapper : public Wrapper<UniformsWrapper>{
     value_type sampler{0, "sampler"};
     value_type camera{0, "camera"};
     value_type timer{0, "timer"};
-    value_type extra1{0, "extra1"};
-    value_type extra2{0, "extra2"};
-    value_type extra3{0, "extra3"};
-    value_type extra4{0, "extra4"};
     value_type viewproj_matrix{0, "viewproj_matrix"};
     value_type PI{0, "PI"};
-
-    UniformsWrapper() = default;
-    UniformsWrapper(std::string_view extra1_name, std::string_view extra2_name, std::string_view extra3_name, std::string_view extra4_name);
-    UniformsWrapper(std::array<std::string_view, 4> extra_names);
 };
 
 #endif //CPP_WRAPPER_HPP

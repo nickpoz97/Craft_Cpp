@@ -34,6 +34,7 @@ static constexpr bool SHOW_INFO_TEXT = true;
 static constexpr bool SHOW_ITEM = true;
 static constexpr int DAY_LENGTH = 600;
 static constexpr bool VSYNC = true;
+static constexpr float INITIAL_FOV = 45;
 #define CPP_COSTANTS_HPP
 
 #endif //CPP_COSTANTS_HPP

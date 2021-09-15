@@ -23,7 +23,7 @@ private:
     void get_uniforms_location();
 
     template<typename GLtype>
-    void _set_extra(int u_location, GLtype val) const;
+    void _set_extra_uniform(int u_location, GLtype val) const;
 public:
     void use() const;
 
@@ -36,7 +36,7 @@ public:
     void set_viewproj(const glm::mat4& m) const;
 
     template<typename GLtype>
-    void set_extra(int extra_suffix, GLtype value) const;
+    void set_extra_uniform(std::string_view uniform_name, GLtype value) const;
 };
 
 

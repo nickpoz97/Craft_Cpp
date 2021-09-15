@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 file(GLOB SOURCE_FILES src/*.cpp deps/noise/noise.cpp deps/glad/src/*.c)
 #file(GLOB SOURCE_FILES deps/noise/noise.c)
 
-add_executable(app ${SOURCE_FILES})
+add_executable(app ${SOURCE_FILES} src/GameView.cpp src/GameView.hpp)
 
 include_directories(deps/glad/include/)
 include_directories(deps/glfw/include/)

@@ -2,14 +2,11 @@
 // Created by ultimatenick on 10/08/21.
 //
 
-#include <cmath>
-
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "gtc/matrix_transform.hpp"
 #include "Player.hpp"
 #include "Model.hpp"
-#include "trigonometric.hpp"
 #include "Sphere.hpp"
 #include "CubeWireframe.hpp"
 #include "Text2D.hpp"
@@ -19,6 +16,7 @@
 #include "fmt/format.h"
 #include "Shader.hpp"
 #include "Chunk.hpp"
+#include "GameView.hpp"
 
 float Model::get_day_time() const {
     if (day_length <= 0) {
@@ -45,27 +43,8 @@ float Model::get_daylight() const {
 
 const Sphere Model::sky{1,3};
 
-int Model::get_scale_factor(int width, int height) {
-    int result = width / height;
-    result = std::max(1, result);
-    result = std::min(2, result);
-    return result;
-}
-
 bool Model::is_flying() const{
     return flying;
-}
-
-int Model::getWidth() const {
-    return width;
-}
-
-int Model::getHeight() const {
-    return height;
-}
-
-int Model::getScale() const {
-    return scale;
 }
 
 void Model::set_player(const glm::vec3& position, const glm::vec2& rotation, std::string_view name, int id) {
@@ -135,9 +114,7 @@ void Model::builder_block(const glm::ivec3 &pos, BlockType w = BlockType::EMPTY)
 }
 
 void Model::render_chunks() const {
-    if(!player || !shaders.block_shader.get_id()){
-        return;
-    }
+    using proj_type = GameView::proj_type;
     const Shader& shader = shaders.block_shader;
     shader.use();
 
@@ -148,14 +125,14 @@ void Model::render_chunks() const {
     shader.set_camera(player->get_position());
     shader.set_sampler(0);
     shader.set_timer(get_day_time());
-    shader.set_extra(1, 2);
-    shader.set_extra(2, light);
-    shader.set_extra(3, RENDER_CHUNK_RADIUS * Chunk::SIZE);
-    shader.set_extra(4, ortho);
+    shader.set_extra_uniform("sky_sampler", 2);
+    shader.set_extra_uniform("daylight", light);
+    shader.set_extra_uniform("fog_distance", RENDER_CHUNK_RADIUS * Chunk::SIZE);
+    shader.set_extra_uniform("ortho", game_view.get_ortho());
 
     for(const auto& pq_c : chunks){
         const Chunk& c = pq_c.second;
-        proj_type pt = ortho ? proj_type::ORTHO_3D : proj_type::PERSP;
+        proj_type pt = game_view.get_ortho() ? proj_type::ORTHO_3D : proj_type::PERSP;
 
         if(c.is_visible(get_viewproj(pt)) && get_chunk_distance(get_player_chunk(), c) < RENDER_CHUNK_RADIUS){
             c.render_object();
@@ -163,51 +140,36 @@ void Model::render_chunks() const {
     }
 }
 
-float Model::getFov() const {
-    return fov;
-}
-
-// TODO to be completed
 void Model::render_sky() const {
-    if(!player){
-        return;
-    }
     const Shader& shader{shaders.sky_shader};
-    shader.set_viewproj(get_viewproj(proj_type::PERSP));
+    shader.use();
+    shader.set_viewproj(get_viewproj(GameView::proj_type::PERSP));
     shader.set_sampler(2);
     shader.set_timer(get_day_time());
     sky.render_object();
 }
 
-glm::mat4 Model::get_viewproj(proj_type pt) const {
+glm::mat4 Model::get_viewproj(GameView::proj_type pt) const {
+    using proj_type = GameView::proj_type;
+
     const glm::mat4 view{
             glm::lookAt(player->get_position(),
             player->get_position() + player->get_camera_direction_vector(),
             {0, 1, 0})
     };
 
-    // TODO insert ORTO_3D
-    switch (pt) {
-        case proj_type::PERSP:
-            return persp_proj * view;
-        break;
-        case proj_type::ORTHO_2D:
-            return ortho_proj_2d * view;
-        break;
-    }
+    return view * game_view.get_proj_matrix(pt);
 }
 
 void Model::render_wireframe() {
-    if(!player){
-        return;
-    }
     Block hit_block = player_hit_test(false);
     if(hit_block.w.is_obstacle()){
         const Shader& s = shaders.line_shader;
+        s.use();
         glLineWidth(1);
         glEnable(GL_COLOR_LOGIC_OP);
         s.use();
-        s.set_viewproj(get_viewproj(proj_type::PERSP));
+        s.set_viewproj(get_viewproj(GameView::proj_type::PERSP));
         CubeWireframe{hit_block.position}.render_lines();
         glDisable(GL_COLOR_LOGIC_OP);
     }
@@ -217,9 +179,9 @@ void Model::render_crosshair() {
     const Shader& shader = shaders.line_shader;
 
     shader.use();
-    glLineWidth(4 * scale);
+    glLineWidth(4 * game_view.get_scale());
     glEnable(GL_COLOR_LOGIC_OP);
-    shader.set_viewproj(get_viewproj(proj_type::ORTHO_2D));
+    shader.set_viewproj(game_view.get_proj_matrix(GameView::proj_type::ORTHO_2D));
     crosshair.render_lines();
 }
 
@@ -227,7 +189,7 @@ void Model::render_text(int justify, const glm::vec2 &position, float n, std::st
     const Shader& shader = shaders.text_shader;
 
     shader.use();
-    shader.set_viewproj(get_viewproj(proj_type::ORTHO_2D));
+    shader.set_viewproj(game_view.get_proj_matrix(GameView::proj_type::ORTHO_2D));
     shader.set_sampler(1);
     const glm::vec2 justified_position{position - glm::vec2{n * justify * (text.size() - 1) / 2, 0}};
     Text2D{justified_position, n, text}.render_object();
@@ -236,7 +198,8 @@ void Model::render_text(int justify, const glm::vec2 &position, float n, std::st
 void Model::render_item() {
     const Shader& shader = shaders.block_shader;
     shader.use();
-    shader.set_viewproj(get_viewproj(proj_type::PERSP));
+    // TODO use another type of matrix
+    shader.set_viewproj(get_viewproj(GameView::proj_type::PERSP));
     shader.set_camera({0,0,5});
     shader.set_sampler(0);
     shader.set_timer(get_day_time());
@@ -268,40 +231,8 @@ void Model::set_prev_item() {
     actual_item = TileBlock::items[new_index];
 }
 
-Model::Model() : Model({"block_vertex.vs", "block_fragment.fs", {}},
-                       {"line_vertex.vs", "line_fragment.fs", {}},
-                       {"sky_vertex.vs", "sky_fragment.fs", {}},
-                       {"text_vertex.vs", "text_fragment.fs", {}})
-{}
-
-GLFWwindow * Model::create_window(bool is_fullscreen) {
-    GLFWmonitor *monitor = nullptr;
-
-    if(is_fullscreen){
-        int mode_count;
-        monitor = glfwGetPrimaryMonitor();
-        const GLFWvidmode *modes = glfwGetVideoModes(monitor, &mode_count);
-        width = modes[mode_count - 1].width;
-        height = modes[mode_count - 1].height;
-    }
-
-    return glfwCreateWindow(width, height, "Craft Cpp", monitor, nullptr);
-}
-
-Model::~Model() {
-    glfwTerminate();
-}
-
 GLFWwindow *Model::get_window() {
-    return window;
-}
-
-void Model::set_ortho(int ortho_size) {
-    ortho = ortho_size;
-}
-
-void Model::set_fov(int fov_degrees) {
-    fov = fov_degrees;
+    return game_view.get_window();
 }
 
 Player *Model::get_player() const{
@@ -310,15 +241,15 @@ Player *Model::get_player() const{
 
 Model::Model(const Shader &block_shader, const Shader &line_shader, const Shader &sky_shader, const Shader &text_shader) :
     shaders{block_shader, line_shader, sky_shader, text_shader},
-    width{WINDOW_WIDTH},
-    height{WINDOW_HEIGTH},
-    crosshair{WINDOW_WIDTH, WINDOW_HEIGTH, get_scale_factor(WINDOW_WIDTH, WINDOW_HEIGTH)}
+    game_view{WINDOW_WIDTH, WINDOW_WIDTH, INITIAL_FOV, 0, FULLSCREEN},
+    crosshair{WINDOW_WIDTH, WINDOW_HEIGTH, game_view.get_scale()}
     {
     glfwSetTime(day_length / 3.0);
-    window = create_window(FULLSCREEN);
     previous_timestamp = glfwGetTime();
 
-    if(window) {
+    if(game_view.get_window()) {
+        GLFWwindow* window;
+
         set_player({}, {}, "player_0", 0);
         ActionHandler::initialize(this);
 
@@ -327,14 +258,6 @@ Model::Model(const Shader &block_shader, const Shader &line_shader, const Shader
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         ActionHandler::set_callbacks(window);
     }
-    update_proj_matrices();
-}
-
-void Model::update_window_size() {
-    scale = get_scale_factor(0, 0);
-    glfwGetFramebufferSize(window, &width, &height);
-    glViewport(0, 0, width, height);
-    update_proj_matrices();
 }
 
 void Model::handle_input(double dt) {
@@ -359,9 +282,9 @@ void Model::render_scene() {
         render_item();
     }
     if(SHOW_INFO_TEXT){
-        float ts = 12 * scale;
+        float ts = 12 * game_view.get_scale();
         float tx = ts / 2;
-        float ty = height - ts;
+        float ty = game_view.get_height() - ts;
 
         int hour = get_day_time() * 24;
         char am_pm = hour < 12 ? 'a' : 'p';
@@ -384,9 +307,9 @@ void Model::render_scene() {
 }
 
 bool Model::swap_pool() {
-    glfwSwapBuffers(window);
+    glfwSwapBuffers(game_view.get_window());
     glfwPollEvents();
-    return !glfwWindowShouldClose(window);
+    return !glfwWindowShouldClose(game_view.get_window());
 }
 
 // build chunks around the player to test collisions
@@ -401,16 +324,13 @@ void Model::load_collision_chunks() {
     }
 }
 
-void Model::update_proj_matrices() {
-    persp_proj = glm::perspective(glm::radians(fov), static_cast<float>(width) / (height), z_near, z_far);
-    ortho_proj_2d = glm::ortho(0, width, 0, height, -1, 1);
-}
-
 void Model::load_visible_chunks() {
+    using proj_type = GameView::proj_type;
+
     glm::ivec2 pq = player->get_pq();
     for(int dp = -RENDER_CHUNK_RADIUS ; dp <= RENDER_CHUNK_RADIUS ; dp++ ){
         for(int dq = -RENDER_CHUNK_RADIUS ; dq <= RENDER_CHUNK_RADIUS ; dq++ ){
-            proj_type pt = ortho ? proj_type::ORTHO_3D : proj_type::PERSP;
+            proj_type pt = game_view.get_ortho() ? proj_type::ORTHO_3D : proj_type::PERSP;
             // build chunk and check if it is in a visible position
             Chunk c{{pq.x + dq, pq.y + dq}, false};
             if(c.is_visible(get_viewproj(pt))){
@@ -444,7 +364,7 @@ void Model::update_chunk_map() {
 }
 
 bool Model::loop() {
-    update_window_size();
+    game_view.update_window();
     double now = glfwGetTime();
     double dt = now - previous_timestamp;
 
@@ -533,16 +453,11 @@ std::pair<bool, glm::vec3> Model::collide(int height, const std::unordered_map<g
     return {result, collision_point};
 }
 
-bool Model::test_point_visibility(const glm::vec3& point) const{
-    proj_type pt = ortho ? proj_type::ORTHO_3D : proj_type::PERSP;
-    glm::vec4 clip_coords = get_viewproj(pt) * glm::vec4{point, 1.0};
-
-    glm::vec4 abs_cc = glm::abs(clip_coords);
-    float w_coord = clip_coords.w;
-
-    return abs_cc.x < w_coord && abs_cc.y < w_coord && abs_cc.z < w_coord;
-}
-
 Crosshair Model::get_crosshair(int width, int height, int scale) {
     return Crosshair(width, height, scale);
+}
+
+void Model::set_perspective_properties(int fov, int orto) {
+    game_view.set_fov(fov);
+    game_view.set_ortho(orto);
 }
