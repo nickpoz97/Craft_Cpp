@@ -1,6 +1,7 @@
 //
 // Created by ultimatenick on 10/08/21.
 //
+#define GLFW_INCLUDE_NONE
 
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
@@ -40,8 +41,6 @@ float Model::get_daylight() const {
         return 1 - 1 / (1 + powf(2, -t));
     }
 }
-
-const Sphere Model::sky{1,3};
 
 bool Model::is_flying() const{
     return flying;
@@ -204,7 +203,7 @@ void Model::render_item() {
     shader.set_sampler(0);
     shader.set_timer(get_day_time());
 
-    Item{actual_item}.render_object();
+    Item{actual_item, game_view}.render_object();
 }
 
 /*void Model::record_block(const glm::ivec3 &pos) {
@@ -239,25 +238,19 @@ Player *Model::get_player() const{
     return player.get();
 }
 
-Model::Model(const Shader &block_shader, const Shader &line_shader, const Shader &sky_shader, const Shader &text_shader) :
+Model::Model(const Shader &block_shader, const Shader &line_shader, const Shader &sky_shader,
+             const Shader &text_shader, GameView &game_view) :
+    game_view{game_view},
     shaders{block_shader, line_shader, sky_shader, text_shader},
-    game_view{WINDOW_WIDTH, WINDOW_WIDTH, INITIAL_FOV, 0, FULLSCREEN},
-    crosshair{WINDOW_WIDTH, WINDOW_HEIGTH, game_view.get_scale()}
+    crosshair{WINDOW_WIDTH, WINDOW_HEIGTH, game_view.get_scale()},
+    sky{1,3}
     {
     glfwSetTime(day_length / 3.0);
     previous_timestamp = glfwGetTime();
 
-    if(game_view.get_window()) {
-        GLFWwindow* window;
-
-        set_player({}, {}, "player_0", 0);
-        ActionHandler::initialize(this);
-
-        glfwMakeContextCurrent(window);
-        glfwSwapInterval(VSYNC);
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        ActionHandler::set_callbacks(window);
-    }
+    set_player({}, {}, "player_0", 0);
+    ActionHandler::initialize(this);
+    ActionHandler::set_callbacks(game_view.get_window());
 }
 
 void Model::handle_input(double dt) {
@@ -426,8 +419,7 @@ std::pair<bool, glm::vec3> Model::collide(int height, const std::unordered_map<g
     glm::vec3 collision_point{};
     bool result{};
 
-    // TODO check if truncation is better than rounding
-    const glm::ivec3 int_pos{position};
+    const glm::ivec3 int_pos{glm::abs(position)};
     const glm::vec3 decimal_dif_pos(position - static_cast<glm::vec3>(int_pos));
     float pad = 0.25;
 

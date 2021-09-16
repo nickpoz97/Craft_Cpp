@@ -5,7 +5,6 @@
 #ifndef CPP_SHADER_HPP
 #define CPP_SHADER_HPP
 
-
 #include <string_view>
 #include <array>
 
@@ -27,7 +26,7 @@ private:
 public:
     void use() const;
 
-    Shader(std::string_view vs_path, std::string_view fs_path, std::array<std::string_view, 4> uniforms_extra_names);
+    Shader(std::string_view vs_path, std::string_view fs_path);
     GLuint get_id() const;
 
     void set_camera(const glm::vec3& camera_pos) const;

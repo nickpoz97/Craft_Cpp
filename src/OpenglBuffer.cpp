@@ -6,7 +6,6 @@
 
 #include "vec3.hpp"
 #include "OpenglBuffer.hpp"
-#include "glad/glad.h"
 #include "Vertex.hpp"
 
 template<typename VertexType>

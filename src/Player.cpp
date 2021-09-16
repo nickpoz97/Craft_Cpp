@@ -131,14 +131,14 @@ const Status &Player::getActualStatus() const {
 Block Player::ray_hit(const Chunk& c, bool previous, int max_distance, int step) const {
 
     const glm::vec3& ray{get_camera_direction_vector()};
-    glm::ivec3 test_pos{actual_status.position - ray}; // better for loop
+    glm::vec3 test_pos{actual_status.position - ray}; // better for loop
     glm::ivec3 test_pos_rounded{}; // better for loop
     glm::ivec3 previous_pos{};
 
     for(int i = 0 ; i < max_distance ; i++){
         test_pos += ray;
         // TODO check if truncation is better than rounding
-        test_pos_rounded = test_pos;
+        test_pos_rounded = glm::round(test_pos);
         if(previous_pos == test_pos_rounded){
             continue;
         }
@@ -184,7 +184,7 @@ Block Player::ray_hit(const Chunk& c, bool previous, int max_distance, int step)
 
 bool Player::insersects_block(int height, const glm::ivec3& block_pos) const {
     // TODO check if truncation is better than rounding
-    const glm::ivec3 int_pos{actual_status.position};
+    const glm::ivec3 int_pos{glm::round(actual_status.position)};
 
     for(int i = 0 ; i < height ; i++){
         if(int_pos == (block_pos - glm::ivec3{0,i,0})){

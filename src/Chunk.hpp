@@ -19,7 +19,7 @@ private:
     using SuperClass = RenderableEntity<CubeVertex>;
     using neighbors_pointers = std::array<std::array<const BlockMap*,3>,3>;
 
-    std::vector<CubeVertex> local_buffer{};
+    std::vector<CubeVertex> local_buffer;
 
     int min_y{};
     int max_y{};

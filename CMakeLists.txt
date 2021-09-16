@@ -2,11 +2,12 @@ cmake_minimum_required(VERSION 3.19)
 project(cpp)
 
 set(CMAKE_CXX_STANDARD 17)
+set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 file(GLOB SOURCE_FILES src/*.cpp deps/noise/noise.cpp deps/glad/src/*.c)
 #file(GLOB SOURCE_FILES deps/noise/noise.c)
 
-add_executable(app ${SOURCE_FILES} src/GameView.cpp src/GameView.hpp)
+add_executable(app ${SOURCE_FILES})
 
 include_directories(deps/glad/include/)
 include_directories(deps/glfw/include/)
@@ -17,4 +18,5 @@ include_directories(deps/fmt/include/)
 add_subdirectory(deps/glfw)
 add_subdirectory(deps/fmt)
 
+install(TARGETS app DESTINATION ".")
 target_link_libraries(app ${CMAKE_DL_LIBS} glfw fmt)

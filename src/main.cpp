@@ -10,18 +10,18 @@
 static int load_texture(std::string_view path, GLint clamp_type = GL_REPEAT);
 
 int main() {
-    /*if(!glfwInit()){
-        std::cerr << "glfw not initialized" << '\n';
+    GameView game_view{WINDOW_WIDTH, WINDOW_WIDTH, INITIAL_FOV, 0, FULLSCREEN};
+    if(!game_view.is_initialized()){
         return -1;
     }
 
-    Model model{};
+    Shader block_shader{"shaders/block_vertex.glsl", "shaders/block_fragment.glsl"};
+    Shader line_shader{"shaders/line_vertex.glsl", "shaders/line_fragment.glsl"};
+    Shader sky_shader{"shaders/sky_vertex.glsl", "shaders/sky_fragment.glsl"};
+    Shader text_shader{"shaders/text_vertex.glsl", "shaders/text_fragment.glsl"};
+
+    Model model{block_shader, line_shader, sky_shader, text_shader, game_view};
     if(!model.get_window()){
-        return -1;
-    }
-
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
-        std::cerr << "glad not initialized" << '\n';
         return -1;
     }
 
@@ -44,14 +44,9 @@ int main() {
         return -1;
     }
 
-    while(true){
-        bool continue_loop = model.loop();
-        if(!continue_loop){
-            break;
-        }
+    while(!glfwWindowShouldClose(game_view.get_window())) {
+        model.loop();
     }
-
-*/
     return 0;
 }
 
@@ -71,11 +66,12 @@ int load_texture(std::string_view path, GLint clamp_type){
     stbi_set_flip_vertically_on_load(true); // st coords instead of uv coords
     int width, height, nr_channels;
     unsigned char* data = stbi_load(path.data(), &width, &height, &nr_channels, 0);
+
     if(!data){
         return -1;
     }
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    //glGenerateMipmap(GL_TEXTURE_2D);
+    glGenerateMipmap(GL_TEXTURE_2D);
 
     stbi_image_free(data);
     return 0;

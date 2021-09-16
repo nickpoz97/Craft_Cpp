@@ -23,17 +23,18 @@
 
 class Model {
 private:
+    GameView& game_view;
+
     struct ShaderWrapper {
         const Shader &block_shader;
         const Shader &line_shader;
         const Shader &sky_shader;
         const Shader &text_shader;
     };
-    GameView game_view;
 
     std::unordered_map<glm::ivec2, Chunk> chunks{};
     ShaderWrapper shaders;
-    static const Sphere sky;
+    const Sphere sky;
 
     std::unique_ptr<Player> player{nullptr};
     double previous_timestamp{};
@@ -62,7 +63,9 @@ private:
 
     glm::mat4 get_viewproj(GameView::proj_type pt) const;
 public:
-    Model(const Shader &block_shader, const Shader &line_shader, const Shader &sky_shader, const Shader &text_shader);
+    Model(const Shader &block_shader, const Shader &line_shader, const Shader &sky_shader,
+          const Shader &text_shader, GameView &game_view);
+
     float get_day_time() const;
     float get_daylight() const;
     void switch_flying();

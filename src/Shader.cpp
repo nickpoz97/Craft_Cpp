@@ -2,15 +2,19 @@
 // Created by ultimatenick on 11/08/21.
 //
 
+#define GLFW_INCLUDE_NONE
+
 #include <fstream>
 #include <sstream>
+#include <iostream>
 #include <vec3.hpp>
-#include <gtc/type_ptr.hpp>
 #include "Shader.hpp"
+#include "gtc/type_ptr.hpp"
+#include "glad/glad.h"
+#include "GLFW/glfw3.h"
 
 Shader::Shader(std::string_view vs_path,
-               std::string_view fs_path,
-               std::array<std::string_view, 4> uniforms_extra_names){
+               std::string_view fs_path){
     unsigned vs_id = build_shader(vs_path);
     unsigned fs_id = build_shader(fs_path);
 
@@ -45,6 +49,7 @@ int Shader::build_shader(std::string_view path) {
     std::string_view code_string{code_stream.str()};
 
     const char* code_c_string = code_string.data();
+
     unsigned shader_id = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(shader_id, 1, &(code_c_string), NULL);
     glCompileShader(shader_id);

@@ -4,6 +4,8 @@
 
 #define GLFW_INCLUDE_NONE
 
+#include <iostream>
+
 #include "trigonometric.hpp"
 #include "gtc/matrix_transform.hpp"
 #include "glad/glad.h"
@@ -20,10 +22,6 @@ int GameView::compute_scale_factor(int width, int height) {
 void GameView::update_all_proj_matrices() {
     update_ortho_proj_matrix();
     update_persp_proj_matrix();
-}
-
-GameView::~GameView() {
-    glfwTerminate();
 }
 
 int GameView::get_width() const {
@@ -78,8 +76,27 @@ height{height},
 fov{fov},
 ortho{ortho},
 scale{compute_scale_factor(width, height)}{
+    if(!glfwInit()){
+        std::cerr << "glfw not initialized" << '\n';
+        return;
+    }
     window = create_window(is_fullscreen);
+    if(!window){
+        std::cerr << "window not created" << '\n';
+        return;
+    }
+
+    glfwMakeContextCurrent(window);
+    glfwSwapInterval(VSYNC);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
+        std::cerr << "glad not initialized" << '\n';
+        return;
+    }
+
     update_all_proj_matrices();
+    initialized = true;
 }
 
 GLFWwindow *GameView::create_window(bool is_fullscreen) {
@@ -113,6 +130,18 @@ glm::mat4 GameView::get_proj_matrix(GameView::proj_type pt) const {
 
 int GameView::get_ortho() const {
     return ortho;
+}
+
+float GameView::get_ratio() const{
+    return width/height;
+}
+
+bool GameView::is_initialized() const {
+    return initialized;
+}
+
+GameView::~GameView() {
+    glfwTerminate();
 }
 
 

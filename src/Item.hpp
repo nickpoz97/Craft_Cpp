@@ -8,13 +8,14 @@
 
 #include "Vertex.hpp"
 #include "RenderableEntity.hpp"
+#include "GameView.hpp"
 
 class Item : public RenderableEntity<CubeVertex>{
 public:
     using SuperClass = RenderableEntity<CubeVertex>;
-    explicit Item(BlockType w);
+    explicit Item(BlockType w, const GameView& game_view);
 private:
-    static std::vector<CubeVertex> gen_local_buffer(BlockType w);
+    static std::vector<CubeVertex> gen_local_buffer(BlockType w, int width, int height, int scale);
 };
 
 

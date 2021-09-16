@@ -10,7 +10,7 @@
 
 Chunk::Chunk(const glm::vec2 &pq_coordinates, bool init) : block_map{pq_coordinates}, pq{pq_coordinates},
                                                            xz_boundaries{get_xz_boundaries(pq_coordinates)},
-                                                           SuperClass{local_buffer}
+                                                           SuperClass{std::vector<CubeVertex>{}}
 {
     if(init){init_chunk();}
 };

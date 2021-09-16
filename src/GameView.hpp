@@ -20,6 +20,8 @@ private:
     int ortho;
     float fov;
 
+    bool initialized = false;
+
     static constexpr float z_near = 0.125f;
     static constexpr float z_far = static_cast<float>(RENDER_CHUNK_RADIUS) * 32 + 64;
 
@@ -44,6 +46,8 @@ public:
     [[nodiscard]] int get_fov() const;
     [[nodiscard]] int get_ortho() const;
     [[nodiscard]] GLFWwindow* get_window() const;
+    [[nodiscard]] float get_ratio() const;
+    [[nodiscard]] bool is_initialized() const;
 
     void set_ortho(int ortho_size);
     void set_fov(int fov_degrees);
