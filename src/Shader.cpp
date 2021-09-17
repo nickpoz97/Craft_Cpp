@@ -15,13 +15,17 @@
 
 Shader::Shader(std::string_view vs_path,
                std::string_view fs_path){
-    unsigned vs_id = build_shader(vs_path);
-    unsigned fs_id = build_shader(fs_path);
+    unsigned vs_id = build_shader(vs_path, shader_type::VERTEX);
+    check_compile_errors(vs_id, vs_path.data());
+    unsigned fs_id = build_shader(fs_path, shader_type::FRAGMENT);
+    check_compile_errors(fs_id, fs_path.data());
 
     id = glCreateProgram();
     glAttachShader(id, vs_id);
     glAttachShader(id, fs_id);
     glLinkProgram(id);
+    check_compile_errors(id, "PROGRAM");
+
     glDeleteProgram(vs_id);
     glDeleteProgram(fs_id);
 
@@ -39,18 +43,26 @@ void Shader::use() const{
     glUseProgram(id);
 }
 
-int Shader::build_shader(std::string_view path) {
+int Shader::build_shader(std::string_view path, shader_type st) {
     std::ifstream code_file;
     std::stringstream code_stream;
 
     code_file.open(path.data());
     code_stream << code_file.rdbuf();
     code_file.close();
-    std::string_view code_string{code_stream.str()};
+    std::string code_string{code_stream.str()};
 
     const char* code_c_string = code_string.data();
 
-    unsigned shader_id = glCreateShader(GL_VERTEX_SHADER);
+    unsigned shader_id;
+    switch (st) {
+        case shader_type::VERTEX:
+            shader_id = glCreateShader(GL_VERTEX_SHADER);
+        break;
+        case shader_type::FRAGMENT:
+            shader_id = glCreateShader(GL_FRAGMENT_SHADER);
+        break;
+    }
     glShaderSource(shader_id, 1, &(code_c_string), NULL);
     glCompileShader(shader_id);
 
@@ -82,6 +94,29 @@ void Shader::set_extra_uniform(std::string_view uniform_name, GLtype value) cons
 
 void Shader::set_viewproj(const glm::mat4& m) const{
     glUniformMatrix4fv(uniforms.viewproj_matrix.id, 1, GL_FALSE, glm::value_ptr(m));
+}
+
+void Shader::check_compile_errors(GLuint shader, std::string type) {
+    GLint success;
+    GLchar infoLog[1024];
+    if(type != "PROGRAM")
+    {
+        glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+        if(!success)
+        {
+            glGetShaderInfoLog(shader, 1024, NULL, infoLog);
+            std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+        }
+    }
+    else
+    {
+        glGetProgramiv(shader, GL_LINK_STATUS, &success);
+        if(!success)
+        {
+            glGetProgramInfoLog(shader, 1024, NULL, infoLog);
+            std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << infoLog << "\n -- --------------------------------------------------- -- " << std::endl;
+        }
+    }
 }
 
 template<>

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
 #include "Model.hpp"
 #include "stb_image.h"
 
@@ -15,10 +16,10 @@ int main() {
         return -1;
     }
 
-    Shader block_shader{"shaders/block_vertex.glsl", "shaders/block_fragment.glsl"};
-    Shader line_shader{"shaders/line_vertex.glsl", "shaders/line_fragment.glsl"};
-    Shader sky_shader{"shaders/sky_vertex.glsl", "shaders/sky_fragment.glsl"};
-    Shader text_shader{"shaders/text_vertex.glsl", "shaders/text_fragment.glsl"};
+    Shader block_shader{"../data/shaders/block_vertex.glsl", "../data/shaders/block_fragment.glsl"};
+    Shader line_shader{"../data/shaders/line_vertex.glsl", "../data/shaders/line_fragment.glsl"};
+    Shader sky_shader{"../data/shaders/sky_vertex.glsl", "../data/shaders/sky_fragment.glsl"};
+    Shader text_shader{"../data/shaders/text_vertex.glsl", "../data/shaders/text_fragment.glsl"};
 
     Model model{block_shader, line_shader, sky_shader, text_shader, game_view};
     if(!model.get_window()){
@@ -30,16 +31,15 @@ int main() {
     glLogicOp(GL_INVERT);
     glClearColor(0, 0, 0, 1);
 
-    int load_status = 0;
-    if(load_texture("textures/texture.png") != 0){
+    if(load_texture("../data/textures/texture.png") != 0){
         std::cerr << "general texture not loaded";
         return -1;
     }
-    if(load_texture("textures/font.png")){
+    if(load_texture("../data/textures/font.png")){
         std::cerr << "font not loaded";
         return -1;
     }
-    if(load_texture("textures/sky.png", GL_CLAMP_TO_EDGE)){
+    if(load_texture("../data/textures/sky.png", GL_CLAMP_TO_EDGE)){
         std::cerr << "sky texture not loaded";
         return -1;
     }

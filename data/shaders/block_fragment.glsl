@@ -7,7 +7,7 @@ in float fog_height;
 
 uniform float timer;
 uniform float daylight;
-uniform float ortho;
+uniform int ortho;
 
 // textures
 uniform sampler2D sampler;
@@ -34,5 +34,5 @@ void main() {
     // the more fog factor is high, the more diffuse_color goes towards sky_color
     diffuse_color = mix(diffuse_color, sky_color, fog_factor);
 
-    gl_FragColor = vcec4(diffuse_color, 1.0);
+    gl_FragColor = vec4(diffuse_color, 1.0);
 }

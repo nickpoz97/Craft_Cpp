@@ -180,7 +180,7 @@ void Model::render_crosshair() {
     shader.use();
     glLineWidth(4 * game_view.get_scale());
     glEnable(GL_COLOR_LOGIC_OP);
-    shader.set_viewproj(game_view.get_proj_matrix(GameView::proj_type::ORTHO_2D));
+    shader.set_viewproj(game_view.get_proj_matrix(GameView::proj_type::TEXT));
     crosshair.render_lines();
 }
 
@@ -188,7 +188,7 @@ void Model::render_text(int justify, const glm::vec2 &position, float n, std::st
     const Shader& shader = shaders.text_shader;
 
     shader.use();
-    shader.set_viewproj(game_view.get_proj_matrix(GameView::proj_type::ORTHO_2D));
+    shader.set_viewproj(game_view.get_proj_matrix(GameView::proj_type::TEXT));
     shader.set_sampler(1);
     const glm::vec2 justified_position{position - glm::vec2{n * justify * (text.size() - 1) / 2, 0}};
     Text2D{justified_position, n, text}.render_object();
@@ -198,12 +198,13 @@ void Model::render_item() {
     const Shader& shader = shaders.block_shader;
     shader.use();
     // TODO use another type of matrix
-    shader.set_viewproj(get_viewproj(GameView::proj_type::PERSP));
+    shader.set_viewproj(get_viewproj(GameView::proj_type::TEXT));
     shader.set_camera({0,0,5});
     shader.set_sampler(0);
     shader.set_timer(get_day_time());
 
-    Item{actual_item, game_view}.render_object();
+    Item item_geometry{actual_item};
+    item_geometry.render_object();
 }
 
 /*void Model::record_block(const glm::ivec3 &pos) {

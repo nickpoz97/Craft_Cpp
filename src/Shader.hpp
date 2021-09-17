@@ -15,14 +15,18 @@
 
 struct Shader {
 private:
+    enum class shader_type{VERTEX, FRAGMENT};
+
     GLuint id;
     UniformsWrapper uniforms;
 
-    static int build_shader(std::string_view code_path);
+    static int build_shader(std::string_view path, shader_type st);
     void get_uniforms_location();
 
     template<typename GLtype>
     void _set_extra_uniform(int u_location, GLtype val) const;
+
+    static void check_compile_errors(GLuint shader, std::string type);
 public:
     void use() const;
 

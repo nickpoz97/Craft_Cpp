@@ -59,6 +59,13 @@ void GameView::update_ortho_proj_matrix() {
     ortho_proj_3d = glm::ortho(-ortho * ratio,ortho * ratio,
                                static_cast<float>(-ortho),static_cast<float>(+ortho),
                                -z_far, z_far);
+
+    float size = 64 * scale;
+    float box = height / size * 2;
+    auto get_offset = [size](int axis){return 1 - size / axis * 2;};
+    glm::vec2 offset{get_offset(width), get_offset(height)};
+
+    ortho_proj_item = glm::ortho(-box * ratio, box * ratio, -box, box, -1.0f, 1.0f);
 }
 
 void GameView::set_ortho(int ortho_size) {
@@ -123,8 +130,10 @@ glm::mat4 GameView::get_proj_matrix(GameView::proj_type pt) const {
             return persp_proj;
         case proj_type::ORTHO_3D:
             return ortho_proj_3d;
-        case proj_type::ORTHO_2D:
+        case proj_type::TEXT:
             return ortho_proj_2d;
+        case proj_type::ITEM:
+            return ortho_proj_item;
     }
 }
 

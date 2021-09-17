@@ -28,13 +28,14 @@ private:
     glm::mat4 persp_proj{};
     glm::mat4 ortho_proj_2d{};
     glm::mat4 ortho_proj_3d{};
+    glm::mat4 ortho_proj_item{};
 
     static int compute_scale_factor(int width, int height);
 
     GLFWwindow* create_window(bool is_fullscreen);
 public:
     enum class proj_type {
-        PERSP, ORTHO_2D, ORTHO_3D
+        PERSP, TEXT, ORTHO_3D, ITEM
     };
 
     GameView(int width, int height, float fov, int ortho, bool is_fullscreen);
