@@ -8,7 +8,7 @@ file(MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 file(GLOB SOURCE_FILES src/*.cpp deps/noise/noise.cpp deps/glad/src/*.c)
 #file(GLOB SOURCE_FILES deps/noise/noise.c)
 
-add_executable(app ${SOURCE_FILES})
+add_executable(app ${SOURCE_FILES} src/GLError.cpp src/GLError.hpp)
 set_target_properties(app PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
 
 include_directories(deps/glad/include/)

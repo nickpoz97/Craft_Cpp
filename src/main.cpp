@@ -7,6 +7,7 @@
 
 #include "Model.hpp"
 #include "stb_image.h"
+#include "GLError.hpp"
 
 static int load_texture(std::string_view path, GLint clamp_type = GL_REPEAT);
 

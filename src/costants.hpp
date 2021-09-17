@@ -29,7 +29,7 @@ static constexpr int WINDOW_HEIGTH = 768;
 
 static constexpr bool FULLSCREEN = false;
 static constexpr bool SHOW_WIREFRAME = false;
-static constexpr bool SHOW_CROSSHAIRS = true;
+static constexpr bool SHOW_CROSSHAIRS = false;
 static constexpr bool SHOW_INFO_TEXT = false;
 static constexpr bool SHOW_ITEM = true;
 static constexpr int DAY_LENGTH = 600;

@@ -33,16 +33,6 @@ constexpr int get_n_uv_elements(){
     return 0;
 }
 
-template<typename VertexType, std::enable_if_t<std::is_base_of_v<CubeVertex, VertexType>, bool> = true>
-constexpr int get_n_matrix_elements(){
-        return 0; //decltype(VertexType::transform)::length();
-}
-
-template<typename VertexType, std::enable_if_t<!std::is_base_of_v<CubeVertex, VertexType>, bool> = true>
-constexpr int get_n_matrix_elements(){
-    return 0;
-}
-
 template<typename VertexType>
 constexpr int get_n_pos_elements(){
     return decltype(VertexType::position)::length();
@@ -61,11 +51,10 @@ private:
     void unbind_buffer() const;
 
     mutable size_t n_indices{};
-    static constexpr std::array<int,4> attributes_dimensions{
+    static constexpr std::array<int,3> attributes_dimensions{
         get_n_pos_elements<VertexType>(),
         get_n_uv_elements<VertexType>(),
         get_n_normal_elements<VertexType>(),
-        get_n_matrix_elements<VertexType>()
     };
 public:
     OpenglBuffer();

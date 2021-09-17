@@ -11,6 +11,7 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "GameView.hpp"
+#include "GLError.hpp"
 
 int GameView::compute_scale_factor(int width, int height) {
     int result = width / height;
@@ -104,6 +105,7 @@ scale{compute_scale_factor(width, height)}{
 
     update_all_proj_matrices();
     initialized = true;
+    check_gl_error();
 }
 
 GLFWwindow *GameView::create_window(bool is_fullscreen) {

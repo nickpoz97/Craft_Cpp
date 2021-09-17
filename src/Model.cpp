@@ -3,6 +3,7 @@
 //
 #define GLFW_INCLUDE_NONE
 
+#include <iostream>
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "gtc/matrix_transform.hpp"
@@ -18,6 +19,7 @@
 #include "Shader.hpp"
 #include "Chunk.hpp"
 #include "GameView.hpp"
+#include "GLError.hpp"
 
 float Model::get_day_time() const {
     if (day_length <= 0) {
@@ -262,9 +264,9 @@ void Model::handle_input(double dt) {
 void Model::render_scene() {
     glClear(GL_COLOR_BUFFER_BIT);
     glClear(GL_DEPTH_BUFFER_BIT);
-    render_sky();
+    //render_sky();
     glClear(GL_DEPTH_BUFFER_BIT);
-    render_chunks();
+    //render_chunks();
     if(SHOW_WIREFRAME){
         render_wireframe();
     }
@@ -297,7 +299,7 @@ void Model::render_scene() {
         };
 
         render_text(ALIGN_LEFT, {tx, ty}, ts, s);
-    }
+    };
 }
 
 bool Model::swap_pool() {

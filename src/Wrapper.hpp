@@ -64,7 +64,7 @@ struct AttributesWrapper : public Wrapper<AttributesWrapper> {
 
 struct UniformsWrapper : public Wrapper<UniformsWrapper>{
     value_type sampler{0, "sampler"};
-    value_type camera{0, "camera"};
+    value_type camera{0, "camera_pos"};
     value_type timer{0, "timer"};
     value_type viewproj_matrix{0, "viewproj_matrix"};
     value_type PI{0, "PI"};

@@ -12,6 +12,7 @@
 #include "gtc/type_ptr.hpp"
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
+#include "GLError.hpp"
 
 Shader::Shader(std::string_view vs_path,
                std::string_view fs_path){
@@ -71,7 +72,9 @@ int Shader::build_shader(std::string_view path, shader_type st) {
 
 void Shader::get_uniforms_location() {
     for(auto& u : uniforms){
+        //std::cerr << u.name << " value before: "<< u.id << '\n';
         u.id = glGetUniformLocation(id, u.name.data());
+        //std::cerr << u.name << " value after: "<< u.id << '\n';
     }
 }
 
