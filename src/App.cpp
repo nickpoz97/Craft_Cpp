@@ -5,7 +5,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "Model.hpp"
+#include "Interaction/Model.hpp"
 #include "stb_image.h"
 #include "Interaction/GLError.hpp"
 
@@ -28,23 +28,19 @@ int main() {
     Shader sky_shader{"../data/shaders/sky_vertex.glsl", "../data/shaders/sky_fragment.glsl"};
     Shader text_shader{"../data/shaders/text_vertex.glsl", "../data/shaders/text_fragment.glsl"};
 
-    Model model{block_shader, line_shader, sky_shader, text_shader, game_view};
-    if(!model.get_window()){
-        return -1;
-    }
-
-    if(model.load_texture("../data/textures/texture.png") != 0){
+    if(Model::load_texture("../data/textures/texture.png") != 0){
         std::cerr << "general texture not loaded";
         return -1;
     }
-    if(model.load_texture("../data/textures/font.png")){
+    if(Model::load_texture("../data/textures/font.png")){
         std::cerr << "font not loaded";
         return -1;
     }
-    if(model.load_texture("../data/textures/sky.png", GL_CLAMP_TO_EDGE)){
+    if(Model::load_texture("../data/textures/sky.png", GL_CLAMP_TO_EDGE)){
         std::cerr << "sky texture not loaded";
         return -1;
     }
+    Model model{block_shader, line_shader, sky_shader, text_shader, game_view};
 
     while(!glfwWindowShouldClose(game_view.get_window())) {
         model.loop();

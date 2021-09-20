@@ -12,14 +12,14 @@
 
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
-#include "Geometry/Chunk.hpp"
-#include "Geometry/Sphere.hpp"
+#include "../Geometry/Chunk.hpp"
+#include "../Geometry/Sphere.hpp"
 #include "glad/glad.h"
-#include "costants.hpp"
-#include "Rendering/Shader.hpp"
+#include "../costants.hpp"
+#include "../Rendering/Shader.hpp"
 #include "Player.hpp"
-#include "Geometry/Crosshair.hpp"
-#include "Interaction/GameView.hpp"
+#include "../Geometry/Crosshair.hpp"
+#include "GameView.hpp"
 
 class Model {
 private:
@@ -33,7 +33,6 @@ private:
         const Shader &text_shader;
     };
 
-    std::unordered_map<unsigned , unsigned> textures{};
     std::unordered_map<glm::ivec2, Chunk> chunks{};
     ShaderWrapper shaders;
     const Sphere sky;
@@ -94,7 +93,7 @@ public:
     void render_crosshair();
     void render_text(int justify, const glm::vec2 &position, float n, std::string_view text);
     void render_item();
-    int load_texture(std::string_view path, GLint clamp_type = GL_REPEAT);
+    static int load_texture(std::string_view path, GLint clamp_type = GL_REPEAT);
 
     //TileBlock get_actual_item() const;
     void set_actual_item(BlockType item_type);

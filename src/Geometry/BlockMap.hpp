@@ -6,9 +6,26 @@
 #define CPP_BLOCKMAP_HPP
 
 #include <vec3.hpp>
-#include <map>
-#include "map_utils.hpp"
+#include <unordered_map>
 #include "TileBlock.hpp"
+#include "vec2.hpp"
+#include "vec3.hpp"
+
+std::size_t hash_int(int key);
+
+template<>
+struct std::hash<glm::ivec3>{
+    std::size_t operator()(const glm::ivec3& v) const;
+};
+
+struct y_coord_comparator{
+    bool operator()(const glm::vec3& a, const glm::vec3& b) const;
+};
+
+template<>
+struct std::hash<glm::ivec2>{
+    std::size_t operator()(const glm::ivec2& v) const;
+};
 
 using BaseMap = std::unordered_map<glm::ivec3, TileBlock>;
 

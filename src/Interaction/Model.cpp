@@ -9,17 +9,17 @@
 #include "gtc/matrix_transform.hpp"
 #include "Player.hpp"
 #include "Model.hpp"
-#include "Geometry/Sphere.hpp"
-#include "Geometry/CubeWireframe.hpp"
-#include "Geometry/Text2D.hpp"
-#include "Geometry/Item.hpp"
+#include "../Geometry/Sphere.hpp"
+#include "../Geometry/CubeWireframe.hpp"
+#include "../Geometry/Text2D.hpp"
+#include "../Geometry/Item.hpp"
 #include "stb_image.h"
 #include "ActionHandler.hpp"
 #include "fmt/format.h"
-#include "Rendering/Shader.hpp"
-#include "Geometry/Chunk.hpp"
-#include "Interaction/GameView.hpp"
-#include "Interaction/GLError.hpp"
+#include "../Rendering/Shader.hpp"
+#include "../Geometry/Chunk.hpp"
+#include "GameView.hpp"
+#include "GLError.hpp"
 
 float Model::get_day_time() const {
     if (day_length <= 0) {
@@ -189,6 +189,7 @@ void Model::render_crosshair() {
     glEnable(GL_COLOR_LOGIC_OP);
     shader.set_viewproj(get_viewproj(GameView::proj_type::UI));
     crosshair.render_lines();
+    glDisable(GL_COLOR_LOGIC_OP);
 }
 
 void Model::render_text(int justify, const glm::vec2 &position, float n, std::string_view text) {
@@ -205,13 +206,11 @@ void Model::render_item() {
     const Shader& shader = shaders.block_shader;
     shader.use();
     shader.set_viewproj(get_viewproj(GameView::proj_type::ITEM));
-    shader.set_camera({0,0,5});
+    //shader.set_camera({0,0,5});
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, textures.at(0));
     shader.set_sampler(0);
     //shader.set_extra_uniform("ortho", 1);
-    shader.set_timer(get_day_time());
+    //shader.set_timer(get_day_time());
 
     float size = 64 * game_view.get_scale();
     auto get_offset = [size](float axis){return 1 - size / axis * 2;};
@@ -277,7 +276,6 @@ void Model::handle_input(double dt) {
 void Model::render_scene() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //render_sky();
-    //glClear(GL_DEPTH_BUFFER_BIT);
     //render_chunks();
     if(SHOW_WIREFRAME){
         render_wireframe();
@@ -378,8 +376,8 @@ void Model::loop() {
     dt = glm::max(dt, 0.0);
     previous_timestamp = now;
 
-    update_chunk_map();
-    handle_input(dt);
+    //update_chunk_map();
+    //handle_input(dt);
     render_scene();
 
     swap_pool();
@@ -491,12 +489,11 @@ int Model::load_texture(std::string_view path, GLint clamp_type) {
     unsigned char* data = stbi_load(path.data(), &width, &height, &nr_channels, 0);
 
     if(!data){
-        return -1;
         stbi_image_free(data);
+        return -1;
     }
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
-    textures.emplace(texture_index, texture_id);
 
     stbi_image_free(data);
     ++texture_index;

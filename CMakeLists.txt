@@ -10,15 +10,15 @@ file(GLOB INTERACTION_FILES src/Interaction/*.cpp)
 file(GLOB RENDERING_FILES src/Rendering/*.cpp deps/glad/src/*.c)
 
 file(GLOB SOURCE_FILES src/*.cpp ${GEOMETRY_FILES} ${INTERACTION_FILES} ${RENDERING_FILES}
-        deps/noise/noise.cpp deps/glad/src/*.c)
+        deps/noise/noise.cpp)
 
 add_executable(app ${SOURCE_FILES} src/Interaction/GLError.cpp src/Interaction/GLError.hpp)
 add_executable(rendering_test test/rendering_test.cpp
         ${INTERACTION_FILES} ${RENDERING_FILES} ${GEOMETRY_FILES}
-        ./src/map_utils.cpp ./deps/noise/noise.cpp)
+        ./deps/noise/noise.cpp)
 add_executable(item_rendering test/item_rendering.cpp
         ${INTERACTION_FILES} ${RENDERING_FILES} ${GEOMETRY_FILES}
-        ./src/map_utils.cpp ./deps/noise/noise.cpp)
+        ./deps/noise/noise.cpp)
 
 set_target_properties(app PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
 set_target_properties(rendering_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/test")

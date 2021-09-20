@@ -8,7 +8,7 @@
 #include <string_view>
 
 #include "vec3.hpp"
-#include "Geometry/Chunk.hpp"
+#include "../Geometry/Chunk.hpp"
 
 struct Status{
     glm::vec3 position;
