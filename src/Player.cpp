@@ -10,8 +10,8 @@
 
 #include "Player.hpp"
 //#include "frustum.hpp"
-#include "Wrapper.hpp"
-#include "Chunk.hpp"
+#include "Rendering/Wrapper.hpp"
+#include "Geometry/Chunk.hpp"
 
 Player::Player(std::string_view name, int id, const glm::vec3 &position, const glm::vec2 &rotation)
         :

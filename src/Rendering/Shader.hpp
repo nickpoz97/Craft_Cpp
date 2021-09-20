@@ -9,7 +9,6 @@
 #include <array>
 
 #include "glad/glad.h"
-#include "Wrapper.hpp"
 #include "vec3.hpp"
 #include "mat4x4.hpp"
 
@@ -18,15 +17,17 @@ private:
     enum class shader_type{VERTEX, FRAGMENT};
 
     GLuint id;
-    UniformsWrapper uniforms;
 
     static int build_shader(std::string_view path, shader_type st);
-    void get_uniforms_location();
 
-    template<typename GLtype>
-    void _set_extra_uniform(int u_location, GLtype val) const;
+    static void _set_extra_uniform(int u_location, int val) ;
+    static void _set_extra_uniform(int u_location, float val) ;
+    void _set_extra_uniform(int u_location, const glm::vec3& val) const;
+    void _set_extra_uniform(int u_location, const glm::vec2& val) const;
+    static void _set_extra_uniform(int u_location, const glm::mat4& val) ;
 
     static void check_compile_errors(GLuint shader, std::string type);
+    void set_pi() const;
 public:
     void use() const;
 

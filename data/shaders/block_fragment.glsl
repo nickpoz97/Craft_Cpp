@@ -16,6 +16,8 @@ uniform sampler2D sky_sampler;
 // PI constant
 uniform float PI;
 
+out vec4 FragColor;
+
 void main() {
     vec3 diffuse_color = vec3(texture2D(sampler, fragment_uv));
     bool no_color = (diffuse_color == vec3(1.0, 0.0, 1.0));
@@ -34,5 +36,5 @@ void main() {
     // the more fog factor is high, the more diffuse_color goes towards sky_color
     diffuse_color = mix(diffuse_color, sky_color, fog_factor);
 
-    gl_FragColor = vec4(diffuse_color, 1.0);
+    FragColor = vec4(diffuse_color, 1.0);
 }

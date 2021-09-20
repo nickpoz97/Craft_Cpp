@@ -12,7 +12,7 @@
 #include "list"
 #include "RenderableEntity.hpp"
 #include "Vertex.hpp"
-#include "costants.hpp"
+#include "../costants.hpp"
 
 class Chunk : public RenderableEntity<CubeVertex>{
 private:

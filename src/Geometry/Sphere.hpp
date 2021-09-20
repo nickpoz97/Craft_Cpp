@@ -11,7 +11,7 @@
 #include "vec3.hpp"
 #include "vec2.hpp"
 #include "Vertex.hpp"
-#include "OpenglBuffer.hpp"
+#include "../Rendering/OpenglBuffer.hpp"
 #include "RenderableEntity.hpp"
 
 // TODO extend RenderableEntity with Sphere

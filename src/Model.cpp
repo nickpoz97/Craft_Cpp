@@ -9,17 +9,17 @@
 #include "gtc/matrix_transform.hpp"
 #include "Player.hpp"
 #include "Model.hpp"
-#include "Sphere.hpp"
-#include "CubeWireframe.hpp"
-#include "Text2D.hpp"
-#include "Item.hpp"
+#include "Geometry/Sphere.hpp"
+#include "Geometry/CubeWireframe.hpp"
+#include "Geometry/Text2D.hpp"
+#include "Geometry/Item.hpp"
 #include "stb_image.h"
 #include "ActionHandler.hpp"
 #include "fmt/format.h"
-#include "Shader.hpp"
-#include "Chunk.hpp"
-#include "GameView.hpp"
-#include "GLError.hpp"
+#include "Rendering/Shader.hpp"
+#include "Geometry/Chunk.hpp"
+#include "Interaction/GameView.hpp"
+#include "Interaction/GLError.hpp"
 
 float Model::get_day_time() const {
     if (day_length <= 0) {
@@ -182,7 +182,7 @@ void Model::render_crosshair() {
     shader.use();
     glLineWidth(4 * game_view.get_scale());
     glEnable(GL_COLOR_LOGIC_OP);
-    shader.set_viewproj(game_view.get_proj_matrix(GameView::proj_type::TEXT));
+    shader.set_viewproj(game_view.get_proj_matrix(GameView::proj_type::UI));
     crosshair.render_lines();
 }
 
@@ -190,7 +190,7 @@ void Model::render_text(int justify, const glm::vec2 &position, float n, std::st
     const Shader& shader = shaders.text_shader;
 
     shader.use();
-    shader.set_viewproj(game_view.get_proj_matrix(GameView::proj_type::TEXT));
+    shader.set_viewproj(game_view.get_proj_matrix(GameView::proj_type::UI));
     shader.set_sampler(1);
     const glm::vec2 justified_position{position - glm::vec2{n * justify * (text.size() - 1) / 2, 0}};
     Text2D{justified_position, n, text}.render_object();
@@ -200,7 +200,7 @@ void Model::render_item() {
     const Shader& shader = shaders.block_shader;
     shader.use();
     // TODO use another type of matrix
-    shader.set_viewproj(get_viewproj(GameView::proj_type::TEXT));
+    shader.set_viewproj(get_viewproj(GameView::proj_type::UI));
     shader.set_camera({0,0,5});
     shader.set_sampler(0);
     shader.set_timer(get_day_time());
@@ -262,10 +262,9 @@ void Model::handle_input(double dt) {
 }
 
 void Model::render_scene() {
-    glClear(GL_COLOR_BUFFER_BIT);
-    glClear(GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //render_sky();
-    glClear(GL_DEPTH_BUFFER_BIT);
+    //glClear(GL_DEPTH_BUFFER_BIT);
     //render_chunks();
     if(SHOW_WIREFRAME){
         render_wireframe();
@@ -302,10 +301,9 @@ void Model::render_scene() {
     };
 }
 
-bool Model::swap_pool() {
+void Model::swap_pool() {
     glfwSwapBuffers(game_view.get_window());
     glfwPollEvents();
-    return !glfwWindowShouldClose(game_view.get_window());
 }
 
 // build chunks around the player to test collisions
@@ -359,8 +357,7 @@ void Model::update_chunk_map() {
     load_visible_chunks();
 }
 
-bool Model::loop() {
-    game_view.update_window();
+void Model::loop() {
     double now = glfwGetTime();
     double dt = now - previous_timestamp;
 
@@ -372,7 +369,7 @@ bool Model::loop() {
     handle_input(dt);
     render_scene();
 
-    return swap_pool();
+    swap_pool();
 }
 
 std::array<const Chunk*, 6> Model::chunk_neighbors_pointers(const glm::ivec2& pq) const{
@@ -455,4 +452,10 @@ Crosshair Model::get_crosshair(int width, int height, int scale) {
 void Model::set_perspective_properties(int fov, int orto) {
     game_view.set_fov(fov);
     game_view.set_ortho(orto);
+}
+
+void Model::update_window() {
+    // TODO update also item and others
+    game_view.update();
+    crosshair.update(game_view.get_width(), game_view.get_height(), game_view.get_scale());
 }

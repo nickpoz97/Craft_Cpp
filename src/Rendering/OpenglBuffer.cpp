@@ -6,12 +6,12 @@
 
 #include "vec3.hpp"
 #include "OpenglBuffer.hpp"
-#include "Vertex.hpp"
+#include "../Geometry/Vertex.hpp"
 
 template<typename VertexType>
 OpenglBuffer<VertexType>::OpenglBuffer(){
-    glGenBuffers(1, &VBO);
     glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
 }
 
 template<typename VertexType>
@@ -62,7 +62,10 @@ void OpenglBuffer<VertexType>::draw_lines() const{
 
 template<typename VertexType>
 void OpenglBuffer<VertexType>::store_data(const std::vector<VertexType> &buffer) const{
-    _store_data(sizeof(buffer), reinterpret_cast<const GLfloat*>(buffer.data()));
+    //_store_data(sizeof(buffer), reinterpret_cast<const GLfloat*>(buffer.data()));
+    _store_data(buffer.size() * sizeof(VertexType), reinterpret_cast<const GLfloat*>(buffer.data()));
+
+    n_indices = buffer.size();
 }
 
 template<typename VertexType>
@@ -70,8 +73,6 @@ void OpenglBuffer<VertexType>::_store_data(int size, const GLfloat *data) const{
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind
-
-    n_indices = size;
 }
 
 template<typename VertexType>

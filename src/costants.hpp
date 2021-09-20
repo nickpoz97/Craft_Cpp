@@ -29,11 +29,11 @@ static constexpr int WINDOW_HEIGTH = 768;
 
 static constexpr bool FULLSCREEN = false;
 static constexpr bool SHOW_WIREFRAME = false;
-static constexpr bool SHOW_CROSSHAIRS = false;
+static constexpr bool SHOW_CROSSHAIRS = true;
 static constexpr bool SHOW_INFO_TEXT = false;
-static constexpr bool SHOW_ITEM = true;
+static constexpr bool SHOW_ITEM = false;
 static constexpr int DAY_LENGTH = 600;
-static constexpr bool VSYNC = true;
+static constexpr bool VSYNC = false;
 static constexpr float INITIAL_FOV = 45;
 #define CPP_COSTANTS_HPP
 

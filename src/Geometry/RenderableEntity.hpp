@@ -9,7 +9,7 @@
 #include <vector>
 #include "vec3.hpp"
 #include "mat4x4.hpp"
-#include "OpenglBuffer.hpp"
+#include "../Rendering/OpenglBuffer.hpp"
 #include "TileBlock.hpp"
 
 template<typename VertexType>

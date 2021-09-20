@@ -7,7 +7,7 @@
 
 #include "RenderableEntity.hpp"
 #include "Vertex.hpp"
-#include "Shader.hpp"
+#include "../Rendering/Shader.hpp"
 
 class Crosshair : public RenderableEntity<Standard2DVertex>{
 private:
@@ -16,6 +16,7 @@ private:
 public:
     Crosshair(int width, int height, int scale);
     void render_object() = delete;
+    void update(int width, int height, int scale);
 };
 
 

@@ -12,17 +12,18 @@
 
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
-#include "Chunk.hpp"
-#include "Sphere.hpp"
+#include "Geometry/Chunk.hpp"
+#include "Geometry/Sphere.hpp"
 #include "glad/glad.h"
 #include "costants.hpp"
-#include "Shader.hpp"
+#include "Rendering/Shader.hpp"
 #include "Player.hpp"
-#include "Crosshair.hpp"
-#include "GameView.hpp"
+#include "Geometry/Crosshair.hpp"
+#include "Interaction/GameView.hpp"
 
 class Model {
 private:
+    friend class ActionHandler;
     GameView& game_view;
 
     struct ShaderWrapper {
@@ -107,15 +108,17 @@ public:
 
     void render_scene();
 
-    bool swap_pool();
+    void swap_pool();
 
-    bool loop();
+    void loop();
 
     GLFWwindow* get_window();
 
     std::array<const Chunk *, 6> chunk_neighbors_pointers(const glm::ivec2 &pq) const;
     Block player_hit_test(bool previous) const;
     std::pair<bool, glm::vec3> collide(int height, const std::unordered_map<glm::ivec2, Chunk> &chunk_map);
+
+    void update_window();
 };
 
 #endif //CPP_MODEL_HPP

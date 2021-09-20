@@ -4,6 +4,7 @@
 
 #define GLFW_INCLUDE_NONE
 
+#include <iostream>
 #include "trigonometric.hpp"
 #include "ActionHandler.hpp"
 #include "Model.hpp"
@@ -215,16 +216,6 @@ glm::vec3 ActionHandler::compute_motion(double delta_t) {
     return motion_vector;
 }
 
-void ActionHandler::set_callbacks(GLFWwindow* window) {
-    if(!members_set && initialized) {
-        glfwSetKeyCallback(window, ActionHandler::on_key);
-        glfwSetMouseButtonCallback(window, on_mouse_button);
-        glfwSetScrollCallback(window, on_scroll);
-
-        members_set = true;
-    }
-}
-
 void ActionHandler::handle_mouse_input() {
     static glm::vec2 former_cursor_pos{};
 
@@ -258,5 +249,20 @@ void ActionHandler::handle_mouse_input() {
         double mx, my;
         glfwGetCursorPos(model_p->get_window(), &mx, &my);
         former_cursor_pos = glm::vec2{mx, my};
+    }
+}
+
+void ActionHandler::set_callbacks(GLFWwindow* window) {
+    if(!members_set && initialized) {
+        glfwSetKeyCallback(window, ActionHandler::on_key);
+        glfwSetMouseButtonCallback(window, on_mouse_button);
+        glfwSetScrollCallback(window, on_scroll);
+
+        auto framebuffer_size_callback = [](GLFWwindow* window, int width, int height){
+            model_p->update_window();
+        };
+        glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+        members_set = true;
     }
 }

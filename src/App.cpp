@@ -7,7 +7,7 @@
 
 #include "Model.hpp"
 #include "stb_image.h"
-#include "GLError.hpp"
+#include "Interaction/GLError.hpp"
 
 static int load_texture(std::string_view path, GLint clamp_type = GL_REPEAT);
 
@@ -16,6 +16,11 @@ int main() {
     if(!game_view.is_initialized()){
         return -1;
     }
+
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+    glLogicOp(GL_INVERT);
+    glClearColor(0, 0, 0, 1);
 
     Shader block_shader{"../data/shaders/block_vertex.glsl", "../data/shaders/block_fragment.glsl"};
     Shader line_shader{"../data/shaders/line_vertex.glsl", "../data/shaders/line_fragment.glsl"};
@@ -27,10 +32,6 @@ int main() {
         return -1;
     }
 
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
-    glLogicOp(GL_INVERT);
-    glClearColor(0, 0, 0, 1);
 
     if(load_texture("../data/textures/texture.png") != 0){
         std::cerr << "general texture not loaded";

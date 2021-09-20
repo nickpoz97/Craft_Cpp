@@ -37,10 +37,10 @@ int GameView::get_scale() const {
     return scale;
 }
 
-void GameView::update_window() {
+void GameView::update() {
     glfwGetFramebufferSize(window, &width, &height);
-    scale = compute_scale_factor(width, height);
     glViewport(0, 0, width, height);
+    scale = compute_scale_factor(width, height);
     update_all_proj_matrices();
 }
 
@@ -56,7 +56,7 @@ void GameView::update_persp_proj_matrix() {
 void GameView::update_ortho_proj_matrix() {
     float ratio = width / height;
 
-    ortho_proj_2d = glm::ortho(0, width, 0, height, -1, 1);
+    ortho_proj_2d = glm::ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height), -1.0f, 1.0f);
     ortho_proj_3d = glm::ortho(-ortho * ratio,ortho * ratio,
                                static_cast<float>(-ortho),static_cast<float>(+ortho),
                                -z_far, z_far);
@@ -88,6 +88,11 @@ scale{compute_scale_factor(width, height)}{
         std::cerr << "glfw not initialized" << '\n';
         return;
     }
+
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
     window = create_window(is_fullscreen);
     if(!window){
         std::cerr << "window not created" << '\n';
@@ -95,8 +100,8 @@ scale{compute_scale_factor(width, height)}{
     }
 
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(VSYNC);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    //glfwSwapInterval(VSYNC);
+    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
         std::cerr << "glad not initialized" << '\n';
@@ -110,7 +115,6 @@ scale{compute_scale_factor(width, height)}{
 
 GLFWwindow *GameView::create_window(bool is_fullscreen) {
     GLFWmonitor *monitor = nullptr;
-
     if(is_fullscreen){
         int mode_count;
         monitor = glfwGetPrimaryMonitor();
@@ -132,7 +136,7 @@ glm::mat4 GameView::get_proj_matrix(GameView::proj_type pt) const {
             return persp_proj;
         case proj_type::ORTHO_3D:
             return ortho_proj_3d;
-        case proj_type::TEXT:
+        case proj_type::UI:
             return ortho_proj_2d;
         case proj_type::ITEM:
             return ortho_proj_item;

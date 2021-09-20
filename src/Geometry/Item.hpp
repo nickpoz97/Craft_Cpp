@@ -8,7 +8,7 @@
 
 #include "Vertex.hpp"
 #include "RenderableEntity.hpp"
-#include "GameView.hpp"
+#include "../Interaction/GameView.hpp"
 
 class Item : public RenderableEntity<CubeVertex>{
 public:

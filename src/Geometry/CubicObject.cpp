@@ -6,7 +6,7 @@
 
 #include "vec3.hpp"
 #include "CubicObject.hpp"
-#include "costants.hpp"
+#include "../costants.hpp"
 #include "trigonometric.hpp"
 
 template<unsigned n_faces>

@@ -7,8 +7,9 @@
 
 #define GLFW_INCLUDE_NONE
 
+#include "mat4x4.hpp"
 #include "GLFW/glfw3.h"
-#include "costants.hpp"
+#include "../costants.hpp"
 
 class GameView {
 private:
@@ -35,7 +36,7 @@ private:
     GLFWwindow* create_window(bool is_fullscreen);
 public:
     enum class proj_type {
-        PERSP, TEXT, ORTHO_3D, ITEM
+        PERSP, UI, ORTHO_3D, ITEM
     };
 
     GameView(int width, int height, float fov, int ortho, bool is_fullscreen);
@@ -52,7 +53,7 @@ public:
 
     void set_ortho(int ortho_size);
     void set_fov(int fov_degrees);
-    void update_window();
+    void update();
 
     void update_all_proj_matrices();
     void update_persp_proj_matrix();

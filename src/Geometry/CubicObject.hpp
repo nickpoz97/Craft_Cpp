@@ -12,7 +12,7 @@
 #include "mat4x4.hpp"
 #include "Vertex.hpp"
 #include "RenderableEntity.hpp"
-#include "costants.hpp"
+#include "../costants.hpp"
 
 using cube_vertex_iterator_t = typename std::vector<CubeVertex>::iterator;
 
