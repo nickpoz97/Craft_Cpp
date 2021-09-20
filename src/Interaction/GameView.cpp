@@ -62,9 +62,7 @@ void GameView::update_ortho_proj_matrix() {
                                -z_far, z_far);
 
     float size = 64 * scale;
-    float box = height / size * 2;
-    auto get_offset = [size](int axis){return 1 - size / axis * 2;};
-    glm::vec2 offset{get_offset(width), get_offset(height)};
+    float box = height / size / 2;
 
     ortho_proj_item = glm::ortho(-box * ratio, box * ratio, -box, box, -1.0f, 1.0f);
 }

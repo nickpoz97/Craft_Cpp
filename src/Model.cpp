@@ -153,13 +153,18 @@ void Model::render_sky() const {
 glm::mat4 Model::get_viewproj(GameView::proj_type pt) const {
     using proj_type = GameView::proj_type;
 
-    const glm::mat4 view{
-            glm::lookAt(player->get_position(),
-            player->get_position() + player->get_camera_direction_vector(),
-            {0, 1, 0})
-    };
+    if(pt == proj_type::ORTHO_3D || pt == proj_type::PERSP) {
+        const glm::mat4 view{
+                glm::lookAt(player->get_position(),
+                            player->get_position() + player->get_camera_direction_vector(),
+                            {0, 1, 0})
+        };
 
-    return view * game_view.get_proj_matrix(pt);
+        return view * game_view.get_proj_matrix(pt);
+    }
+
+    // view independence
+    return game_view.get_proj_matrix(pt);
 }
 
 void Model::render_wireframe() {
@@ -182,7 +187,7 @@ void Model::render_crosshair() {
     shader.use();
     glLineWidth(4 * game_view.get_scale());
     glEnable(GL_COLOR_LOGIC_OP);
-    shader.set_viewproj(game_view.get_proj_matrix(GameView::proj_type::UI));
+    shader.set_viewproj(get_viewproj(GameView::proj_type::UI));
     crosshair.render_lines();
 }
 
@@ -199,13 +204,21 @@ void Model::render_text(int justify, const glm::vec2 &position, float n, std::st
 void Model::render_item() {
     const Shader& shader = shaders.block_shader;
     shader.use();
-    // TODO use another type of matrix
-    shader.set_viewproj(get_viewproj(GameView::proj_type::UI));
+    shader.set_viewproj(get_viewproj(GameView::proj_type::ITEM));
     shader.set_camera({0,0,5});
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, textures.at(0));
     shader.set_sampler(0);
+    //shader.set_extra_uniform("ortho", 1);
     shader.set_timer(get_day_time());
 
-    Item item_geometry{actual_item};
+    float size = 64 * game_view.get_scale();
+    auto get_offset = [size](float axis){return 1 - size / axis * 2;};
+
+    glm::vec2 offset{get_offset(game_view.get_width()),get_offset(game_view.get_height())};
+
+    Item item_geometry{actual_item, -offset};
     item_geometry.render_object();
 }
 
@@ -458,4 +471,34 @@ void Model::update_window() {
     // TODO update also item and others
     game_view.update();
     crosshair.update(game_view.get_width(), game_view.get_height(), game_view.get_scale());
+}
+
+int Model::load_texture(std::string_view path, GLint clamp_type) {
+    unsigned texture_id;
+    glGenTextures(1, &texture_id);
+
+    static unsigned texture_index = 0;
+    glActiveTexture(GL_TEXTURE0 + texture_index);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, clamp_type);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, clamp_type);
+
+    stbi_set_flip_vertically_on_load(true); // st coords instead of uv coords
+    int width, height, nr_channels;
+    unsigned char* data = stbi_load(path.data(), &width, &height, &nr_channels, 0);
+
+    if(!data){
+        return -1;
+        stbi_image_free(data);
+    }
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    textures.emplace(texture_index, texture_id);
+
+    stbi_image_free(data);
+    ++texture_index;
+    return 0;
 }

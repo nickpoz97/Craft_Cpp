@@ -22,7 +22,7 @@ private:
     cube_vertex_iterator_t begin;
     size_t n_vertices;
 
-    static glm::vec3 rotate_asy(const glm::vec3 &v, float alpha);
+    static glm::vec3 rotate_asy(const glm::vec3 &v, float angle_degrees);
 public:
     using PositionsMatrix = std::array<std::array<glm::vec3, 4>, n_faces>;
     using IndicesMatrix = std::array<std::array<int, INDICES_FACE_COUNT>, n_faces>;
@@ -44,6 +44,9 @@ public:
     static const NormalMatrix normals;
 
     [[nodiscard]] cube_vertex_iterator_t get_end() const;
+    [[nodiscard]] cube_vertex_iterator_t get_begin() const;
+
+    void print_vertex_info();
 };
 
 using Plant = CubicObject<4>;

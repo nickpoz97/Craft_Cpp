@@ -33,6 +33,7 @@ private:
         const Shader &text_shader;
     };
 
+    std::unordered_map<unsigned , unsigned> textures{};
     std::unordered_map<glm::ivec2, Chunk> chunks{};
     ShaderWrapper shaders;
     const Sphere sky;
@@ -93,6 +94,7 @@ public:
     void render_crosshair();
     void render_text(int justify, const glm::vec2 &position, float n, std::string_view text);
     void render_item();
+    int load_texture(std::string_view path, GLint clamp_type = GL_REPEAT);
 
     //TileBlock get_actual_item() const;
     void set_actual_item(BlockType item_type);

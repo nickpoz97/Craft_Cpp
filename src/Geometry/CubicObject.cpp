@@ -3,6 +3,8 @@
 //
 
 #include <numeric>
+#include <fmt/ostream.h>
+#include <gtx/rotate_vector.hpp>
 
 #include "vec3.hpp"
 #include "CubicObject.hpp"
@@ -39,9 +41,13 @@ CubicObject<n_faces>::CubicObject(const BlockType &block_type, const std::array<
             float du = static_cast<float>(tile_block.face_tile(face_index) % 16) * S;
             float dv = static_cast<float>(tile_block.face_tile(face_index) / 16) * S;
             // obtain local(cube or flower) coordinates
-            actual_vertex.position = N * face_vertices[i];
+            actual_vertex.position = center_position +
+                    glm::rotateY(N * face_vertices[i], glm::radians(asy_rotation));
             // obtain world coordinates (first rotation and then translation)
-            actual_vertex.position = center_position + rotate_asy(vertices_it->position, asy_rotation);
+            /*actual_vertex.position = center_position + glm::rotateY(actual_vertex.position,
+                                                                    glm::radians(asy_rotation));*/
+
+
             // assign normal
             actual_vertex.normal = face_normal;
             actual_vertex.uv = {
@@ -58,11 +64,11 @@ cube_vertex_iterator_t CubicObject<n_faces>::get_end() const {
 }
 
 template<unsigned int n_faces>
-glm::vec3 CubicObject<n_faces>::rotate_asy(const glm::vec3 &v, float alpha) {
+glm::vec3 CubicObject<n_faces>::rotate_asy(const glm::vec3 &v, float angle_degrees) {
     return {
-        glm::cos(alpha) * v.x + glm::sin(alpha) * v.z,
+            glm::cos(angle_degrees) * v.x - glm::sin(angle_degrees) * v.z,
         v.y,
-        -glm::sin(alpha) * v.x + glm::cos(alpha) * v.z,
+            glm::sin(angle_degrees) * v.x + glm::cos(angle_degrees) * v.z,
     };
 }
 
@@ -70,6 +76,15 @@ Cube::Cube(const BlockType &block_type, const std::array<bool, 6> &visible_faces
            cube_vertex_iterator_t vertices_it) :
                 super(block_type, visible_faces, position, 0, vertices_it)
            {}
+
+template<unsigned n_faces>
+void CubicObject<n_faces>::print_vertex_info() {
+    int index = 0;
+    for(auto it = get_begin() ; it != get_end() ; ++it){
+        fmt::print("pos: ({},{},{}), face: {}, normal: ({},{},{})\n", it->position.x, it->position.y, it->position.z,
+                   (index++) / INDICES_FACE_COUNT, it->normal.x, it->normal.y, it->normal.z);
+    }
+}
 
 template<>
 const CubicObject<6>::PositionsMatrix CubicObject<6>::local_vertex_positions{{
@@ -116,6 +131,11 @@ const CubicObject<6>::UvsMatrix CubicObject<6>::uvs{{
     {{{0, 0}, {0, 1}, {1, 0}, {1, 1}}},
     {{{1, 0}, {1, 1}, {0, 0}, {0, 1}}}
 }};
+
+template<unsigned int n_faces>
+cube_vertex_iterator_t CubicObject<n_faces>::get_begin() const {
+    return begin;
+}
 
 template<>
 const CubicObject<4>::PositionsMatrix CubicObject<4>::local_vertex_positions{{

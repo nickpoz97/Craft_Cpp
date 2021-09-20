@@ -13,9 +13,9 @@
 class Item : public RenderableEntity<CubeVertex>{
 public:
     using SuperClass = RenderableEntity<CubeVertex>;
-    explicit Item(BlockType w);
+    explicit Item(BlockType w, const glm::vec2 &center_position);
 private:
-    static std::vector<CubeVertex> gen_local_buffer(BlockType w);
+    static std::vector<CubeVertex> gen_local_buffer(BlockType w, const glm::vec2 &center_position);
 };
 
 

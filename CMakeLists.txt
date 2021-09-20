@@ -16,9 +16,13 @@ add_executable(app ${SOURCE_FILES} src/Interaction/GLError.cpp src/Interaction/G
 add_executable(rendering_test test/rendering_test.cpp
         ${INTERACTION_FILES} ${RENDERING_FILES} ${GEOMETRY_FILES}
         ./src/map_utils.cpp ./deps/noise/noise.cpp)
+add_executable(item_rendering test/item_rendering.cpp
+        ${INTERACTION_FILES} ${RENDERING_FILES} ${GEOMETRY_FILES}
+        ./src/map_utils.cpp ./deps/noise/noise.cpp)
 
 set_target_properties(app PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
 set_target_properties(rendering_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/test")
+set_target_properties(item_rendering PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/test")
 
 include_directories(deps/glad/include/)
 include_directories(deps/glfw/include/)
@@ -31,4 +35,5 @@ add_subdirectory(deps/glfw)
 add_subdirectory(deps/fmt)
 
 target_link_libraries(app ${CMAKE_DL_LIBS} glfw fmt)
-target_link_libraries(rendering_test ${CMAKE_DL_LIBS} glfw)
+target_link_libraries(rendering_test ${CMAKE_DL_LIBS} glfw fmt)
+target_link_libraries(item_rendering ${CMAKE_DL_LIBS} glfw fmt)
