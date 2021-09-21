@@ -101,9 +101,8 @@ void ActionHandler::initialize(Model* model_address){
         player_p = model_p->get_player();
         initialized = (player_p != nullptr) && (model_p != nullptr);
         if(initialized && model_p->get_window()){
-            glfwMakeContextCurrent(model_p->get_window());
-            glfwSwapInterval(VSYNC);
-            glfwSetInputMode(model_p->get_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            // TODO change this in final build to GLFW_CURSOR_DISABLED
+            glfwSetInputMode(model_p->get_window(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
             glfwSetKeyCallback(model_p->get_window(), on_key);
             glfwSetMouseButtonCallback(model_p->get_window(), on_mouse_button);
             glfwSetScrollCallback(model_p->get_window(), on_scroll);

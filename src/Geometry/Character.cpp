@@ -21,3 +21,7 @@ Character::Character(const glm::vec2 &position, float m, float n, char c){
     }};
 }
 
+int Character::get_n_vertices() {
+    return n_vertices;
+}
+

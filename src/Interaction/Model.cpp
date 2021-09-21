@@ -197,20 +197,22 @@ void Model::render_text(int justify, const glm::vec2 &position, float n, std::st
 
     shader.use();
     shader.set_viewproj(game_view.get_proj_matrix(GameView::proj_type::UI));
+    // TODO check if it is the right sampler
     shader.set_sampler(1);
     const glm::vec2 justified_position{position - glm::vec2{n * justify * (text.size() - 1) / 2, 0}};
-    Text2D{justified_position, n, text}.render_object();
+    Text2D text2d{justified_position, n, text};
+    text2d.render_object();
 }
 
 void Model::render_item() {
     const Shader& shader = shaders.block_shader;
     shader.use();
     shader.set_viewproj(get_viewproj(GameView::proj_type::ITEM));
-    //shader.set_camera({0,0,5});
+    shader.set_camera({0,0,5});
 
     shader.set_sampler(0);
-    //shader.set_extra_uniform("ortho", 1);
-    //shader.set_timer(get_day_time());
+    shader.set_extra_uniform("ortho", 1);
+    shader.set_timer(get_day_time());
 
     float size = 64 * game_view.get_scale();
     auto get_offset = [size](float axis){return 1 - size / axis * 2;};
@@ -275,7 +277,7 @@ void Model::handle_input(double dt) {
 
 void Model::render_scene() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //render_sky();
+    render_sky();
     //render_chunks();
     if(SHOW_WIREFRAME){
         render_wireframe();
@@ -297,17 +299,20 @@ void Model::render_scene() {
         hour = hour % 12;
         hour = hour ? hour : 12;
 
-        int p = player->get_pq().x;
+        /*int p = player->get_pq().x;
         int q = player->get_pq().y;
         float x = player->get_position().x;
         float y = player->get_position().y;
-        float z = player->get_position().z;
+        float z = player->get_position().z;*/
+        int p{}, q{}, x{}, y{}, z{};
 
-        std::string_view s{
-            fmt::format("(%d, %d) (%.2f, %.2f, %.2f) n_chunks: %d, hour: %d%cm",
+        std::string s{
+            // TODO float must be .2f
+            fmt::format("pq: ({}, {}) position: ({}, {}, {}) n_chunks: {}, hour: {}{}m",
                         p, q, x, y, z, chunks.size(), hour, am_pm)
         };
 
+        //fmt::print("{}\n", s);
         render_text(ALIGN_LEFT, {tx, ty}, ts, s);
     };
 }

@@ -27,10 +27,11 @@ void main() {
         discard;
     }
 
-    float light_intensity = min(1.0, daylight);
-    vec3 light_color = vec3(light_intensity);
+    //float light_intensity = min(1.0, daylight);
+    float light_intensity = 1.0;
+    vec3 light = vec3(light_intensity);
     // diffuse color changes by day time
-    diffuse_color *= light_color;
+    diffuse_color *= light;
 
     vec3 sky_color = vec3(texture2D(sky_sampler, vec2(timer, fog_height)));
     // the more fog factor is high, the more diffuse_color goes towards sky_color

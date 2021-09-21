@@ -18,7 +18,7 @@ void Text2D::render_object() const {
 }
 
 std::vector<Uv2DVertex> Text2D::gen_buffer(const glm::vec2 &position, float n, std::string_view text) {
-    std::vector<Uv2DVertex> buffer(text.size());
+    std::vector<Uv2DVertex> buffer(text.size() * Character::get_n_vertices());
     auto buffer_it{buffer.begin()};
 
     glm::vec2 char_pos = position;

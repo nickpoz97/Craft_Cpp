@@ -22,7 +22,8 @@ void main() {
     gl_Position = viewproj_matrix * vec4(world_position, 1.0);
     fragment_uv = vertex_uv;
     // if angle is more than 90 degrees then face is at the opposite side of light
-    diffuse_intensity = max(0.0, dot(normal, light_direction));
+    //diffuse_intensity = max(0.0, dot(normal, light_direction));
+    diffuse_intensity = 1.0;
 
     if(bool(ortho)){
         fog_factor = 0.0;

@@ -15,13 +15,14 @@ class Character{
     static constexpr float a = s;
     static constexpr float b = s * 2;
 
-    std::array<Uv2DVertex, 6> vertices;
+    static constexpr int n_vertices = 6;
+    std::array<Uv2DVertex, n_vertices> vertices;
 public:
     auto begin() {return vertices.begin();}
     auto end() {return vertices.end();}
 
-public:
     Character(const glm::vec2 &position, float m, float n, char c);
+    static int get_n_vertices();
 };
 
 

@@ -107,6 +107,8 @@ scale{compute_scale_factor(width, height)}{
     }
 
     update_all_proj_matrices();
+    glfwSwapInterval(VSYNC);
+
     initialized = true;
     check_gl_error();
 }
