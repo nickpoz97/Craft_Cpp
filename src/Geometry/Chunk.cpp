@@ -46,7 +46,7 @@ Chunk::operator bool() const {
     return !block_map.empty();
 }
 
-void Chunk::compute_chunk_geometry(const neighbors_pointers &neighbors_block_maps) {
+void Chunk::compute_chunk_geometry(const std::array<const Chunk*, 6> &np) const {
     opaque_matrix_type opaque{};
     height_matrix_type highest{};
 
@@ -58,9 +58,9 @@ void Chunk::compute_chunk_geometry(const neighbors_pointers &neighbors_block_map
     };
 
     // this matrices store info about visibility
-    populate_opaque_and_height_matrix(neighbors_block_maps, offset, opaque, highest);
+    populate_opaque_and_height_matrix(np, offset, opaque, highest);
 
-    count_exposed_faces(block_map, opaque, offset);
+    int n_faces = count_exposed_faces(block_map, opaque, offset);
     // each visible face has INDICES_FACE_COUNT indices that represent the triangle
     local_buffer = std::vector<CubeVertex>(n_faces * INDICES_FACE_COUNT);
     auto v_it = local_buffer.begin();
@@ -74,37 +74,36 @@ void Chunk::compute_chunk_geometry(const neighbors_pointers &neighbors_block_map
     }
 }
 
-void Chunk::populate_opaque_and_height_matrix(const std::array<std::array<const BlockMap *, 3>, 3> &neighbors_block_maps,
+void Chunk::populate_opaque_and_height_matrix(const std::array<const Chunk*, 6> &np,
                                               const glm::ivec3 &offset,
                                               opaque_matrix_type &opaque,
                                               height_matrix_type &highest) {
     // analyze neighbors maps
-    for(const auto& blockmaps_row : neighbors_block_maps){
-        for(const auto bm_ref : blockmaps_row){
-            // check if neighbor is not instantiated
-            if(!bm_ref){
-                continue;
-            }
-            // kv is key-value (position-item)
-            for(const auto& kv : *bm_ref){
-                const glm::ivec3& block_pos{kv.first};
-                const TileBlock& tileBlock{kv.second};
-                // v is the pos relative to the beginning of the chunk (o)
-                auto v = block_pos - offset;
+    for(const auto* neighbor_ref : np){
+        // check if neighbor is not present or not instantiated
+        if(!neighbor_ref || !(*neighbor_ref)){
+            continue;
+        }
+        // kv is key-value (position-item)
+        for(const auto& kv : neighbor_ref->block_map){
+            const glm::ivec3& block_pos{kv.first};
+            const TileBlock& tileBlock{kv.second};
+            // v is the pos relative to the beginning of the chunk (o)
+            auto v = block_pos - offset;
 
-                opaque[v.x][v.y][v.z] = !tileBlock.is_transparent();
-                if (opaque[v.x][v.y][v.z]) {
-                    // update highest block in the xz position
-                    highest[v.x][v.z] = glm::max(highest[v.x][v.z], static_cast<char>(v.y));
-                }
+            opaque[v.x][v.y][v.z] = !tileBlock.is_transparent();
+            if (opaque[v.x][v.y][v.z]) {
+                // update highest block in the xz position
+                highest[v.x][v.z] = glm::max(highest[v.x][v.z], static_cast<char>(v.y));
             }
         }
     }
 }
 
-void Chunk::count_exposed_faces(const BlockMap& map, const opaque_matrix_type &opaque, const glm::ivec3& offset) {
+int Chunk::count_exposed_faces(const BlockMap& map, const opaque_matrix_type &opaque, const glm::ivec3& offset) const {
     int miny = 256;
     int maxy = 0;
+    int n_faces = 0;
 
     for(const auto& kv : map) {
         glm::ivec3 abs_pos{kv.first};
@@ -135,6 +134,7 @@ void Chunk::count_exposed_faces(const BlockMap& map, const opaque_matrix_type &o
 
         n_faces += total;
     }
+    return n_faces;
 }
 
 decltype(Chunk::local_buffer)::iterator Chunk::generate_block_geometry(const opaque_matrix_type &opaque,
@@ -142,7 +142,7 @@ decltype(Chunk::local_buffer)::iterator Chunk::generate_block_geometry(const opa
                                                                        const glm::ivec3& block_abs_pos,
                                                                        const height_matrix_type &highest,
                                                                        const glm::ivec3& v,
-                                                                       TileBlock w) {
+                                                                       TileBlock w) const {
     std::array<bool, 6> f{
             !opaque[v.x - 1][v.y][v.z],
             !opaque[v.x + 1][v.y][v.z],
@@ -187,12 +187,11 @@ std::array<glm::vec3, 4> Chunk::get_xz_boundaries(const glm::vec2 &pq) {
     return false;
 }*/
 
-void Chunk::update_buffer(const neighbors_pointers &np) {
-    if(dirty && !block_map.empty()) {
-        compute_chunk_geometry(np);
-        SuperClass::update_buffer(local_buffer);
-        dirty = false;
-    }
+void Chunk::update_buffer(const std::array<const Chunk*, 6> &np) const {
+    compute_chunk_geometry(np);
+    SuperClass::update_buffer(local_buffer);
+    local_buffer.clear();
+    dirty = false;
 }
 
 bool Chunk::is_dirty() const {
@@ -315,6 +314,14 @@ glm::ivec2 Chunk::chunked(const glm::vec3& position) {
             chunked(static_cast<int>(position.x)),
             chunked(static_cast<int>(position.z))
     };
+}
+
+void Chunk::render_object(const std::array<const Chunk*, 6>& neighbors_refs) const{
+    if(dirty && !block_map.empty()){
+        update_buffer(neighbors_refs);
+    }
+    dirty = false;
+    SuperClass ::render_object();
 }
 
 
