@@ -27,7 +27,7 @@ RenderableEntity<VertexType>::RenderableEntity(const std::array<VertexType, n_va
 }*/
 
 template<typename VertexType>
-void RenderableEntity<VertexType>::update_buffer(const std::vector<VertexType> &local_buffer) {
+void RenderableEntity<VertexType>::update_buffer(const std::vector<VertexType> &local_buffer) const {
     gpu_buffer.store_data(local_buffer);
 }
 

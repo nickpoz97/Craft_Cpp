@@ -137,11 +137,7 @@ void Model::render_chunks() const {
         proj_type pt = game_view.get_ortho() ? proj_type::ORTHO_3D : proj_type::PERSP;
 
         if(c.is_visible(get_viewproj(pt)) && get_chunk_distance(get_player_chunk(), c) < RENDER_CHUNK_RADIUS){
-            // TODO implement this
-            /*if(c.is_dirty()) {
-                c.update_buffer(chunk_neighbors_pointers(c.pq));
-            }*/
-            c.render_object();
+            c.render_object(chunk_neighbors_pointers(c.pq));
         }
     }
 }
