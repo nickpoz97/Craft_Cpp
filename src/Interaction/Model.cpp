@@ -2,6 +2,7 @@
 // Created by ultimatenick on 10/08/21.
 //
 #define GLFW_INCLUDE_NONE
+#define STB_IMAGE_IMPLEMENTATION
 
 #include <iostream>
 #include "glad/glad.h"
@@ -19,7 +20,7 @@
 #include "../Rendering/Shader.hpp"
 #include "../Geometry/Chunk.hpp"
 #include "GameView.hpp"
-#include "GLError.hpp"
+#include "../Rendering/GLError.hpp"
 
 float Model::get_day_time() const {
     if (day_length <= 0) {
@@ -136,6 +137,10 @@ void Model::render_chunks() const {
         proj_type pt = game_view.get_ortho() ? proj_type::ORTHO_3D : proj_type::PERSP;
 
         if(c.is_visible(get_viewproj(pt)) && get_chunk_distance(get_player_chunk(), c) < RENDER_CHUNK_RADIUS){
+            // TODO implement this
+            /*if(c.is_dirty()) {
+                c.update_buffer(chunk_neighbors_pointers(c.pq));
+            }*/
             c.render_object();
         }
     }
@@ -278,7 +283,7 @@ void Model::handle_input(double dt) {
 void Model::render_scene() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     render_sky();
-    //render_chunks();
+    render_chunks();
     if(SHOW_WIREFRAME){
         render_wireframe();
     }
@@ -299,12 +304,12 @@ void Model::render_scene() {
         hour = hour % 12;
         hour = hour ? hour : 12;
 
-        /*int p = player->get_pq().x;
+        int p = player->get_pq().x;
         int q = player->get_pq().y;
         float x = player->get_position().x;
         float y = player->get_position().y;
-        float z = player->get_position().z;*/
-        int p{}, q{}, x{}, y{}, z{};
+        float z = player->get_position().z;
+        //int p{}, q{}, x{}, y{}, z{};
 
         std::string s{
             // TODO float must be .2f
@@ -381,8 +386,8 @@ void Model::loop() {
     dt = glm::max(dt, 0.0);
     previous_timestamp = now;
 
-    //update_chunk_map();
-    //handle_input(dt);
+    update_chunk_map();
+    handle_input(dt);
     render_scene();
 
     swap_pool();

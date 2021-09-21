@@ -12,7 +12,7 @@
 #include "gtc/type_ptr.hpp"
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
-#include "../Interaction/GLError.hpp"
+#include "GLError.hpp"
 
 Shader::Shader(std::string_view vs_path,
                std::string_view fs_path){

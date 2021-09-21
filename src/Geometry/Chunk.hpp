@@ -17,7 +17,6 @@
 class Chunk : public RenderableEntity<CubeVertex>{
 private:
     using SuperClass = RenderableEntity<CubeVertex>;
-    using neighbors_pointers = std::array<std::array<const BlockMap*,3>,3>;
 
     std::vector<CubeVertex> local_buffer;
 
@@ -26,7 +25,7 @@ private:
     std::array<glm::vec3, 4> xz_boundaries;
 
     BlockMap block_map;
-    bool dirty{false};
+    mutable bool dirty{false};
 
     int n_faces{}; // n of faces
 
@@ -49,6 +48,8 @@ private:
 
     std::array<glm::vec3, 8> get_chunk_boundaries() const;
 public:
+    using neighbors_pointers = std::array<std::array<const BlockMap*,3>,3>;
+
     Chunk(const glm::vec2 &pq_coordinates, bool init);
     const glm::ivec2 pq;
     static constexpr int SIZE = CHUNK_SIZE;

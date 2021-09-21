@@ -12,11 +12,14 @@ file(GLOB RENDERING_FILES src/Rendering/*.cpp deps/glad/src/*.c)
 file(GLOB SOURCE_FILES src/*.cpp ${GEOMETRY_FILES} ${INTERACTION_FILES} ${RENDERING_FILES}
         deps/noise/noise.cpp)
 
-add_executable(app ${SOURCE_FILES} src/Interaction/GLError.cpp src/Interaction/GLError.hpp)
+add_executable(app ${SOURCE_FILES} src/Rendering/GLError.cpp src/Rendering/GLError.hpp)
 add_executable(rendering_test test/rendering_test.cpp
         ${INTERACTION_FILES} ${RENDERING_FILES} ${GEOMETRY_FILES}
         ./deps/noise/noise.cpp)
 add_executable(item_rendering test/item_rendering.cpp
+        ${INTERACTION_FILES} ${RENDERING_FILES} ${GEOMETRY_FILES}
+        ./deps/noise/noise.cpp)
+add_executable(chunk_rendering test/chunk_rendering.cpp
         ${INTERACTION_FILES} ${RENDERING_FILES} ${GEOMETRY_FILES}
         ./deps/noise/noise.cpp)
 
@@ -26,14 +29,16 @@ set_target_properties(item_rendering PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJ
 
 include_directories(deps/glad/include/)
 include_directories(deps/glfw/include/)
-include_directories(deps/glm)
+include_directories(deps/glm/)
 include_directories(deps/noise/)
 include_directories(deps/stbi/)
 include_directories(deps/fmt/include/)
 include_directories(deps/catch2)
+
 add_subdirectory(deps/glfw)
 add_subdirectory(deps/fmt)
 
 target_link_libraries(app ${CMAKE_DL_LIBS} glfw fmt)
 target_link_libraries(rendering_test ${CMAKE_DL_LIBS} glfw fmt)
 target_link_libraries(item_rendering ${CMAKE_DL_LIBS} glfw fmt)
+target_link_libraries(chunk_rendering ${CMAKE_DL_LIBS} glfw fmt)

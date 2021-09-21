@@ -157,6 +157,7 @@ decltype(Chunk::local_buffer)::iterator Chunk::generate_block_geometry(const opa
         return plant.get_end();
     }
     else{
+        // TODO check vertex_it
         auto cube = Cube(w.getIndex(), f, block_abs_pos, vertex_it);
         return cube.get_end();
     }
@@ -187,9 +188,11 @@ std::array<glm::vec3, 4> Chunk::get_xz_boundaries(const glm::vec2 &pq) {
 }*/
 
 void Chunk::update_buffer(const neighbors_pointers &np) {
-    compute_chunk_geometry(np);
-    SuperClass::update_buffer(local_buffer);
-    dirty = false;
+    if(dirty && !block_map.empty()) {
+        compute_chunk_geometry(np);
+        SuperClass::update_buffer(local_buffer);
+        dirty = false;
+    }
 }
 
 bool Chunk::is_dirty() const {
@@ -263,6 +266,7 @@ void Chunk::init_chunk() {
             }
         }
     }
+    dirty = true;
 }
 
 bool Chunk::is_visible(const glm::mat4 &viewproj) const {

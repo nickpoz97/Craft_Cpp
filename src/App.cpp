@@ -1,5 +1,4 @@
 #define GLFW_INCLUDE_NONE
-#define STB_IMAGE_IMPLEMENTATION
 
 #include <iostream>
 #include <glad/glad.h>
@@ -7,7 +6,7 @@
 
 #include "Interaction/Model.hpp"
 #include "stb_image.h"
-#include "Interaction/GLError.hpp"
+#include "Rendering/GLError.hpp"
 
 static int load_texture(std::string_view path, GLint clamp_type = GL_REPEAT);
 

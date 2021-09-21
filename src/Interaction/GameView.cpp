@@ -11,7 +11,7 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 #include "GameView.hpp"
-#include "GLError.hpp"
+#include "../Rendering/GLError.hpp"
 
 int GameView::compute_scale_factor(int width, int height) {
     int result = width / height;
