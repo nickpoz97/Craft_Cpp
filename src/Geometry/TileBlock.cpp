@@ -72,6 +72,9 @@ decltype(TileBlock::tiles) TileBlock::tiles{{
 }};
 
 int TileBlock::face_tile(unsigned face_index) const{
+    if(is_plant() && face_index >= 2) {
+        return tiles[tile_index].get_face_val(face_index + 2);
+    }
     return tiles[tile_index].get_face_val(face_index);
 }
 

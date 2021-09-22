@@ -395,7 +395,8 @@ std::array<const Chunk*, 6> Model::chunk_neighbors_pointers(const glm::ivec2& pq
 
     for(int dp = -1 ; dp <= 1 ; dp++){
         for(int dq = -1 ; dq <= 1 ; dq++){
-            *(it++) = & chunks.at({pq.x - dp, pq.y - dq});
+            auto result_it{chunks.find({pq.x - dp, pq.y - dq})};
+            *(it++) = (result_it != chunks.end()) ? &(result_it->second) : nullptr;
         }
     }
 

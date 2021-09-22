@@ -42,3 +42,5 @@ target_link_libraries(app ${CMAKE_DL_LIBS} glfw fmt)
 target_link_libraries(rendering_test ${CMAKE_DL_LIBS} glfw fmt)
 target_link_libraries(item_rendering ${CMAKE_DL_LIBS} glfw fmt)
 target_link_libraries(chunk_rendering ${CMAKE_DL_LIBS} glfw fmt)
+
+add_compile_definitions(DEBUG)

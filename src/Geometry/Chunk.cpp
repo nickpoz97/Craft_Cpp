@@ -46,7 +46,7 @@ Chunk::operator bool() const {
     return !block_map.empty();
 }
 
-void Chunk::compute_chunk_geometry(const std::array<const Chunk*, 6> &np) const {
+Chunk::BufferType Chunk::compute_chunk_geometry(const std::array<const Chunk*, 6> &np) const {
     opaque_matrix_type opaque{};
     height_matrix_type highest{};
 
@@ -62,7 +62,7 @@ void Chunk::compute_chunk_geometry(const std::array<const Chunk*, 6> &np) const 
 
     int n_faces = count_exposed_faces(block_map, opaque, offset);
     // each visible face has INDICES_FACE_COUNT indices that represent the triangle
-    local_buffer = std::vector<CubeVertex>(n_faces * INDICES_FACE_COUNT);
+    BufferType local_buffer = std::vector<CubeVertex>(n_faces * INDICES_FACE_COUNT);
     auto v_it = local_buffer.begin();
 
     for(const auto& kv : block_map){
@@ -72,6 +72,8 @@ void Chunk::compute_chunk_geometry(const std::array<const Chunk*, 6> &np) const 
         // generate geometry of actual block (value returned by function is first free position in buffer)
         v_it = generate_block_geometry(opaque, v_it, block_pos, highest, block_pos - offset, tileBlock);
     }
+
+    return local_buffer;
 }
 
 void Chunk::populate_opaque_and_height_matrix(const std::array<const Chunk*, 6> &np,
@@ -91,6 +93,9 @@ void Chunk::populate_opaque_and_height_matrix(const std::array<const Chunk*, 6> 
             // v is the pos relative to the beginning of the chunk (o)
             auto v = block_pos - offset;
 
+#ifdef DEBUG
+            //assert(opaque[v.x][v.y][v.z] == 0);
+#endif
             opaque[v.x][v.y][v.z] = !tileBlock.is_transparent();
             if (opaque[v.x][v.y][v.z]) {
                 // update highest block in the xz position
@@ -122,6 +127,9 @@ int Chunk::count_exposed_faces(const BlockMap& map, const opaque_matrix_type &op
 
         // count if almost one side is visible
         int total = std::accumulate(f.begin(), f.end(), 0);
+#ifdef DEBUG
+        assert(total >= 0 && total <= 6);
+#endif
         if(total == 0){
             continue;
         }
@@ -137,8 +145,8 @@ int Chunk::count_exposed_faces(const BlockMap& map, const opaque_matrix_type &op
     return n_faces;
 }
 
-decltype(Chunk::local_buffer)::iterator Chunk::generate_block_geometry(const opaque_matrix_type &opaque,
-                                                                       decltype(local_buffer)::iterator vertex_it,
+Chunk::BufferType::iterator Chunk::generate_block_geometry(const opaque_matrix_type &opaque,
+                                                                       BufferType::iterator vertex_it,
                                                                        const glm::ivec3& block_abs_pos,
                                                                        const height_matrix_type &highest,
                                                                        const glm::ivec3& v,
@@ -151,14 +159,25 @@ decltype(Chunk::local_buffer)::iterator Chunk::generate_block_geometry(const opa
             !opaque[v.x][v.y][v.z - 1],
             !opaque[v.x][v.y][v.z + 1]
     };
+#ifdef DEBUG
+    auto begin_it = vertex_it;
+#endif
 
     if(w.is_plant()){
-        auto plant = Plant(w.getIndex(), f, block_abs_pos, simplex2(block_abs_pos.x, block_abs_pos.z, 4, 0.5, 2) * 360, vertex_it);
+        Plant plant{w.getIndex(), {1,1,1,1}, block_abs_pos, simplex2(block_abs_pos.x, block_abs_pos.z, 4, 0.5, 2) * 360, vertex_it};
+#ifdef DEBUG
+        assert(begin_it + 4 * INDICES_FACE_COUNT == plant.get_end());
+#endif
         return plant.get_end();
     }
+
     else{
         // TODO check vertex_it
-        auto cube = Cube(w.getIndex(), f, block_abs_pos, vertex_it);
+        Cube cube{w.getIndex(), f, block_abs_pos, vertex_it};
+#ifdef DEBUG
+        int visible_faces = std::accumulate(f.begin(), f.end(), 0);
+        assert(begin_it + visible_faces* INDICES_FACE_COUNT == cube.get_end());
+#endif
         return cube.get_end();
     }
 }
@@ -188,9 +207,7 @@ std::array<glm::vec3, 4> Chunk::get_xz_boundaries(const glm::vec2 &pq) {
 }*/
 
 void Chunk::update_buffer(const std::array<const Chunk*, 6> &np) const {
-    compute_chunk_geometry(np);
-    SuperClass::update_buffer(local_buffer);
-    local_buffer.clear();
+    SuperClass::update_buffer(compute_chunk_geometry(np));
     dirty = false;
 }
 

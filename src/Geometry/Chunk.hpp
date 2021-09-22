@@ -17,8 +17,7 @@
 class Chunk : public RenderableEntity<CubeVertex>{
 private:
     using SuperClass = RenderableEntity<CubeVertex>;
-
-    mutable std::vector<CubeVertex> local_buffer;
+    using BufferType = std::vector<CubeVertex>;
 
     mutable int min_y{};
     mutable int max_y{};
@@ -44,7 +43,7 @@ private:
         height_matrix_type &highest
     );
     int count_exposed_faces(const BlockMap& map, const opaque_matrix_type &opaque, const glm::ivec3& offset) const;
-    decltype(local_buffer)::iterator generate_block_geometry(const opaque_matrix_type &opaque, decltype(local_buffer)::iterator vertex_it, const glm::ivec3& block_abs_pos,
+    BufferType::iterator generate_block_geometry(const opaque_matrix_type &opaque, BufferType::iterator vertex_it, const glm::ivec3& block_abs_pos,
                                                              const height_matrix_type &highest, const glm::ivec3& v, TileBlock w) const;
 
     std::array<glm::vec3, 8> get_chunk_boundaries() const;
@@ -59,7 +58,7 @@ public:
     TileBlock get_block(const glm::ivec3& block_pos) const;
     explicit operator bool() const;
 
-    void compute_chunk_geometry(const std::array<const Chunk*, 6> &np) const;
+    BufferType compute_chunk_geometry(const std::array<const Chunk*, 6> &np) const;
 
     void set_block(const glm::ivec3& position, BlockType w);
     //bool is_visible(const Frustum& frustum) const;

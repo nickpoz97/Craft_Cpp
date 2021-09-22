@@ -11,14 +11,29 @@
 #include "../costants.hpp"
 #include "trigonometric.hpp"
 
+template<>
+const float CubicObject<6>::A = 0.0 + 1 / 2048.0;
+
+template<>
+const float CubicObject<6>::B = S - 1 / 2048.0;
+
+template<>
+const float CubicObject<4>::A = 0.0;
+
+template<>
+const float CubicObject<4>::B = S;
+
 template<unsigned n_faces>
-CubicObject<n_faces>::CubicObject(const BlockType &block_type, const std::array<bool, 6> &visible_faces,
+CubicObject<n_faces>::CubicObject(const BlockType &block_type, const std::array<bool, n_faces> &visible_faces,
                                   const glm::vec3 &center_position,
                                   float asy_rotation, cube_vertex_iterator_t vertices_it) :
         begin{vertices_it},
         n_vertices{static_cast<size_t>(std::accumulate(visible_faces.begin(), visible_faces.end(), 0) * INDICES_FACE_COUNT)}{
     TileBlock tile_block{block_type};
 
+#ifdef DEBUG
+    //assert(glm::round(center_position) == center_position);
+#endif
     auto face_v_it = local_vertex_positions.begin();
     auto face_uvs_it = uvs.begin();
     auto face_nrm_it = normals.begin();
@@ -26,10 +41,16 @@ CubicObject<n_faces>::CubicObject(const BlockType &block_type, const std::array<
     for(auto face_ind_it = indices.begin() ; face_ind_it != indices.end() ; ++face_ind_it){
         // obtain index of face
         int face_index = face_ind_it - indices.begin();
+#ifdef DEBUG
+        assert(face_index < n_faces);
+#endif
         // test if face is visible
         if (!visible_faces[face_index]) {
             continue;
         }
+        float du = static_cast<float>(tile_block.face_tile(face_index) % 16) * S;
+        float dv = static_cast<float>(tile_block.face_tile(face_index) / 16) * S;
+
         //obtain arrays of actual face elements
         const auto& face_vertices = *(face_v_it++);
         const glm::vec3& face_normal = *(face_nrm_it++);
@@ -38,10 +59,8 @@ CubicObject<n_faces>::CubicObject(const BlockType &block_type, const std::array<
         for(int i : *face_ind_it) {
             auto& actual_vertex = *(vertices_it++);
             // initialize texture coordinates
-            float du = static_cast<float>(tile_block.face_tile(face_index) % 16) * S;
-            float dv = static_cast<float>(tile_block.face_tile(face_index) / 16) * S;
             // obtain local(cube or flower) coordinates
-            actual_vertex.position = center_position +
+            actual_vertex.position = glm::round(center_position) +
                     glm::rotateY(N * face_vertices[i], glm::radians(asy_rotation));
             // obtain world coordinates (first rotation and then translation)
             /*actual_vertex.position = center_position + glm::rotateY(actual_vertex.position,
@@ -155,10 +174,10 @@ const CubicObject<4>::NormalMatrix CubicObject<4>::normals{{
 
 template<>
 const CubicObject<4>::IndicesMatrix CubicObject<4>::indices{{
-    {-1, 0, 0},
-    {+1, 0, 0},
-    {0, 0, -1},
-    {0, 0, +1}
+{0, 3, 2, 0, 1, 3},
+    {0, 3, 1, 0, 2, 3},
+    {0, 3, 2, 0, 1, 3},
+    {0, 3, 1, 0, 2, 3}
 }};
 
 template<>

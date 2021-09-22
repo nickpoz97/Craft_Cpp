@@ -30,12 +30,12 @@ public:
     using UvsMatrix = std::array<std::array<glm::bvec2, 4>, n_faces>;
 
     static constexpr float S = 0.0625;
-    static constexpr float A = 0.0 + 1 / 2048.0;
-    static constexpr float B = S - 1 / 2048.0;
+    static const float A;
+    static const float B;
 
     static constexpr int max_indices = INDICES_FACE_COUNT * n_faces;
 
-    CubicObject(const BlockType &block_type, const std::array<bool, 6> &visible_faces, const glm::vec3 &center_position,
+    CubicObject(const BlockType &block_type, const std::array<bool, n_faces> &visible_faces, const glm::vec3 &center_position,
                 float asy_rotation, cube_vertex_iterator_t vertices_it);
 
     static const PositionsMatrix local_vertex_positions;
