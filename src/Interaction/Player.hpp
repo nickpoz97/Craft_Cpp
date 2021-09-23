@@ -15,9 +15,9 @@ struct Status{
     glm::vec2 orientation_degrees;
     double t;
 
-    friend Status operator+(const Status& a, const Status& b);
+    /*friend Status operator+(const Status& a, const Status& b);
     friend Status operator-(const Status& a, const Status& b);
-    friend Status operator*(const Status& a, float p);
+    friend Status operator*(const Status& a, float p);*/
 };
 
 /*struct HitResult{
@@ -49,6 +49,7 @@ public:
     glm::vec3 get_motion_vector(int x_movement, int z_movement, bool is_flying, bool jump_action) const;
     glm::vec3 get_up_vector() const;
     glm::vec3 get_right_vector() const;
+    glm::mat4 get_view_matrix() const;
 
     //void update_player_status(const glm::vec3& new_position, const glm::vec2& new_rotation, bool interpolate);
     void update_player_position(const glm::vec3& new_position);

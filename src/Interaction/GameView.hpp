@@ -26,11 +26,6 @@ private:
     static constexpr float z_near = 0.125f;
     static constexpr float z_far = static_cast<float>(RENDER_CHUNK_RADIUS) * 32 + 64;
 
-    glm::mat4 persp_proj{};
-    glm::mat4 ortho_proj_2d{};
-    glm::mat4 ortho_proj_3d{};
-    glm::mat4 ortho_proj_item{};
-
     static int compute_scale_factor(int width, int height);
 
     GLFWwindow* create_window(bool is_fullscreen);
@@ -50,16 +45,13 @@ public:
     [[nodiscard]] GLFWwindow* get_window() const;
     [[nodiscard]] float get_ratio() const;
     [[nodiscard]] bool is_initialized() const;
+    [[nodiscard]] float item_box_side() const;
 
     void set_ortho(int ortho_size);
     void set_fov(int fov_degrees);
     void update();
 
-    void update_all_proj_matrices();
-    void update_persp_proj_matrix();
-    void update_ortho_proj_matrix();
-
-    glm::mat4 get_proj_matrix(proj_type pt) const;
+    [[nodiscard]] glm::mat4 get_proj_matrix(proj_type pt) const;
 };
 
 

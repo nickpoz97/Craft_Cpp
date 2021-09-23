@@ -294,8 +294,7 @@ Status operator*(const Status &a, float p) {
 
 std::pair<bool, glm::vec3> Player::collide(int height, const std::unordered_map<glm::ivec2, Chunk> &chunk_map) {
     const glm::vec3& position{actual_status.position};
-    glm::ivec2 pq{Chunk::chunked(position)};
-    const Chunk& c{chunk_map.at(pq)};
+    const Chunk& c{chunk_map.at(get_pq())};
     glm::vec3 collision_point{};
     bool result{};
 
@@ -323,4 +322,8 @@ std::pair<bool, glm::vec3> Player::collide(int height, const std::unordered_map<
         collision_point.z = (enable.z) ? int_pos.x + signs.x * pad : collision_point.z;
     }
     return {result, collision_point};
+}
+
+glm::mat4 Player::get_view_matrix() const {
+    return glm::lookAt(get_position(), get_position() + get_camera_direction_vector(), get_up_vector());
 }

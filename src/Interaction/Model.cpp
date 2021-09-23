@@ -136,9 +136,9 @@ void Model::render_chunks() const {
         const Chunk& c = pq_c.second;
         proj_type pt = game_view.get_ortho() ? proj_type::ORTHO_3D : proj_type::PERSP;
 
-        if(c.is_visible(get_viewproj(pt)) && get_chunk_distance(get_player_chunk(), c) < RENDER_CHUNK_RADIUS){
+        //if(c.is_visible(get_viewproj(pt)) && get_chunk_distance(get_player_chunk(), c) < RENDER_CHUNK_RADIUS){
             c.render_object(chunk_neighbors_pointers(c.pq));
-        }
+        //}
     }
 }
 
@@ -155,16 +155,11 @@ glm::mat4 Model::get_viewproj(GameView::proj_type pt) const {
     using proj_type = GameView::proj_type;
 
     if(pt == proj_type::ORTHO_3D || pt == proj_type::PERSP) {
-        const glm::mat4 view{
-                glm::lookAt(player->get_position(),
-                            player->get_position() + player->get_camera_direction_vector(),
-                            {0, 1, 0})
-        };
 
-        return view * game_view.get_proj_matrix(pt);
+        return player->get_view_matrix() * game_view.get_proj_matrix(pt);
     }
 
-    // view independence
+    // view independence for UI
     return game_view.get_proj_matrix(pt);
 }
 
@@ -268,6 +263,10 @@ Model::Model(const Shader &block_shader, const Shader &line_shader, const Shader
 
     set_player({}, {}, "player_0", 0);
     ActionHandler::initialize(this);
+
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+    glClearColor(.7, .7, 1, 1);
 #ifdef DEBUG
     fmt::print("ActionHandler enabled: {}", ActionHandler::is_enabled_for(this));
 #endif
@@ -280,12 +279,11 @@ void Model::handle_input(double dt) {
 
 void Model::render_scene() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    render_sky();
+    //render_sky();
     render_chunks();
     if(SHOW_WIREFRAME){
         render_wireframe();
     }
-    glClear(GL_DEPTH_BUFFER_BIT);
     if (SHOW_CROSSHAIRS) {
         render_crosshair();
     }

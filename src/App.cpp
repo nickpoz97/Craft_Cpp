@@ -16,13 +16,8 @@ int main() {
         return -1;
     }
 
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
-    glLogicOp(GL_INVERT);
-    glClearColor(0, 0, 0, 1);
-
-    Shader block_shader{"../data/shaders/testing_cube_v.glsl", "../data/shaders/testing_cube_f.glsl"};
     //Shader block_shader{"../data/shaders/testing_cube_v.glsl", "../data/shaders/testing_cube_f.glsl"};
+    Shader block_shader{"../data/shaders/testing_cube_v.glsl", "../data/shaders/testing_cube_f.glsl"};
     Shader line_shader{"../data/shaders/line_vertex.glsl", "../data/shaders/line_fragment.glsl"};
     Shader sky_shader{"../data/shaders/sky_vertex.glsl", "../data/shaders/sky_fragment.glsl"};
     Shader text_shader{"../data/shaders/text_vertex.glsl", "../data/shaders/text_fragment.glsl"};
@@ -42,6 +37,7 @@ int main() {
     Model model{block_shader, line_shader, sky_shader, text_shader, game_view};
 
     while(!glfwWindowShouldClose(game_view.get_window())) {
+        //model.loop();
         model.loop();
     }
     return 0;

@@ -20,11 +20,6 @@ int GameView::compute_scale_factor(int width, int height) {
     return result;
 }
 
-void GameView::update_all_proj_matrices() {
-    update_ortho_proj_matrix();
-    update_persp_proj_matrix();
-}
-
 int GameView::get_width() const {
     return width;
 }
@@ -41,35 +36,14 @@ void GameView::update() {
     glfwGetFramebufferSize(window, &width, &height);
     glViewport(0, 0, width, height);
     scale = compute_scale_factor(width, height);
-    update_all_proj_matrices();
 }
 
 void GameView::set_fov(int fov_degrees) {
     fov = fov_degrees;
-    update_persp_proj_matrix();
-}
-
-void GameView::update_persp_proj_matrix() {
-    persp_proj = glm::perspective(glm::radians(fov), static_cast<float>(width) / (height), z_near, z_far);
-}
-
-void GameView::update_ortho_proj_matrix() {
-    float ratio = width / height;
-
-    ortho_proj_2d = glm::ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height), -1.0f, 1.0f);
-    ortho_proj_3d = glm::ortho(-ortho * ratio,ortho * ratio,
-                               static_cast<float>(-ortho),static_cast<float>(+ortho),
-                               -z_far, z_far);
-
-    float size = 64 * scale;
-    float box = height / size / 2;
-
-    ortho_proj_item = glm::ortho(-box * ratio, box * ratio, -box, box, -1.0f, 1.0f);
 }
 
 void GameView::set_ortho(int ortho_size) {
     ortho = ortho_size;
-    update_ortho_proj_matrix();
 }
 
 int GameView::get_fov() const {
@@ -106,7 +80,6 @@ scale{compute_scale_factor(width, height)}{
         return;
     }
 
-    update_all_proj_matrices();
     glfwSwapInterval(VSYNC);
 
     initialized = true;
@@ -133,13 +106,16 @@ GLFWwindow *GameView::get_window() const {
 glm::mat4 GameView::get_proj_matrix(GameView::proj_type pt) const {
     switch (pt) {
         case proj_type::PERSP:
-            return persp_proj;
+            return glm::perspective(glm::radians(fov), static_cast<float>(width) / (height), z_near, z_far);
         case proj_type::ORTHO_3D:
-            return ortho_proj_3d;
+            return glm::ortho(-ortho * get_ratio() ,ortho * get_ratio(),
+                              static_cast<float>(-ortho),static_cast<float>(+ortho),
+                              -z_far, z_far);
         case proj_type::UI:
-            return ortho_proj_2d;
+            return glm::ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height), -1.0f, 1.0f);
         case proj_type::ITEM:
-            return ortho_proj_item;
+            return glm::ortho(-item_box_side() * get_ratio(), item_box_side() * get_ratio(),
+                              -item_box_side(), item_box_side(), -1.0f, 1.0f);
     }
 }
 
@@ -159,5 +135,7 @@ GameView::~GameView() {
     glfwTerminate();
 }
 
-
-
+float GameView::item_box_side() const {
+    float size = 64 * scale;
+    return height / size / 2;
+}

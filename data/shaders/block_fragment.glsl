@@ -25,7 +25,7 @@ void main() {
 
     if(no_color || (is_cloud && bool(ortho))){
         discard;
-    }
+    }/*
 
     //float light_intensity = min(1.0, daylight);
     float light_intensity = 1.0;
@@ -35,7 +35,7 @@ void main() {
 
     vec3 sky_color = vec3(texture2D(sky_sampler, vec2(timer, fog_height)));
     // the more fog factor is high, the more diffuse_color goes towards sky_color
-    diffuse_color = mix(diffuse_color, sky_color, fog_factor);
+    diffuse_color = mix(diffuse_color, sky_color, fog_factor);*/
 
     FragColor = vec4(diffuse_color, 1.0);
 }
