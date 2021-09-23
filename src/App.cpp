@@ -21,7 +21,7 @@ int main() {
     glLogicOp(GL_INVERT);
     glClearColor(0, 0, 0, 1);
 
-    Shader block_shader{"../data/shaders/block_vertex.glsl", "../data/shaders/block_fragment.glsl"};
+    Shader block_shader{"../data/shaders/testing_cube_v.glsl", "../data/shaders/testing_cube_f.glsl"};
     //Shader block_shader{"../data/shaders/testing_cube_v.glsl", "../data/shaders/testing_cube_f.glsl"};
     Shader line_shader{"../data/shaders/line_vertex.glsl", "../data/shaders/line_fragment.glsl"};
     Shader sky_shader{"../data/shaders/sky_vertex.glsl", "../data/shaders/sky_fragment.glsl"};

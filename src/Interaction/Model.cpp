@@ -268,12 +268,14 @@ Model::Model(const Shader &block_shader, const Shader &line_shader, const Shader
 
     set_player({}, {}, "player_0", 0);
     ActionHandler::initialize(this);
-    ActionHandler::set_callbacks(game_view.get_window());
+#ifdef DEBUG
+    fmt::print("ActionHandler enabled: {}", ActionHandler::is_enabled_for(this));
+#endif
 }
 
 void Model::handle_input(double dt) {
-    ActionHandler::handle_mouse_input();
-    ActionHandler::handle_movement(dt);
+    ActionHandler::handle_mouse_position();
+    ActionHandler::handle_key_pressing(dt);
 }
 
 void Model::render_scene() {
@@ -430,39 +432,6 @@ Block Model::player_hit_test(bool previous) const {
     return result;
 }
 
-std::pair<bool, glm::vec3> Model::collide(int height, const std::unordered_map<glm::ivec2, Chunk> &chunk_map) {
-    const glm::vec3& position{player->get_position()};
-    glm::ivec2 pq{Chunk::chunked(position)};
-    const Chunk& c{chunk_map.at(pq)};
-    glm::vec3 collision_point{};
-    bool result{};
-
-    const glm::ivec3 int_pos{glm::abs(position)};
-    const glm::vec3 decimal_dif_pos(position - static_cast<glm::vec3>(int_pos));
-    float pad = 0.25;
-
-    // TODO check (+1 -> value > pad) and (-1 -> value < pad)
-    glm::ivec3 signs{glm::step(pad, decimal_dif_pos) - glm::step(pad, -decimal_dif_pos)};
-    std::array<glm::vec3, 3> block_pos{{
-                                               {int_pos.x + (signs.x) * 1, int_pos.y, int_pos.z},
-                                               {int_pos.x, int_pos.y + (signs.y) * 1, int_pos.z},
-                                               {int_pos.x, int_pos.y, int_pos.z + (signs.z) * 1},
-                                       }};
-
-    for(int y_step = 0; y_step < height ; ++y_step){
-        glm::bvec3 enable{
-                c.get_block(block_pos[0] + glm::vec3{signs.x, 0, 0} * pad).is_obstacle(),
-                c.get_block(block_pos[1] + glm::vec3{0, signs.y, 0} * pad).is_obstacle(),
-                c.get_block(block_pos[2] + glm::vec3{0, 0, signs.z} * pad).is_obstacle()
-        };
-
-        collision_point.x = (enable.x) ? int_pos.x + signs.x * pad : collision_point.x;
-        collision_point.y = (enable.y) ? (result=1, int_pos.x) + signs.x * pad : collision_point.y;
-        collision_point.z = (enable.z) ? int_pos.x + signs.x * pad : collision_point.z;
-    }
-    return {result, collision_point};
-}
-
 Crosshair Model::get_crosshair(int width, int height, int scale) {
     return Crosshair(width, height, scale);
 }
@@ -505,4 +474,107 @@ int Model::load_texture(std::string_view path, GLint clamp_type) {
     stbi_image_free(data);
     ++texture_index;
     return 0;
+}
+
+void Model::resolve_keyboard_input(int key, int control, bool cursor_disabled) {
+    switch(key){
+        case GLFW_KEY_ESCAPE:
+            if(cursor_disabled) {glfwSetInputMode(game_view.get_window(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);}
+            return;
+        case GLFW_KEY_ENTER:
+            control ? on_right_click() : on_left_click();
+            return;
+        case GLFW_KEY_TAB:
+            switch_flying();
+            return;
+        case '0':
+            set_actual_item(BlockType::GLASS);
+            return;
+        case 'E':
+            set_next_item();
+            return;
+        case 'R':
+            set_prev_item();
+            return;
+        default:
+            if (key >= '1' && key <= '9') {
+                // +1 to skip empty
+                set_actual_item(TileBlock::items[key - '1']);
+            }
+            return;
+    }
+}
+
+void Model::on_left_click() {
+    Block result = player_hit_test(false);
+    const auto& hit_pos {result.position};
+    const auto& hit_tile_block {result.w};
+
+    if(hit_pos.y > 0 && hit_pos.y < 256 && hit_tile_block.is_destructable()){
+        builder_block(hit_pos, BlockType::EMPTY);
+        //model_p->record_block(hit_pos, BlockType::EMPTY);
+        if(!get_block(hit_pos + glm::ivec3{0,1,0}).is_empty()){
+            builder_block(hit_pos + glm::ivec3{0,1,0}, BlockType::EMPTY);
+        }
+    }
+}
+
+void Model::on_right_click() {
+    Block result = player_hit_test(false);
+    const auto& hit_pos {result.position};
+    const auto& hit_tile_block {result.w};
+
+    if(hit_pos.y > 0 && hit_pos.y < 256 && hit_tile_block.is_destructable()){
+        if(!player->insersects_block(2, hit_pos)){
+            // delete block
+            builder_block(hit_pos, BlockType::EMPTY);
+            //model_p->record_block(hit_pos);
+        }
+    }
+}
+
+void Model::on_middle_click() {
+    const Block hit_block{player_hit_test(false)};
+    const TileBlock& hit_tile_block {hit_block.w};
+    if(hit_tile_block.is_user_buildable()){
+        set_actual_item(hit_tile_block.getIndex());
+    }
+}
+
+void Model::resolve_mouse_movement(const glm::vec2& offset) {
+    float sensitivity = 0.1;
+    player->rotate(offset * sensitivity);
+}
+
+double Model::resolve_scroll(double scroll_pos, double threshold) {
+    if(scroll_pos < -threshold){
+        set_prev_item();
+        return 0;
+    }
+
+    if(scroll_pos > threshold){
+        set_next_item();
+        return 0;
+    }
+    return scroll_pos;
+}
+
+void Model::resolve_mouse_button(int button, int control, bool cursor_disabled) {
+    switch(button){
+        case GLFW_MOUSE_BUTTON_LEFT:
+            if(cursor_disabled){
+                control ? on_right_click() : on_left_click();
+            }
+            else{
+                // restore camera control
+                glfwSetInputMode(game_view.get_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            }
+            return;
+        case GLFW_MOUSE_BUTTON_RIGHT:
+            if(cursor_disabled && !control) {on_right_click();}
+            return;
+        case GLFW_MOUSE_BUTTON_MIDDLE:
+            if(cursor_disabled) {on_middle_click();}
+            return;
+    }
 }

@@ -13,27 +13,18 @@
 
 class ActionHandler {
 private:
-    static inline Player* player_p{nullptr};
     static inline Model* model_p{nullptr};
-    static inline GameView* game_view_p{nullptr};
 
-    static inline bool initialized{false};
-    static inline bool members_set{false};
-
-    static void on_right_click();
-    static void on_left_click();
-    static void on_middle_click();
-    static glm::vec3 compute_motion(double delta_t);
-
-    static void on_key(GLFWwindow *window, int key, int scancode, int action, int mods);
-    static void on_scroll(GLFWwindow *window, double xdelta, double ydelta);
-    static void on_mouse_button(GLFWwindow *window, int button, int action, int mods);
-
+    static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
+    static void scroll_callback(GLFWwindow *window, double xdelta, double ydelta);
+    static void mouse_button_callback(GLFWwindow *window, int button, int action, int mods);
+    static void set_callbacks();
 public:
     static void initialize(Model* model_address);
-    static void set_callbacks(GLFWwindow* window);
-    static void handle_movement(double delta_t);
-    static void handle_mouse_input();
+    static void destroy();
+    static void handle_key_pressing(double delta_t);
+    static void handle_mouse_position();
+    static bool is_enabled_for(Model* m_ref);
 };
 
 

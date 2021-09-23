@@ -23,7 +23,7 @@
 
 class Model {
 private:
-    friend class ActionHandler;
+    //friend class ActionHandler;
     GameView& game_view;
 
     struct ShaderWrapper {
@@ -63,6 +63,10 @@ private:
     static Crosshair get_crosshair(int width, int height, int scale);
 
     glm::mat4 get_viewproj(GameView::proj_type pt) const;
+
+    void on_left_click();
+    void on_right_click();
+    void on_middle_click();
 public:
     Model(const Shader &block_shader, const Shader &line_shader, const Shader &sky_shader,
           const Shader &text_shader, GameView &game_view);
@@ -117,9 +121,12 @@ public:
 
     std::array<const Chunk *, 6> chunk_neighbors_pointers(const glm::ivec2 &pq) const;
     Block player_hit_test(bool previous) const;
-    std::pair<bool, glm::vec3> collide(int height, const std::unordered_map<glm::ivec2, Chunk> &chunk_map);
 
     void update_window();
+    void resolve_keyboard_input(int key, int control, bool cursor_disabled);
+    void resolve_mouse_movement(const glm::vec2& offset);
+    double resolve_scroll(double scroll_pos, double threshold);
+    void resolve_mouse_button(int button, int control, bool cursor_disabled);
 };
 
 #endif //CPP_MODEL_HPP

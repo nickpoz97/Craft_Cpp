@@ -1,6 +1,21 @@
 //
 // Created by ultimatenick on 07/08/21.
 //
+#include <iostream>
+#include "glad/glad.h"
+#include "../Rendering/GLError.hpp"
+#include "GameView.hpp"
+#include "../Rendering/Shader.hpp"
+#include "fmt/format.h"
+#include "ActionHandler.hpp"
+#include "stb_image.h"
+#include "../Geometry/Item.hpp"
+#include "../Geometry/Text2D.hpp"
+#include "../Geometry/CubeWireframe.hpp"
+#include "../Geometry/Sphere.hpp"
+#include "Model.hpp"
+#include "gtc/matrix_transform.hpp"
+
 #define GLFW_INCLUDE_NONE
 
 #include "GLFW/glfw3.h"
@@ -16,8 +31,8 @@
 Player::Player(std::string_view name, int id, const glm::vec3 &position, const glm::vec2 &rotation)
         :
     actual_status{position, rotation, glfwGetTime()},
-    former_status1{actual_status},
-    former_status2{actual_status},
+    //former_status1{actual_status},
+    //former_status2{actual_status},
     name{name},
     id{id}
     /*,
@@ -36,8 +51,8 @@ Player::Player(std::string_view name, int id, const glm::vec3 &position, const g
     //frustum.update(false);
 }
 
-glm::vec3 Player::get_motion_vector(int x_movement, int z_movement, bool is_flying) const{
-    const glm::vec2& rotation = actual_status.rotation;
+glm::vec3 Player::get_motion_vector(int x_movement, int z_movement, bool is_flying, bool jump_action) const{
+    const glm::vec2& rotation = actual_status.orientation_degrees;
 
     if (!z_movement && !x_movement) {
         return {0,0,0};
@@ -55,6 +70,9 @@ glm::vec3 Player::get_motion_vector(int x_movement, int z_movement, bool is_flyi
         if (z_movement > 0) {
             y = -y;
         }
+        if(jump_action){
+            y += 1.0f;
+        }
         return {cosf(rotation.x + strafe) * m,
             y,
             sinf(rotation.x + strafe) * m
@@ -68,35 +86,35 @@ glm::vec3 Player::get_motion_vector(int x_movement, int z_movement, bool is_flyi
 }
 
 glm::vec3 Player::get_camera_direction_vector() const {
-    const glm::vec2& rotation = actual_status.rotation;
+    float yaw = actual_status.orientation_degrees.x;
+    float pitch = actual_status.orientation_degrees.y;
 
-    float m = cosf(rotation.y);
     return glm::normalize(glm::vec3{
-        cosf(rotation.x - glm::radians(90.0f)) * m,
-        sinf(rotation.y),
-        sinf(rotation.x - glm::radians(90.0f)) * m
+          cos(glm::radians(yaw)) * cos(glm::radians(pitch)),
+          sin(glm::radians(pitch)),
+          sin(glm::radians(yaw)) * cos(glm::radians(pitch)),
     });
 }
 
-void Player::update_player_status(const glm::vec3 &new_position, const glm::vec2 &new_rotation, bool interpolate) {
+/*void Player::update_player_status(const glm::vec3 &new_position, const glm::vec2 &new_rotation, bool interpolate) {
     if(interpolate){
         former_status1 = former_status2;
         former_status2 = {new_position, new_rotation, glfwGetTime()};
 
-        if (former_status2.rotation.x - former_status1.rotation.x > glm::pi<float>()){
-            former_status1.rotation.x += 2* glm::pi<float>();
+        if (former_status2.orientation_degrees.x - former_status1.orientation_degrees.x > glm::pi<float>()){
+            former_status1.orientation_degrees.x += 2 * glm::pi<float>();
         }
 
-        if (former_status1.rotation.x - former_status2.rotation.x > glm::pi<float>()){
-            former_status1.rotation.x -= 2*glm::pi<float>();
+        if (former_status1.orientation_degrees.x - former_status2.orientation_degrees.x > glm::pi<float>()){
+            former_status1.orientation_degrees.x -= 2 * glm::pi<float>();
         }
     }
-    else{
+    if(!interpolate){
         actual_status = {new_position, new_rotation, glfwGetTime()};
     }
-}
+}*/
 
-void Player::interpolate_player() {
+/*void Player::interpolate_player() {
     double dt1 = former_status2.t - former_status1.t;
     double dt2 = glfwGetTime() - former_status2.t;
 
@@ -105,11 +123,11 @@ void Player::interpolate_player() {
 
     auto p = static_cast<float>(glm::min(dt2/dt1, 1.0));
     update_player(former_status1 + (former_status2 - former_status1) * p, false);
-}
+}*/
 
-void Player::update_player(const Status& new_status, bool interpolate) {
-    update_player_status(new_status.position, new_status.rotation, interpolate);
-}
+/*void Player::update_player(const Status& new_status, bool interpolate) {
+    update_player_status(new_status.position, new_status.orientation_degrees, interpolate);
+}*/
 
 glm::vec3 Player::get_right_vector() const{
     glm::vec3 asy{0.0f, 1.0f, 0.0f};
@@ -120,14 +138,6 @@ glm::vec3 Player::get_up_vector() const{
     return glm::cross(get_camera_direction_vector(), get_right_vector());
 }
 
-const Status &Player::getActualStatus() const {
-    return actual_status;
-}
-
-/*const Frustum &Player::getFrustum() const {
-    return frustum;
-}*/
-
 Block Player::ray_hit(const Chunk& c, bool previous, int max_distance, int step) const {
 
     const glm::vec3& ray{get_camera_direction_vector()};
@@ -137,7 +147,6 @@ Block Player::ray_hit(const Chunk& c, bool previous, int max_distance, int step)
 
     for(int i = 0 ; i < max_distance ; i++){
         test_pos += ray;
-        // TODO check if truncation is better than rounding
         test_pos_rounded = glm::round(test_pos);
         if(previous_pos == test_pos_rounded){
             continue;
@@ -206,22 +215,63 @@ void Player::update_player_position(const glm::vec3 &new_position) {
     actual_status.position = new_position;
 }
 
-void Player::update_player_rotation(const glm::vec2 &new_rotation) {
-    actual_status.rotation = new_rotation;
+void Player::update_player_orientation(const glm::vec2 &new_orientation_deg) {
+    actual_status.orientation_degrees = new_orientation_deg;
 }
 
-void Player::increment_player_rotation(const glm::ivec2 &increment) {
-    actual_status.rotation += increment;
+void Player::rotate(const glm::ivec2 &angle_degrees) {
+    glm::vec2 new_orientation = actual_status.orientation_degrees += angle_degrees;
+
+    static constexpr float yaw_limit = 360.0f;
+    static constexpr float pitch_limit = 89.0f;
+
+    if(new_orientation.x > yaw_limit) {new_orientation.x -= yaw_limit;}
+    if(new_orientation.x < 0.0f) {new_orientation.x += yaw_limit;}
+
+    if(glm::abs(new_orientation.y) > pitch_limit) {
+        new_orientation.y = glm::sign(new_orientation.y) * pitch_limit;
+    }
+    actual_status.orientation_degrees = new_orientation;
 }
 
 const glm::vec2 &Player::get_rotation() const {
-    return actual_status.rotation;
+    return actual_status.orientation_degrees;
+}
+
+void Player::apply_movement(double delta_t, bool is_flying, bool jump_action,
+                            const glm::vec2 &horizontal_motion, const std::unordered_map<glm::ivec2, Chunk> &chunk_map) {
+    float speed = is_flying ? 20 : 5;
+
+    auto motion_vector = get_motion_vector(horizontal_motion.x, horizontal_motion.y, is_flying, jump_action);
+    if(jump_action && !is_flying && delta_y == 0){
+        delta_y = 8;
+    }
+
+    int estimate = glm::length(motion_vector * speed + glm::vec3{0, glm::abs(static_cast<float>(delta_y)) * 2, 0});
+    int step = glm::max(estimate, 8);
+
+    float ut = delta_t / step;
+    motion_vector *= (ut * speed);
+
+    for(int i = 0 ; i < step ; i++){
+        delta_y = is_flying ? 0 : glm::max(delta_y - ut * 25, -250.0);
+        update_player_position(motion_vector + glm::vec3{0, delta_y * ut, 0});
+
+        auto collision_result = collide(2, chunk_map);
+        update_player_position(collision_result.second);
+        if(collision_result.first){
+            delta_y = 0;
+        }
+    }
+    if(actual_status.position.y < 0){
+        actual_status.position.y += chunk_map.at(get_pq()).getHighestBlock();
+    }
 }
 
 Status operator+(const Status &a, const Status &b) {
     return {
         a.position + b.position,
-        a.rotation + b.rotation,
+        a.orientation_degrees + b.orientation_degrees,
         0
     };
 }
@@ -229,7 +279,7 @@ Status operator+(const Status &a, const Status &b) {
 Status operator-(const Status &a, const Status &b) {
     return {
         a.position - b.position,
-        a.rotation - b.rotation,
+        a.orientation_degrees - b.orientation_degrees,
         0
     };
 }
@@ -237,8 +287,40 @@ Status operator-(const Status &a, const Status &b) {
 Status operator*(const Status &a, float p) {
     return {
         p * a.position,
-        p * a.rotation,
+        p * a.orientation_degrees,
         0
     };
 }
 
+std::pair<bool, glm::vec3> Player::collide(int height, const std::unordered_map<glm::ivec2, Chunk> &chunk_map) {
+    const glm::vec3& position{actual_status.position};
+    glm::ivec2 pq{Chunk::chunked(position)};
+    const Chunk& c{chunk_map.at(pq)};
+    glm::vec3 collision_point{};
+    bool result{};
+
+    const glm::ivec3 int_pos{glm::abs(position)};
+    const glm::vec3 decimal_dif_pos(position - static_cast<glm::vec3>(int_pos));
+    float pad = 0.25;
+
+    // TODO check (+1 -> value > pad) and (-1 -> value < pad)
+    glm::ivec3 signs{glm::step(pad, decimal_dif_pos) - glm::step(pad, -decimal_dif_pos)};
+    std::array<glm::vec3, 3> block_pos{{
+                                               {int_pos.x + (signs.x) * 1, int_pos.y, int_pos.z},
+                                               {int_pos.x, int_pos.y + (signs.y) * 1, int_pos.z},
+                                               {int_pos.x, int_pos.y, int_pos.z + (signs.z) * 1},
+                                       }};
+
+    for(int y_step = 0; y_step < height ; ++y_step){
+        glm::bvec3 enable{
+                c.get_block(block_pos[0] + glm::vec3{signs.x, 0, 0} * pad).is_obstacle(),
+                c.get_block(block_pos[1] + glm::vec3{0, signs.y, 0} * pad).is_obstacle(),
+                c.get_block(block_pos[2] + glm::vec3{0, 0, signs.z} * pad).is_obstacle()
+        };
+
+        collision_point.x = (enable.x) ? int_pos.x + signs.x * pad : collision_point.x;
+        collision_point.y = (enable.y) ? (result=1, int_pos.x) + signs.x * pad : collision_point.y;
+        collision_point.z = (enable.z) ? int_pos.x + signs.x * pad : collision_point.z;
+    }
+    return {result, collision_point};
+}

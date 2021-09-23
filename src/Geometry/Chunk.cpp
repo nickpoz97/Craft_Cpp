@@ -79,11 +79,11 @@ Chunk::BufferType Chunk::compute_chunk_geometry(const std::array<const Chunk*, 6
 void Chunk::populate_opaque_and_height_matrix(const std::array<const Chunk*, 6> &np,
                                               const glm::ivec3 &offset,
                                               opaque_matrix_type &opaque,
-                                              height_matrix_type &highest) {
+                                              height_matrix_type &highest) const{
     // analyze neighbors maps
     for(const auto* neighbor_ref : np){
         // check if neighbor is not present or not instantiated
-        if(!neighbor_ref || !(*neighbor_ref)){
+        if(!neighbor_ref || get_chunk_distance(*this, *neighbor_ref) > 1){
             continue;
         }
         // kv is key-value (position-item)
@@ -317,8 +317,8 @@ void Chunk::set_block(const glm::ivec3& position, BlockType w) {
     dirty = true;
 }
 
-int get_chunk_distance(const Chunk& c1, const Chunk& c2) {
-    auto delta = c1.pq - c2.pq;
+int get_chunk_distance(const Chunk &c1, const Chunk &c2) {
+    glm::ivec2 delta = c1.pq - c2.pq;
     return glm::max(glm::abs(delta.x), glm::abs(delta.y));
 }
 

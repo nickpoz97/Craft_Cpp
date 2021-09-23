@@ -60,7 +60,7 @@ CubicObject<n_faces>::CubicObject(const BlockType &block_type, const std::array<
             auto& actual_vertex = *(vertices_it++);
             // initialize texture coordinates
             // obtain local(cube or flower) coordinates
-            actual_vertex.position = glm::round(center_position) +
+            actual_vertex.position = center_position +
                     glm::rotateY(N * face_vertices[i], glm::radians(asy_rotation));
             // obtain world coordinates (first rotation and then translation)
             /*actual_vertex.position = center_position + glm::rotateY(actual_vertex.position,

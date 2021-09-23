@@ -36,12 +36,12 @@ private:
     using opaque_matrix_type = std::array<std::array<std::array<bool,XZ_SIZE>,Y_SIZE>,XZ_SIZE>;
     using height_matrix_type = std::array<std::array<char,XZ_SIZE>,XZ_SIZE>;
 
-    static void populate_opaque_and_height_matrix(
+    void populate_opaque_and_height_matrix(
         const std::array<const Chunk*, 6> &np,
         const glm::ivec3 &offset,
         opaque_matrix_type &opaque,
         height_matrix_type &highest
-    );
+    ) const;
     int count_exposed_faces(const BlockMap& map, const opaque_matrix_type &opaque, const glm::ivec3& offset) const;
     BufferType::iterator generate_block_geometry(const opaque_matrix_type &opaque, BufferType::iterator vertex_it, const glm::ivec3& block_abs_pos,
                                                              const height_matrix_type &highest, const glm::ivec3& v, TileBlock w) const;
@@ -67,7 +67,6 @@ public:
     bool is_dirty() const;
 
     void init_chunk();
-    friend int get_chunk_distance(const Chunk& c1, const Chunk& c2);
 
     static glm::ivec2 chunked(const glm::vec3& position);
     static int chunked(int val);
@@ -75,6 +74,6 @@ public:
     void render_object(const std::array<const Chunk*, 6>& neighbors_refs) const;
 };
 
-int get_chunk_distance(const Chunk& c1, const Chunk& c2);
+int get_chunk_distance(const Chunk &c1, const Chunk &c2);
 
 #endif //CPP_CHUNK_HPP
