@@ -77,13 +77,27 @@ struct TileCube {
     int frontFace;
     int backFace;
 
-    [[nodiscard]] int get_face_val(unsigned index) const;
-    [[nodiscard]] int count_visible_faces() const;
+    class Iterator : public std::iterator<std::output_iterator_tag, int>{
+    public:
+        Iterator(const int* tile_pointer, bool is_plant);
+        int operator*();
+        const int* operator->();
+        Iterator& operator++();
+        bool operator==(const Iterator& b);
+        bool operator!=(const Iterator& b);
+    private:
+        const int* tile_pointer;
+        const bool is_plant;
+        int face_index{};
+    };
+
+    Iterator begin(bool is_plant) const;
+    Iterator end(bool is_plant) const;
 };
 
 class TileBlock{
 private:
-    BlockType tile_index{};
+    BlockType tilecube_index{};
 public:
     static const std::array<TileCube, 256> tiles;
     [[nodiscard]] BlockType getIndex() const;
@@ -92,7 +106,6 @@ public:
     TileBlock() = default;
     TileBlock& operator=(const TileBlock& tileBlock) = default;
     TileBlock(const TileBlock& other) = default;
-    [[nodiscard]] int face_tile(unsigned index) const;
 
     [[nodiscard]] bool is_plant() const;
     [[nodiscard]] bool is_obstacle() const;
@@ -102,6 +115,9 @@ public:
     [[nodiscard]] bool is_user_buildable() const;
 
     explicit operator int() const;
+
+    TileCube::Iterator begin();
+    TileCube::Iterator end();
 
     static constexpr std::array items{
             GRASS,

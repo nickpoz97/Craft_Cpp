@@ -36,7 +36,7 @@ class Wrapper {
 public:
     using value_type = typename wrapper_value<WrapperType>::t;
 
-    class Iterator : std::iterator<std::output_iterator_tag, value_type>{
+    class Iterator : std::iterator<std::input_iterator_tag, value_type>{
     public:
         Iterator(value_type* actual_attribute);
         value_type& operator*();

@@ -71,28 +71,8 @@ decltype(TileBlock::tiles) TileBlock::tiles{{
     {207, 207, 207, 207, 207, 207}, // 63
 }};
 
-int TileBlock::face_tile(unsigned face_index) const{
-    if(is_plant() && face_index >= 2) {
-        return tiles[tile_index].get_face_val(face_index + 2);
-    }
-    return tiles[tile_index].get_face_val(face_index);
-}
-
-int TileCube::get_face_val(unsigned index) const{
-    size_t size = sizeof(*this) / sizeof(int);
-    return (index <= size) ? *(reinterpret_cast<const int *>(this) + index) : 0;
-}
-
-int TileCube::count_visible_faces() const{
-    int count = 0;
-    for(int i = 0 ; i < 6 ; i++){
-        count += (get_face_val(i) != 0);
-    }
-    return count;
-}
-
 bool TileBlock::is_plant() const{
-    switch (tile_index) {
+    switch (tilecube_index) {
         case BlockType::TALL_GRASS:
         case BlockType::YELLOW_FLOWER:
         case BlockType::RED_FLOWER:
@@ -110,7 +90,7 @@ bool TileBlock::is_obstacle() const{
     if (is_plant()) {
         return false;
     }
-    switch (tile_index) {
+    switch (tilecube_index) {
         case BlockType::EMPTY:
         case BlockType::CLOUD:
             return false;
@@ -123,7 +103,7 @@ bool TileBlock::is_transparent() const{
     if (is_plant()) {
         return true;
     }
-    switch (tile_index) {
+    switch (tilecube_index) {
         case BlockType::EMPTY:
         case BlockType::GLASS:
         case BlockType::LEAVES:
@@ -136,7 +116,7 @@ bool TileBlock::is_transparent() const{
 }
 
 bool TileBlock::is_destructable() const{
-    switch (tile_index) {
+    switch (tilecube_index) {
         case BlockType::EMPTY:
         case BlockType::CLOUD:
             return false;
@@ -146,19 +126,62 @@ bool TileBlock::is_destructable() const{
 }
 
 bool TileBlock::is_empty() const {
-    return tile_index == BlockType::EMPTY;
+    return tilecube_index == BlockType::EMPTY;
 }
 
 TileBlock::operator int() const {
-    return static_cast<int>(tile_index);
+    return static_cast<int>(tilecube_index);
 }
 
 BlockType TileBlock::getIndex() const {
-    return tile_index;
+    return tilecube_index;
 }
 
-TileBlock::TileBlock(BlockType tile_index) : tile_index{tile_index} {}
+TileBlock::TileBlock(BlockType tile_index) : tilecube_index{tile_index} {}
 
 bool TileBlock::is_user_buildable() const {
     return is_destructable();
+}
+
+TileCube::Iterator TileBlock::begin() {
+    return tiles[getIndex()].begin(is_plant());
+}
+
+TileCube::Iterator TileBlock::end() {
+    return tiles[getIndex()].end(is_plant());
+}
+
+TileCube::Iterator TileCube::begin(bool is_plant) const{
+    return {reinterpret_cast<const int*>(this), is_plant};
+}
+
+TileCube::Iterator TileCube::end(bool is_plant) const{
+    const int* begin_ref{reinterpret_cast<const int*>(this)};
+    int n_tiles = is_plant ? 4 : 6;
+    return {begin_ref + n_tiles, is_plant};
+}
+
+TileCube::Iterator::Iterator(const int *tile_pointer, bool is_plant) : tile_pointer{tile_pointer}, is_plant{is_plant} {}
+
+int TileCube::Iterator::operator*() {
+    return *tile_pointer;
+}
+
+const int *TileCube::Iterator::operator->() {
+    return tile_pointer;
+}
+
+TileCube::Iterator &TileCube::Iterator::operator++() {
+    bool skip_updown = is_plant && (face_index == 1);
+    tile_pointer += skip_updown ? 3 : 1;
+    face_index += skip_updown ? 3 : 1;
+    return *this;
+}
+
+bool TileCube::Iterator::operator==(const TileCube::Iterator &b) {
+    return tile_pointer == b.tile_pointer;
+}
+
+bool TileCube::Iterator::operator!=(const TileCube::Iterator &b) {
+    return tile_pointer != b.tile_pointer;
 }

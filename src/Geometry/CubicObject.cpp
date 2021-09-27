@@ -37,19 +37,17 @@ CubicObject<n_faces>::CubicObject(const BlockType &block_type, const std::array<
     auto face_v_it = local_vertex_positions.begin();
     auto face_uvs_it = uvs.begin();
     auto face_nrm_it = normals.begin();
+    auto tile_it = tile_block.begin();
+    auto visible_faces_it = visible_faces.begin();
 
-    for(auto face_ind_it = indices.begin() ; face_ind_it != indices.end() ; ++face_ind_it){
-        // obtain index of face
-        int face_index = face_ind_it - indices.begin();
-#ifdef DEBUG
-        assert(face_index < n_faces);
-#endif
+    for(auto face_ind_it{indices.begin()} ; face_ind_it != indices.end() ; ++face_ind_it){
         // test if face is visible
-        if (!visible_faces[face_index]) {
+        if (!*(visible_faces_it++)) {
             continue;
         }
-        float du = static_cast<float>(tile_block.face_tile(face_index) % 16) * S;
-        float dv = static_cast<float>(tile_block.face_tile(face_index) / 16) * S;
+        float du = static_cast<float>(*tile_it % 16) * S;
+        float dv = static_cast<float>(*tile_it / 16) * S;
+        ++tile_it;
 
         //obtain arrays of actual face elements
         const auto& face_vertices = *(face_v_it++);
@@ -62,11 +60,6 @@ CubicObject<n_faces>::CubicObject(const BlockType &block_type, const std::array<
             // obtain local(cube or flower) coordinates
             actual_vertex.position = center_position +
                     glm::rotateY(N * face_vertices[i], glm::radians(asy_rotation));
-            // obtain world coordinates (first rotation and then translation)
-            /*actual_vertex.position = center_position + glm::rotateY(actual_vertex.position,
-                                                                    glm::radians(asy_rotation));*/
-
-
             // assign normal
             actual_vertex.normal = face_normal;
             actual_vertex.uv = {
