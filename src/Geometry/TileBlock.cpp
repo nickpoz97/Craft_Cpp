@@ -78,12 +78,12 @@ int TileBlock::face_tile(unsigned face_index) const{
     return tiles[tile_index].get_face_val(face_index);
 }
 
-int Tiles::get_face_val(unsigned index) const{
+int TileCube::get_face_val(unsigned index) const{
     size_t size = sizeof(*this) / sizeof(int);
     return (index <= size) ? *(reinterpret_cast<const int *>(this) + index) : 0;
 }
 
-int Tiles::count_visible_faces() const{
+int TileCube::count_visible_faces() const{
     int count = 0;
     for(int i = 0 ; i < 6 ; i++){
         count += (get_face_val(i) != 0);

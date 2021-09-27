@@ -31,6 +31,7 @@ private:
     Status actual_status;
     //Status former_status1;
     //Status former_status2;
+    static glm::vec2 normalize_angles(const glm::vec2& orientation);
 
     double delta_y{};
 
@@ -41,20 +42,23 @@ private:
     //Frustum frustum;
 
 public:
-    const glm::vec3& get_position() const;
-    const glm::vec2& get_rotation() const;
+    static constexpr float yaw_limit = 360.0f;
+    static constexpr float pitch_limit = 89.0f;
+    static constexpr glm::vec3 up{0.0, 1.0, 0.0};
 
     Player(std::string_view name, int id, const glm::vec3 &position, const glm::vec2 &rotation);
+
+    const glm::vec3& get_position() const;
+    const glm::vec2& get_orientation_degrees() const;
     glm::vec3 get_camera_direction_vector() const;
     glm::vec3 get_motion_vector(int x_movement, int z_movement, bool is_flying, bool jump_action) const;
-    glm::vec3 get_up_vector() const;
     glm::vec3 get_right_vector() const;
     glm::mat4 get_view_matrix() const;
 
     //void update_player_status(const glm::vec3& new_position, const glm::vec2& new_rotation, bool interpolate);
     void update_player_position(const glm::vec3& new_position);
     void update_player_orientation(const glm::vec2& new_orientation_deg);
-    void rotate(const glm::ivec2& angle_degrees);
+    void rotate(const glm::vec2& angle_degrees);
     std::pair<bool, glm::vec3> collide(int height, const std::unordered_map<glm::ivec2, Chunk> &chunk_map);
 
     //void update_player(const Status& new_status, bool interpolate);

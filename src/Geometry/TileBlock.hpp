@@ -69,7 +69,7 @@ enum BlockType{
     COLOR_31
 };
 
-struct Tiles {
+struct TileCube {
     int leftFace;
     int rightFace;
     int topFace;
@@ -83,9 +83,9 @@ struct Tiles {
 
 class TileBlock{
 private:
-    static const std::array<Tiles, 256> tiles;
     BlockType tile_index{};
 public:
+    static const std::array<TileCube, 256> tiles;
     [[nodiscard]] BlockType getIndex() const;
 
     explicit TileBlock(BlockType block_type);

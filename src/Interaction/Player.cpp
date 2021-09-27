@@ -1,54 +1,25 @@
 //
 // Created by ultimatenick on 07/08/21.
 //
+#define GLFW_INCLUDE_NONE
+
 #include <iostream>
-#include "glad/glad.h"
-#include "../Rendering/GLError.hpp"
-#include "GameView.hpp"
-#include "../Rendering/Shader.hpp"
-#include "fmt/format.h"
-#include "ActionHandler.hpp"
-#include "stb_image.h"
-#include "../Geometry/Item.hpp"
 #include "../Geometry/Text2D.hpp"
-#include "../Geometry/CubeWireframe.hpp"
-#include "../Geometry/Sphere.hpp"
 #include "Model.hpp"
 #include "gtc/matrix_transform.hpp"
 
-#define GLFW_INCLUDE_NONE
-
 #include "GLFW/glfw3.h"
-#include <cmath>
 #include "mat4x4.hpp"
 #include "ext/matrix_transform.hpp"
 
 #include "Player.hpp"
-//#include "frustum.hpp"
-#include "../Rendering/Wrapper.hpp"
-#include "../Geometry/Chunk.hpp"
 
 Player::Player(std::string_view name, int id, const glm::vec3 &position, const glm::vec2 &rotation)
         :
-    actual_status{position, rotation, glfwGetTime()},
-    //former_status1{actual_status},
-    //former_status2{actual_status},
+    actual_status{position, normalize_angles(rotation), glfwGetTime()},
     name{name},
     id{id}
-    /*,
-    frustum{
-        model.getFov(),
-        model.z_near,
-        model.z_far,
-        model.getWidth() / model.getHeight(),
-        *this}*/
     {
-
-    glm::mat4 transform = glm::translate(glm::mat4{1.0f}, position);
-    transform = glm::rotate(transform, rotation.y, {0, 1, 0});
-    transform = glm::rotate(transform, rotation.x, {1, 0, 0});
-
-    //frustum.update(false);
 }
 
 glm::vec3 Player::get_motion_vector(int x_movement, int z_movement, bool is_flying, bool jump_action) const{
@@ -134,30 +105,26 @@ glm::vec3 Player::get_right_vector() const{
     return glm::normalize(glm::cross(asy, get_camera_direction_vector()));
 }
 
-glm::vec3 Player::get_up_vector() const{
-    return glm::cross(get_camera_direction_vector(), get_right_vector());
-}
-
 Block Player::ray_hit(const Chunk& c, bool previous, int max_distance, int step) const {
 
     const glm::vec3& ray{get_camera_direction_vector()};
     glm::vec3 test_pos{actual_status.position - ray}; // better for loop
-    glm::ivec3 test_pos_rounded{}; // better for loop
+    glm::ivec3 block_pos{}; // better for loop
     glm::ivec3 previous_pos{};
 
     for(int i = 0 ; i < max_distance ; i++){
         test_pos += ray;
-        test_pos_rounded = glm::round(test_pos);
-        if(previous_pos == test_pos_rounded){
+        block_pos = glm::round(test_pos);
+        if(previous_pos == block_pos){
             continue;
         }
-        const TileBlock& material = c.get_block(test_pos_rounded);
+        const TileBlock& material = c.get_block(block_pos);
         if(material.is_obstacle()){
             return (previous) ?
                 Block{previous_pos, material} :
-                Block{test_pos_rounded, material};
+                Block{block_pos, material};
         }
-        previous_pos = test_pos_rounded;
+        previous_pos = block_pos;
     }
 
     return Block{};
@@ -219,22 +186,11 @@ void Player::update_player_orientation(const glm::vec2 &new_orientation_deg) {
     actual_status.orientation_degrees = new_orientation_deg;
 }
 
-void Player::rotate(const glm::ivec2 &angle_degrees) {
-    glm::vec2 new_orientation = actual_status.orientation_degrees += angle_degrees;
-
-    static constexpr float yaw_limit = 360.0f;
-    static constexpr float pitch_limit = 89.0f;
-
-    if(new_orientation.x > yaw_limit) {new_orientation.x -= yaw_limit;}
-    if(new_orientation.x < 0.0f) {new_orientation.x += yaw_limit;}
-
-    if(glm::abs(new_orientation.y) > pitch_limit) {
-        new_orientation.y = glm::sign(new_orientation.y) * pitch_limit;
-    }
-    actual_status.orientation_degrees = new_orientation;
+void Player::rotate(const glm::vec2 &angle_degrees) {
+    actual_status.orientation_degrees = normalize_angles(actual_status.orientation_degrees + angle_degrees);
 }
 
-const glm::vec2 &Player::get_rotation() const {
+const glm::vec2 &Player::get_orientation_degrees() const {
     return actual_status.orientation_degrees;
 }
 
@@ -325,5 +281,13 @@ std::pair<bool, glm::vec3> Player::collide(int height, const std::unordered_map<
 }
 
 glm::mat4 Player::get_view_matrix() const {
-    return glm::lookAt(get_position(), get_position() + get_camera_direction_vector(), get_up_vector());
+    return glm::lookAt(get_position(), get_position() + get_camera_direction_vector(), up);
+}
+
+glm::vec2 Player::normalize_angles(const glm::vec2 &orientation) {
+    float yaw_decimal_part{orientation.x - glm::floor(orientation.x)};
+    int yaw_integer_part{static_cast<int>(orientation.x) % static_cast<int>(yaw_limit)};
+    float yaw = yaw_integer_part + yaw_decimal_part;
+    float pitch = glm::clamp(orientation.y, -pitch_limit, pitch_limit);
+    return {yaw, pitch};
 }

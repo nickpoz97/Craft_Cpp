@@ -2,30 +2,33 @@ cmake_minimum_required(VERSION 3.19)
 project(cpp)
 
 set(CMAKE_CXX_STANDARD 17)
-
 file(MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+add_compile_definitions(DEBUG)
 
 file(GLOB GEOMETRY_FILES src/Geometry/*.cpp)
 file(GLOB INTERACTION_FILES src/Interaction/*.cpp)
 file(GLOB RENDERING_FILES src/Rendering/*.cpp deps/glad/src/*.c)
+file(GLOB CATCH_TEST_FILES ${PROJECT_SOURCE_DIR}/test/*)
+file(GLOB RENDERING_TEST_FILES ${PROJECT_SOURCE_DIR}/rendering_test/*)
+set(SOURCE_FILES ${GEOMETRY_FILES} ${INTERACTION_FILES} ${RENDERING_FILES} deps/noise/noise.cpp)
+set(MAIN src/App.cpp)
 
-file(GLOB SOURCE_FILES src/*.cpp ${GEOMETRY_FILES} ${INTERACTION_FILES} ${RENDERING_FILES}
-        deps/noise/noise.cpp)
+add_subdirectory(deps/glfw)
+add_subdirectory(deps/fmt)
 
-add_executable(app ${SOURCE_FILES} src/Rendering/GLError.cpp src/Rendering/GLError.hpp)
-add_executable(rendering_test test/rendering_test.cpp
-        ${INTERACTION_FILES} ${RENDERING_FILES} ${GEOMETRY_FILES}
-        ./deps/noise/noise.cpp)
-add_executable(item_rendering test/item_rendering.cpp
-        ${INTERACTION_FILES} ${RENDERING_FILES} ${GEOMETRY_FILES}
-        ./deps/noise/noise.cpp)
-add_executable(chunk_rendering test/chunk_rendering.cpp
-        ${INTERACTION_FILES} ${RENDERING_FILES} ${GEOMETRY_FILES}
-        ./deps/noise/noise.cpp)
+link_libraries(${CMAKE_DL_LIBS} glfw fmt)
 
-set_target_properties(app PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
-set_target_properties(rendering_test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/test")
-set_target_properties(item_rendering PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/test")
+add_executable(app ${SOURCE_FILES} ${MAIN})
+add_executable(rendering_test ${SOURCE_FILES} rendering_test/crosshair_test.cpp)
+add_executable(item_rendering ${SOURCE_FILES} rendering_test/item_rendering.cpp)
+add_executable(chunk_rendering ${SOURCE_FILES} rendering_test/chunk_rendering.cpp)
+
+set(TEST_MAIN test/main_test.cpp)
+
+add_executable(test_catch ${INTERACTION_FILES} ${RENDERING_FILES} ${GEOMETRY_FILES} ./deps/noise/noise.cpp
+        test/player_test.cpp ${TEST_MAIN} ${CATCH_TEST_FILES})
+
+set_target_properties(${BUILDSYSTEM_TARGETS} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
 
 include_directories(deps/glad/include/)
 include_directories(deps/glfw/include/)
@@ -34,13 +37,7 @@ include_directories(deps/noise/)
 include_directories(deps/stbi/)
 include_directories(deps/fmt/include/)
 include_directories(deps/catch2)
+include_directories(src)
 
-add_subdirectory(deps/glfw)
-add_subdirectory(deps/fmt)
-
-target_link_libraries(app ${CMAKE_DL_LIBS} glfw fmt)
-target_link_libraries(rendering_test ${CMAKE_DL_LIBS} glfw fmt)
-target_link_libraries(item_rendering ${CMAKE_DL_LIBS} glfw fmt)
-target_link_libraries(chunk_rendering ${CMAKE_DL_LIBS} glfw fmt)
-
-add_compile_definitions(DEBUG)
+enable_testing()
+add_test(NAME player_catch2 COMMAND ./player_catch2 WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
