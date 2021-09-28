@@ -32,8 +32,8 @@ bool y_coord_comparator::operator()(const glm::vec3 &a, const glm::vec3 &b) cons
 
 BlockMap::BlockMap(const glm::ivec2 &pq) : delta{pq.x * Chunk::SIZE - 1, 0, pq.y * Chunk::SIZE - 1}{}
 
-const glm::ivec3 &BlockMap::get_delta() const{
-    return delta;
+glm::ivec2 BlockMap::get_pq() const{
+    return {(delta.x + 1) /Chunk::SIZE, (delta.z + 1) /Chunk::SIZE};
 }
 
 TileBlock BlockMap::at(const glm::ivec3 &key) const{
@@ -76,5 +76,9 @@ BlockMap::Iterator BlockMap::begin() const{
 
 BlockMap::Iterator BlockMap::end() const{
     return {cend(), delta};
+}
+
+glm::ivec3 BlockMap::get_delta() const {
+    return delta;
 }
 
