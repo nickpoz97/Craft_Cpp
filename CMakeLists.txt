@@ -33,7 +33,7 @@ set(TEST_MAIN test/main_test.cpp)
 #add_executable(tileblock_test ${INTERACTION_FILES} ${RENDERING_FILES} ${GEOMETRY_FILES} ./deps/noise/noise.cpp
 #        ${TEST_MAIN} test/tileblock_test.cpp)
 add_executable(catch_test ${INTERACTION_FILES} ${RENDERING_FILES} ${GEOMETRY_FILES} ./deps/noise/noise.cpp
-        ${TEST_MAIN} test/player_test.cpp test/tileblock_test.cpp test/cubic_object_test.cpp test/block_map_test.cpp)
+        ${TEST_MAIN} test/player_test.cpp test/tileblock_test.cpp test/cubic_object_test.cpp test/block_map_test.cpp test/chunk_test.cpp)
 
 include_directories(deps/glad/include/)
 include_directories(deps/glfw/include/)

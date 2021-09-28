@@ -346,9 +346,9 @@ void Model::load_visible_chunks() {
             Chunk c{{pq.x + dq, pq.y + dq}, false};
             if(c.is_visible(get_viewproj(pt))){
                 // check if chunk was not already in the map
-                bool inserted = chunks.insert({c.pq, c}).second;
+                /*bool inserted = chunks.insert(std::pair(c.pq, c)).second;
                 // if abstent -> init it
-                if(inserted) {c.init_chunk();}
+                if(inserted) {c.init_chunk();}*/
             }
         }
     }
@@ -535,7 +535,7 @@ void Model::on_middle_click() {
     const Block hit_block{player_hit_test(false)};
     const TileBlock& hit_tile_block {hit_block.w};
     if(hit_tile_block.is_user_buildable()){
-        set_actual_item(hit_tile_block.getIndex());
+        set_actual_item(hit_tile_block.get_index());
     }
 }
 

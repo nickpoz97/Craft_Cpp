@@ -10,7 +10,7 @@
 
 Chunk::Chunk(const glm::vec2 &pq_coordinates, bool init) : block_map{pq_coordinates}, pq{pq_coordinates},
                                                            xz_boundaries{get_xz_boundaries(pq_coordinates)},
-                                                           SuperClass{std::vector<CubeVertex>{}}
+                                                           SuperClass{}
 {
     if(init){init_chunk();}
 };
@@ -164,7 +164,7 @@ Chunk::BufferType::iterator Chunk::generate_block_geometry(const opaque_matrix_t
 #endif
 
     if(w.is_plant()){
-        Plant plant{w.getIndex(), {1,1,1,1}, block_abs_pos, simplex2(block_abs_pos.x, block_abs_pos.z, 4, 0.5, 2) * 360, vertex_it};
+        Plant plant{w.get_index(), {1, 1, 1, 1}, block_abs_pos, simplex2(block_abs_pos.x, block_abs_pos.z, 4, 0.5, 2) * 360, vertex_it};
 #ifdef DEBUG
         assert(begin_it + 4 * INDICES_FACE_COUNT == plant.end());
 #endif
@@ -173,7 +173,7 @@ Chunk::BufferType::iterator Chunk::generate_block_geometry(const opaque_matrix_t
 
     else{
         // TODO check vertex_it
-        Cube cube{w.getIndex(), f, block_abs_pos, vertex_it};
+        Cube cube{w.get_index(), f, block_abs_pos, vertex_it};
 #ifdef DEBUG
         int visible_faces = std::accumulate(f.begin(), f.end(), 0);
         assert(begin_it + visible_faces* INDICES_FACE_COUNT == cube.end());

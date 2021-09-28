@@ -16,7 +16,7 @@ TEST_CASE("BlockMap initialization and insertion", "[initialization][data_insert
 
     auto position = GENERATE(glm::ivec3{-4, 6, 7}, glm::ivec3{0,0,0}, glm::vec3{5.9, 4.2, 7.9});
     b.set_block(position, block_type);
-    REQUIRE(b.at(position).getIndex() == block_type);
+    REQUIRE(b.at(position).get_index() == block_type);
 
     REQUIRE(b.at({1,1,1}).is_empty());
 }

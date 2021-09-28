@@ -100,7 +100,7 @@ private:
     BlockType tilecube_index{};
 public:
     static const std::array<TileCube, 256> tiles;
-    [[nodiscard]] BlockType getIndex() const;
+    [[nodiscard]] BlockType get_index() const;
 
     explicit TileBlock(BlockType block_type);
     TileBlock() = default;

@@ -41,8 +41,8 @@ constexpr int get_n_pos_elements(){
 template<typename VertexType>
 class OpenglBuffer {
 private:
-    GLuint VBO;
-    GLuint VAO;
+    GLuint VBO{};
+    GLuint VAO{};
     static constexpr GLuint STRIDE = sizeof(VertexType);
     void set_vao_attributes() const;
     void _store_data(int size, const GLfloat *data) const;

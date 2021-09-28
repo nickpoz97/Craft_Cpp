@@ -10,7 +10,7 @@ TEST_CASE("Tileblock instantiation", "[instantiation]"){
     do{
         w = static_cast<BlockType>(++i);
         TileBlock t{w};
-        REQUIRE(t.getIndex() == w);
+        REQUIRE(t.get_index() == w);
         auto other_it = TileBlock::tiles[i].begin(t.is_plant());
         for(auto tile : t){
             REQUIRE(tile == *other_it);

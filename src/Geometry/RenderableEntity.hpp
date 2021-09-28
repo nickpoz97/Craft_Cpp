@@ -7,6 +7,7 @@
 
 
 #include <vector>
+#include <memory>
 #include "vec3.hpp"
 #include "mat4x4.hpp"
 #include "../Rendering/OpenglBuffer.hpp"
@@ -15,7 +16,7 @@
 template<typename VertexType>
 class RenderableEntity{
 private:
-    OpenglBuffer<VertexType> gpu_buffer{};
+    mutable std::unique_ptr<OpenglBuffer<VertexType>> gpu_buffer{nullptr};
 public:
     explicit RenderableEntity(const std::vector<VertexType>& local_buffer);
     explicit RenderableEntity() = default;
