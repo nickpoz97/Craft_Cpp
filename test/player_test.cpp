@@ -7,7 +7,7 @@
 #include "vec3.hpp"
 #include "vec2.hpp"
 
-TEST_CASE("Player instantiation")
+TEST_CASE("Player instantiation", "[instantiation]")
 {
     auto position{GENERATE(glm::vec3{},glm::vec3{53,14,78})};
 

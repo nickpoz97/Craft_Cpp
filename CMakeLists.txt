@@ -3,6 +3,7 @@ project(cpp)
 
 set(CMAKE_CXX_STANDARD 17)
 file(MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+set(CMAKE_BUILD_TYPE Debug)
 add_compile_definitions(DEBUG)
 
 add_subdirectory(deps/glfw)
@@ -27,10 +28,12 @@ add_executable(chunk_rendering ${SOURCE_FILES} rendering_test/chunk_rendering.cp
 
 set(TEST_MAIN test/main_test.cpp)
 
-add_executable(player_catch ${INTERACTION_FILES} ${RENDERING_FILES} ${GEOMETRY_FILES} ./deps/noise/noise.cpp
-        ${TEST_MAIN} test/player_test.cpp)
-add_executable(tileblock_test ${INTERACTION_FILES} ${RENDERING_FILES} ${GEOMETRY_FILES} ./deps/noise/noise.cpp
-        ${TEST_MAIN} test/tileblock_test.cpp)
+#add_executable(player_catch ${INTERACTION_FILES} ${RENDERING_FILES} ${GEOMETRY_FILES} ./deps/noise/noise.cpp
+#        ${TEST_MAIN} test/player_test.cpp)
+#add_executable(tileblock_test ${INTERACTION_FILES} ${RENDERING_FILES} ${GEOMETRY_FILES} ./deps/noise/noise.cpp
+#        ${TEST_MAIN} test/tileblock_test.cpp)
+add_executable(catch_test ${INTERACTION_FILES} ${RENDERING_FILES} ${GEOMETRY_FILES} ./deps/noise/noise.cpp
+        ${TEST_MAIN} test/player_test.cpp test/tileblock_test.cpp test/cubic_object_test.cpp test/block_map_test.cpp)
 
 include_directories(deps/glad/include/)
 include_directories(deps/glfw/include/)
@@ -42,5 +45,7 @@ include_directories(deps/catch2)
 include_directories(src)
 
 enable_testing()
-add_test(NAME player_catch COMMAND ./player_catch WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
-add_test(NAME tileblock_catch COMMAND ./tileblock_test WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+#add_test(NAME player_catch COMMAND ./player_catch WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+#add_test(NAME tileblock_catch COMMAND ./tileblock_test WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+add_test(NAME catch_test COMMAND "./catch_test" WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+#add_test(NAME tileblock_catch COMMAND "./catch_test WORKING_DIRECTORY" ${PROJECT_SOURCE_DIR}/bin)

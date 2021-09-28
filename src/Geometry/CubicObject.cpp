@@ -27,7 +27,7 @@ template<unsigned n_faces>
 CubicObject<n_faces>::CubicObject(const BlockType &block_type, const std::array<bool, n_faces> &visible_faces,
                                   const glm::vec3 &center_position,
                                   float asy_rotation, cube_vertex_iterator_t vertices_it) :
-        begin{vertices_it},
+        begin_iterator{vertices_it},
         n_vertices{static_cast<size_t>(std::accumulate(visible_faces.begin(), visible_faces.end(), 0) * INDICES_FACE_COUNT)}{
     TileBlock tile_block{block_type};
 
@@ -71,8 +71,8 @@ CubicObject<n_faces>::CubicObject(const BlockType &block_type, const std::array<
 }
 
 template<unsigned int n_faces>
-cube_vertex_iterator_t CubicObject<n_faces>::get_end() const {
-    return begin + n_vertices;
+cube_vertex_iterator_t CubicObject<n_faces>::end() const {
+    return begin_iterator + n_vertices;
 }
 
 template<unsigned int n_faces>
@@ -92,7 +92,7 @@ Cube::Cube(const BlockType &block_type, const std::array<bool, 6> &visible_faces
 template<unsigned n_faces>
 void CubicObject<n_faces>::print_vertex_info() {
     int index = 0;
-    for(auto it = get_begin() ; it != get_end() ; ++it){
+    for(auto it = begin() ; it != end() ; ++it){
         fmt::print("pos: ({},{},{}), face: {}, normal: ({},{},{})\n", it->position.x, it->position.y, it->position.z,
                    (index++) / INDICES_FACE_COUNT, it->normal.x, it->normal.y, it->normal.z);
     }
@@ -145,8 +145,8 @@ const CubicObject<6>::UvsMatrix CubicObject<6>::uvs{{
 }};
 
 template<unsigned int n_faces>
-cube_vertex_iterator_t CubicObject<n_faces>::get_begin() const {
-    return begin;
+cube_vertex_iterator_t CubicObject<n_faces>::begin() const {
+    return begin_iterator;
 }
 
 template<>

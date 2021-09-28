@@ -19,7 +19,7 @@ using cube_vertex_iterator_t = typename std::vector<CubeVertex>::iterator;
 template<unsigned n_faces>
 class CubicObject{
 private:
-    cube_vertex_iterator_t begin;
+    cube_vertex_iterator_t begin_iterator;
     size_t n_vertices;
 
     static glm::vec3 rotate_asy(const glm::vec3 &v, float angle_degrees);
@@ -43,8 +43,8 @@ public:
     static const IndicesMatrix indices;
     static const NormalMatrix normals;
 
-    [[nodiscard]] cube_vertex_iterator_t get_end() const;
-    [[nodiscard]] cube_vertex_iterator_t get_begin() const;
+    [[nodiscard]] cube_vertex_iterator_t end() const;
+    [[nodiscard]] cube_vertex_iterator_t begin() const;
 
     void print_vertex_info();
 };

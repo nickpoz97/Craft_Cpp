@@ -166,9 +166,9 @@ Chunk::BufferType::iterator Chunk::generate_block_geometry(const opaque_matrix_t
     if(w.is_plant()){
         Plant plant{w.getIndex(), {1,1,1,1}, block_abs_pos, simplex2(block_abs_pos.x, block_abs_pos.z, 4, 0.5, 2) * 360, vertex_it};
 #ifdef DEBUG
-        assert(begin_it + 4 * INDICES_FACE_COUNT == plant.get_end());
+        assert(begin_it + 4 * INDICES_FACE_COUNT == plant.end());
 #endif
-        return plant.get_end();
+        return plant.end();
     }
 
     else{
@@ -176,9 +176,9 @@ Chunk::BufferType::iterator Chunk::generate_block_geometry(const opaque_matrix_t
         Cube cube{w.getIndex(), f, block_abs_pos, vertex_it};
 #ifdef DEBUG
         int visible_faces = std::accumulate(f.begin(), f.end(), 0);
-        assert(begin_it + visible_faces* INDICES_FACE_COUNT == cube.get_end());
+        assert(begin_it + visible_faces* INDICES_FACE_COUNT == cube.end());
 #endif
-        return cube.get_end();
+        return cube.end();
     }
 }
 

@@ -4,7 +4,7 @@
 #include "catch.hpp"
 #include "Geometry/TileBlock.hpp"
 
-TEST_CASE("Tileblock instantiation"){
+TEST_CASE("Tileblock instantiation", "[instantiation]"){
     int i = -1;
     BlockType w;
     do{
