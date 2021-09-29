@@ -270,16 +270,19 @@ void Chunk::generate_blockmap(Chunk* c) {
 }
 
 bool Chunk::is_visible(const glm::mat4 &viewproj) const {
+    glm::ivec3 result{};
+
     for(const auto& p : get_chunk_boundaries()){
         glm::vec4 clip_point = viewproj * glm::vec4{p, 1};
-        float clip_w = clip_point.w;
-        clip_point = glm::abs(clip_point);
+        clip_point /= clip_point.w;
 
-        if(clip_point.x < clip_w && clip_point.y < clip_w && clip_point.z < clip_w){
+        glm::ivec3 test_vector = glm::clamp(glm::ivec3{clip_point}, {-1, -1, -1}, {1, 1, 1});
+        if(test_vector == glm::ivec3{}){
             return true;
         }
+        result += test_vector;
     }
-    return false;
+    return ((result.x == 0 || result.y == 0) && glm::abs(result.z) < 8);
 }
 
 std::array<glm::ivec3, 8> Chunk::get_chunk_boundaries() const {
@@ -332,13 +335,14 @@ void Chunk::render_object(const std::array<const Chunk*, 6>& neighbors_refs) con
 }
 
 void Chunk::init_chunk() {
-    init_chunk_threads.emplace_back(Chunk::generate_blockmap, this);
+    init_chunk_threads.emplace_front(Chunk::generate_blockmap, this);
 }
 
 void Chunk::wait_threads() {
-    for(auto& t : init_chunk_threads){
+    for(std::thread& t : init_chunk_threads) {
         t.join();
     }
+    init_chunk_threads.clear();
 }
 
 int Chunk::get_min_x() const {
