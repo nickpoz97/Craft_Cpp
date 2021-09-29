@@ -59,7 +59,7 @@ void Model::delete_player() {
 
 int Model::highest_block(const glm::vec2& pq) {
     const Chunk& chunk = chunks.at(pq);
-    return chunk.get_max_y();
+    return chunk.getHighestBlock();
 }
 
 const std::unordered_map<glm::ivec2, Chunk> &Model::getChunks() const {

@@ -8,20 +8,10 @@
 #include "noise.hpp"
 #include "CubicObject.hpp"
 
-Chunk::Chunk(const glm::vec2 &pq_coordinates, bool init) : block_map{pq_coordinates}, pq{pq_coordinates},
-                                                           xz_boundaries{get_xz_boundaries(pq_coordinates)},
-                                                           SuperClass{}
+Chunk::Chunk(const glm::vec2 &pq_coordinates, bool init) : block_map{pq_coordinates}, pq{pq_coordinates}, SuperClass{}
 {
-    if(init){init_chunk();}
+    if(init){ init_chunk();}
 };
-
-int Chunk::get_min_y() const{
-    return min_y;
-}
-
-int Chunk::get_max_y() const{
-    return max_y;
-}
 
 int Chunk::getHighestBlock() const{
     int highest_y = -1;
@@ -113,6 +103,9 @@ int Chunk::count_exposed_faces(const BlockMap& map, const opaque_matrix_type &op
     for(const auto& kv : map) {
         glm::ivec3 abs_pos{kv.first};
         TileBlock tileBlock{kv.second};
+        /*if(tileBlock.is_empty()){
+            continue;
+        }*/
         auto v = abs_pos - offset;
 
         // if block next to this face is opaque, no need to render
@@ -136,9 +129,6 @@ int Chunk::count_exposed_faces(const BlockMap& map, const opaque_matrix_type &op
         if(tileBlock.is_plant()){
             total = 4;
         }
-
-        min_y = glm::min(min_y, abs_pos.y);
-        max_y = glm::max(max_y, abs_pos.y);
 
         n_faces += total;
     }
@@ -171,27 +161,18 @@ Chunk::BufferType::iterator Chunk::generate_block_geometry(const opaque_matrix_t
         return plant.end();
     }
 
-    else{
+    else /*if(!w.is_empty())*/{
         // TODO check vertex_it
         Cube cube{w.get_index(), f, block_abs_pos, vertex_it};
 #ifdef DEBUG
         int visible_faces = std::accumulate(f.begin(), f.end(), 0);
-        assert(begin_it + visible_faces* INDICES_FACE_COUNT == cube.end());
+        assert(begin_it + visible_faces * INDICES_FACE_COUNT == cube.end());
 #endif
         return cube.end();
     }
-}
-
-std::array<glm::vec3, 4> Chunk::get_xz_boundaries(const glm::vec2 &pq) {
-    glm::vec3 min{pq[0] * Chunk::SIZE - 1.0f, 0, pq[1] * Chunk::SIZE - 1.0f};
-    glm::vec3 max{min + static_cast<float>(Chunk::SIZE + 1) * glm::vec3{1, 0, 1}};
-
-    return {{
-        {min.x, 0, min.z},
-        {max.x, 0, min.z},
-        {min.x, 0, max.z},
-        {max.x, 0, max.z}
-    }};
+    /*else{
+        return vertex_it;
+    }*/
 }
 
 /*bool Chunk::is_visible(const Frustum& frustum) const {
@@ -215,14 +196,18 @@ bool Chunk::is_dirty() const {
     return dirty;
 }
 
-void Chunk::init_chunk() {
+void Chunk::generate_blockmap(Chunk* c) {
     const int pad = 1;
     // for each block xz position
     for(int dx{-pad}; dx < Chunk::SIZE + pad ; dx++){
         for(int dz{-pad}; dz < Chunk::SIZE + pad ; dz++){
-            bool on_edge_flag = (dx < 0 || dz < 0 || dx >= Chunk::SIZE || dz >= Chunk::SIZE);
-            int x = pq.x * Chunk::SIZE + dx;
-            int z = pq.y * Chunk::SIZE + dz;
+#ifdef DEBUG
+            assert(c->pq * Chunk::SIZE - pad == glm::ivec2(c->get_min_x(), c->get_min_z()) );
+            assert(c->pq * Chunk::SIZE + Chunk::SIZE == glm::ivec2(c->get_max_x(), c->get_max_z()) );
+#endif
+            int on_edge_flag = (dx < 0 || dz < 0 || dx >= Chunk::SIZE || dz >= Chunk::SIZE);
+            int x = c->pq.x * Chunk::SIZE + dx;
+            int z = c->pq.y * Chunk::SIZE + dz;
 
             float f = simplex2(x * 0.01, z * 0.01, 4, 0.5, 2);
             float g = simplex2(-x * 0.01, -z * 0.01, 2, 0.9, 2);
@@ -235,59 +220,58 @@ void Chunk::init_chunk() {
                 w = BlockType::SAND;
             }
             for(int y = 0 ; y < h ; y++){
-                // TODO check if borders are empty
-                block_map.set_block({x, y, z}, static_cast<BlockType>(w * on_edge_flag));
+                c->block_map.set_block({x, y, z}, static_cast<BlockType>(w * !on_edge_flag));
             }
-            if(w == BlockType::GRASS){
-                if(SHOW_PLANTS){
+            if(w == BlockType::GRASS && !on_edge_flag) {
+                if (SHOW_PLANTS) {
                     // grass
                     if (simplex2(-x * 0.1, z * 0.1, 4, 0.8, 2) > 0.6) {
-                        block_map.set_block({x, h, z},static_cast<BlockType>(BlockType::TALL_GRASS * on_edge_flag));
+                        c->block_map.set_block({x, h, z}, static_cast<BlockType>(BlockType::TALL_GRASS));
                     }
                     // flowers
                     if (simplex2(x * 0.05, -z * 0.05, 4, 0.8, 2) > 0.7) {
                         // w_f max == 23
                         int w_f = 18 + simplex2(x * 0.1, z * 0.1, 4, 0.8, 2) * 7;
-                        block_map.set_block({x, h, z}, static_cast<BlockType>(w_f * on_edge_flag));
+                        c->block_map.set_block({x, h, z}, static_cast<BlockType>(w_f));
                     }
                 }
                 bool ok = SHOW_TREES && !(dx - 4 < 0 || dz - 4 < 0 || dx + 4 >= CHUNK_SIZE || dz + 4 >= CHUNK_SIZE);
                 ok = ok && (simplex2(x, z, 6, 0.5, 2) > 0.84);
 
-                if(ok){
-                    for(int y = h + 3; y < h + 8; y++){
+                if (ok) {
+                    for (int y = h + 3; y < h + 8; y++) {
                         for (int ox = -3; ox <= 3; ox++) {
                             for (int oz = -3; oz <= 3; oz++) {
                                 int d = (ox * ox) + (oz * oz) +
                                         (y - (h + 4)) * (y - (h + 4));
                                 if (d < 11) {
-                                    block_map.set_block({x + ox, y, z + oz}, BlockType::LEAVES);
+                                    c->block_map.set_block({x + ox, y, z + oz}, BlockType::LEAVES);
                                 }
                             }
                         }
                     }
                     for (int y = h; y < h + 7; y++) {
-                        block_map.set_block({x, y, z},BlockType::WOOD);
+                        c->block_map.set_block({x, y, z}, BlockType::WOOD);
                     }
                 }
-                if (SHOW_CLOUDS) {
-                    for (int y = 64; y < 72; y++) {
-                        if (simplex3(
-                                x * 0.01, y * 0.1, z * 0.01, 8, 0.5, 2) > 0.75)
-                        {
-                            block_map.set_block({x, y, z}, BlockType::CLOUD);
-                        }
+            }
+            if (SHOW_CLOUDS) {
+                for (int y = 64; y < 72; y++) {
+                    if (simplex3(
+                            x * 0.01, y * 0.1, z * 0.01, 8, 0.5, 2) > 0.75)
+                    {
+                        c->block_map.set_block({x, y, z}, BlockType::CLOUD);
                     }
                 }
             }
         }
     }
-    dirty = true;
+    c->dirty = true;
 }
 
 bool Chunk::is_visible(const glm::mat4 &viewproj) const {
     for(const auto& p : get_chunk_boundaries()){
-        glm::vec4 clip_point = viewproj * glm::vec4{(p + static_cast<float>(min_y)), 1};
+        glm::vec4 clip_point = viewproj * glm::vec4{p, 1};
         float clip_w = clip_point.w;
         clip_point = glm::abs(clip_point);
 
@@ -298,15 +282,21 @@ bool Chunk::is_visible(const glm::mat4 &viewproj) const {
     return false;
 }
 
-std::array<glm::vec3, 8> Chunk::get_chunk_boundaries() const {
-    std::array<glm::vec3, 8> boundaries{};
+std::array<glm::ivec3, 8> Chunk::get_chunk_boundaries() const {
+    std::array<glm::ivec2, 4> xz_boundaries{{
+        {get_min_x(), get_min_z()},
+        {get_max_x(), get_min_z()},
+        {get_min_x(), get_max_z()},
+        {get_max_x(), get_max_z()},
+    }};
+    std::array<glm::ivec3, 8> boundaries{};
     auto it{boundaries.begin()};
 
     for(const auto& p : xz_boundaries){
-        *(it++) = p + static_cast<float>(min_y);
+        *(it++) = glm::vec3{p[0], 0, p[1]};
     }
     for(const auto& p : xz_boundaries){
-        *(it++) = p + static_cast<float>(max_y);
+        *(it++) = glm::vec3{p[0], getHighestBlock(), p[1]};
     }
 
     return boundaries;
@@ -339,6 +329,32 @@ void Chunk::render_object(const std::array<const Chunk*, 6>& neighbors_refs) con
     }
     dirty = false;
     SuperClass ::render_object();
+}
+
+void Chunk::init_chunk() {
+    init_chunk_threads.emplace_back(Chunk::generate_blockmap, this);
+}
+
+void Chunk::wait_threads() {
+    for(auto& t : init_chunk_threads){
+        t.join();
+    }
+}
+
+int Chunk::get_min_x() const {
+    return pq.x * Chunk::SIZE - 1;
+}
+
+int Chunk::get_max_x() const {
+    return get_min_x() + Chunk::SIZE + 1;
+}
+
+int Chunk::get_min_z() const {
+    return pq.y * Chunk::SIZE - 1;
+}
+
+int Chunk::get_max_z() const{
+    return get_min_z() + Chunk::SIZE + 1;
 }
 
 
