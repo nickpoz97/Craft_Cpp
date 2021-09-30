@@ -7,10 +7,9 @@
 
 #include <array>
 #include <thread>
-#include <mutex>
-
-#include "vec2.hpp"
+#include <unordered_map>
 #include "BlockMap.hpp"
+#include "vec2.hpp"
 #include "list"
 #include "RenderableEntity.hpp"
 #include "Vertex.hpp"
@@ -22,7 +21,8 @@ private:
     using SuperClass = RenderableEntity<CubeVertex>;
     using BufferType = std::vector<CubeVertex>;
 
-    BlockMap block_map;
+    using MyMap = std::unordered_map<glm::ivec3, BlockType>;
+    MyMap block_map{};
     mutable bool dirty{false};
 
     // XZ_SIZE is the size of 3 chunks
@@ -40,7 +40,7 @@ private:
         opaque_matrix_type &opaque,
         height_matrix_type &highest
     ) const;
-    int count_exposed_faces(const BlockMap& map, const opaque_matrix_type &opaque, const glm::ivec3& offset) const;
+    int count_exposed_faces(const MyMap& map, const opaque_matrix_type &opaque, const glm::ivec3& offset) const;
     BufferType::iterator generate_block_geometry(const opaque_matrix_type &opaque, BufferType::iterator vertex_it, const glm::ivec3& block_abs_pos,
                                                              const height_matrix_type &highest, const glm::ivec3& v, TileBlock w) const;
 
@@ -75,7 +75,7 @@ public:
     void render_object(const std::array<const Chunk*, 6>& neighbors_refs) const;
     void init_chunk();
     static void wait_threads();
-    static void generate_blockmap(Chunk* c);
+    void generate_blockmap();
 };
 
 int get_chunk_distance(const Chunk &c1, const Chunk &c2);

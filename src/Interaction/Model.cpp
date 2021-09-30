@@ -315,8 +315,12 @@ void Model::load_chunks_in_range() {
     const glm::ivec2& player_chunk = player.get_pq();
     for(int dp = -CREATE_CHUNK_RADIUS ; dp <= CREATE_CHUNK_RADIUS ; dp++){
         for(int dq = -CREATE_CHUNK_RADIUS ; dq <= CREATE_CHUNK_RADIUS ; dq++) {
-            glm::vec2 pq_coordinate{player_chunk.x + dp, player_chunk.x + dq};
-            chunks.try_emplace(pq_coordinate, Chunk{pq_coordinate, true});
+            glm::vec2 pq_coordinate{player_chunk.x + dp, player_chunk.y + dq};
+            auto result = chunks.try_emplace(pq_coordinate, Chunk{pq_coordinate, false});
+            if(result.second){
+                Chunk& c = result.first->second;
+                c.init_chunk();
+            }
         }
     }
 }

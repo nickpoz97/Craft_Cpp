@@ -9,7 +9,7 @@
 #include "noise.hpp"
 #include "CubicObject.hpp"
 
-Chunk::Chunk(const glm::vec2 &pq_coordinates, bool init) : block_map{pq_coordinates}, pq{pq_coordinates}, SuperClass{}
+Chunk::Chunk(const glm::vec2 &pq_coordinates, bool init) : block_map{}, pq{pq_coordinates}, SuperClass{}
 {
     if(init){ init_chunk();}
 };
@@ -29,7 +29,7 @@ int Chunk::getHighestBlock() const{
 }
 
 TileBlock Chunk::get_block(const glm::ivec3& block_pos) const{
-    return block_map.at(block_pos);
+    return TileBlock(block_map.at(block_pos));
 }
 
 Chunk::operator bool() const {
@@ -96,7 +96,7 @@ void Chunk::populate_opaque_and_height_matrix(const std::array<const Chunk*, 6> 
     }
 }
 
-int Chunk::count_exposed_faces(const BlockMap& map, const opaque_matrix_type &opaque, const glm::ivec3& offset) const {
+int Chunk::count_exposed_faces(const MyMap& map, const opaque_matrix_type &opaque, const glm::ivec3& offset) const {
     int miny = 256;
     int maxy = 0;
     int n_faces = 0;
@@ -197,18 +197,14 @@ bool Chunk::is_dirty() const {
     return dirty;
 }
 
-void Chunk::generate_blockmap(Chunk* c) {
+void Chunk::generate_blockmap() {
     const int pad = 1;
     // for each block xz position
     for(int dx{-pad}; dx < Chunk::SIZE + pad ; dx++){
         for(int dz{-pad}; dz < Chunk::SIZE + pad ; dz++){
-#ifdef DEBUG
-            assert(c->pq * Chunk::SIZE - pad == glm::ivec2(c->get_min_x(), c->get_min_z()) );
-            assert(c->pq * Chunk::SIZE + Chunk::SIZE == glm::ivec2(c->get_max_x(), c->get_max_z()) );
-#endif
             int on_edge_flag = (dx < 0 || dz < 0 || dx >= Chunk::SIZE || dz >= Chunk::SIZE);
-            int x = c->pq.x * Chunk::SIZE + dx;
-            int z = c->pq.y * Chunk::SIZE + dz;
+            int x = pq.x * Chunk::SIZE + dx;
+            int z = pq.y * Chunk::SIZE + dz;
 
             float f = simplex2(x * 0.01, z * 0.01, 4, 0.5, 2);
             float g = simplex2(-x * 0.01, -z * 0.01, 2, 0.9, 2);
@@ -221,19 +217,19 @@ void Chunk::generate_blockmap(Chunk* c) {
                 w = BlockType::SAND;
             }
             for(int y = 0 ; y < h ; y++){
-                c->block_map.set_block({x, y, z}, static_cast<BlockType>(w * !on_edge_flag));
+                block_map[{x, y, z}] = static_cast<BlockType>(w * !on_edge_flag);
             }
             if(w == BlockType::GRASS && !on_edge_flag) {
                 if (SHOW_PLANTS) {
                     // grass
                     if (simplex2(-x * 0.1, z * 0.1, 4, 0.8, 2) > 0.6) {
-                        c->block_map.set_block({x, h, z}, static_cast<BlockType>(BlockType::TALL_GRASS));
+                        block_map[{x, h, z}] = static_cast<BlockType>(BlockType::TALL_GRASS);
                     }
                     // flowers
                     if (simplex2(x * 0.05, -z * 0.05, 4, 0.8, 2) > 0.7) {
                         // w_f max == 23
                         int w_f = 18 + simplex2(x * 0.1, z * 0.1, 4, 0.8, 2) * 7;
-                        c->block_map.set_block({x, h, z}, static_cast<BlockType>(w_f));
+                        block_map[{x, h, z}] = static_cast<BlockType>(w_f);
                     }
                 }
                 bool ok = SHOW_TREES && !(dx - 4 < 0 || dz - 4 < 0 || dx + 4 >= CHUNK_SIZE || dz + 4 >= CHUNK_SIZE);
@@ -246,13 +242,13 @@ void Chunk::generate_blockmap(Chunk* c) {
                                 int d = (ox * ox) + (oz * oz) +
                                         (y - (h + 4)) * (y - (h + 4));
                                 if (d < 11) {
-                                    c->block_map.set_block({x + ox, y, z + oz}, BlockType::LEAVES);
+                                    block_map[{x + ox, y, z + oz}] = BlockType::LEAVES;
                                 }
                             }
                         }
                     }
                     for (int y = h; y < h + 7; y++) {
-                        c->block_map.set_block({x, y, z}, BlockType::WOOD);
+                        block_map[{x, y, z}] = BlockType::WOOD;
                     }
                 }
             }
@@ -261,13 +257,13 @@ void Chunk::generate_blockmap(Chunk* c) {
                     if (simplex3(
                             x * 0.01, y * 0.1, z * 0.01, 8, 0.5, 2) > 0.75)
                     {
-                        c->block_map.set_block({x, y, z}, BlockType::CLOUD);
+                        block_map[{x, y, z}] = BlockType::CLOUD;
                     }
                 }
             }
         }
     }
-    c->dirty = true;
+    dirty = true;
 }
 
 bool Chunk::is_visible(const glm::mat4 &viewproj) const {
@@ -307,7 +303,7 @@ std::array<glm::ivec3, 8> Chunk::get_chunk_boundaries() const {
 }
 
 void Chunk::set_block(const glm::ivec3& position, BlockType w) {
-    block_map.set_block(position, w);
+    block_map[position] = w;
     dirty = true;
 }
 
@@ -336,7 +332,7 @@ void Chunk::render_object(const std::array<const Chunk*, 6>& neighbors_refs) con
 }
 
 void Chunk::init_chunk() {
-    init_chunk_threads.emplace_front(Chunk::generate_blockmap, this);
+    init_chunk_threads.emplace_front(&Chunk::generate_blockmap, this);
 }
 
 void Chunk::wait_threads() {
@@ -369,5 +365,3 @@ int Chunk::get_min_z() const {
 int Chunk::get_max_z() const{
     return get_min_z() + Chunk::SIZE + 1;
 }
-
-
