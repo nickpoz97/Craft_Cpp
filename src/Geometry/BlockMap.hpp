@@ -35,7 +35,6 @@ private:
 public:
     explicit BlockMap(const glm::ivec2 &pq);
     TileBlock at(const glm::ivec3& key) const;
-    TileBlock operator[](const glm::ivec3& key) = delete;
     void set_block(const glm::ivec3& position, BlockType block_type);
     [[nodiscard]] glm::ivec2 get_pq() const;
     [[nodiscard]] glm::ivec3 get_delta() const;

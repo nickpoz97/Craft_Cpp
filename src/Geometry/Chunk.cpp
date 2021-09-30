@@ -3,6 +3,7 @@
 //
 
 #include <numeric>
+#include <iostream>
 
 #include "Chunk.hpp"
 #include "noise.hpp"
@@ -339,7 +340,15 @@ void Chunk::init_chunk() {
 }
 
 void Chunk::wait_threads() {
-    for(std::thread& t : init_chunk_threads) {
+    /*while(!init_chunk_threads.empty()){
+        std::thread& t = init_chunk_threads.front();
+#ifdef DEBUG
+        std::cout << t.get_id() << '\t';
+        std::thread::id id{};
+#endif
+        t.join();
+        init_chunk_threads.pop_front();*/
+    for(auto& t : init_chunk_threads){
         t.join();
     }
     init_chunk_threads.clear();

@@ -16,7 +16,7 @@ private:
 public:
     Crosshair(int width, int height, int scale);
     void render_object() = delete;
-    void update(int width, int height, int scale);
+    void render_lines() const;
 };
 
 

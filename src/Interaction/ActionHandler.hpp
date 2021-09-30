@@ -19,6 +19,9 @@ private:
     static void scroll_callback(GLFWwindow *window, double xdelta, double ydelta);
     static void mouse_button_callback(GLFWwindow *window, int button, int action, int mods);
     static void set_callbacks();
+
+    static void resolve_mouse_button(int button, int control, bool cursor_disabled);
+    static void resolve_keyboard_input(int key, int control, bool cursor_disabled);
 public:
     static void initialize(Model* model_address);
     static void destroy();

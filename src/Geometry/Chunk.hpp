@@ -7,6 +7,7 @@
 
 #include <array>
 #include <thread>
+#include <mutex>
 
 #include "vec2.hpp"
 #include "BlockMap.hpp"
@@ -43,24 +44,24 @@ private:
     BufferType::iterator generate_block_geometry(const opaque_matrix_type &opaque, BufferType::iterator vertex_it, const glm::ivec3& block_abs_pos,
                                                              const height_matrix_type &highest, const glm::ivec3& v, TileBlock w) const;
 
+    BufferType compute_chunk_geometry(const std::array<const Chunk*, 6> &np) const;
     std::array<glm::ivec3, 8> get_chunk_boundaries() const;
 public:
     Chunk(const glm::vec2 &pq_coordinates, bool init);
     const glm::ivec2 pq;
-    static constexpr int SIZE = CHUNK_SIZE;
 
+    static constexpr int SIZE = CHUNK_SIZE;
     int get_min_x() const;
     int get_max_x() const;
     int get_min_z() const;
+
     int get_max_z() const;
 
     static constexpr auto get_y_limit = [](){return Y_SIZE - 2;};
-
     int getHighestBlock() const;
     TileBlock get_block(const glm::ivec3& block_pos) const;
-    explicit operator bool() const;
 
-    BufferType compute_chunk_geometry(const std::array<const Chunk*, 6> &np) const;
+    explicit operator bool() const;
 
     void set_block(const glm::ivec3& position, BlockType w);
     //bool is_visible(const Frustum& frustum) const;

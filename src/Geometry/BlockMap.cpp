@@ -42,8 +42,8 @@ TileBlock BlockMap::at(const glm::ivec3 &key) const{
 }
 
 void BlockMap::set_block(const glm::ivec3 &position, BlockType block_type) {
-    erase(position - delta);
-    emplace(position - delta, block_type);
+    //erase(position - delta);
+    BaseMap::operator[](position - delta) = TileBlock{block_type};
 }
 
 BlockMap::Iterator::Iterator(const const_iterator& it, const glm::ivec3& delta) : map_it{it}, delta{delta} {}

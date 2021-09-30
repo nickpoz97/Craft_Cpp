@@ -21,23 +21,39 @@
 #include "../Geometry/Crosshair.hpp"
 #include "GameView.hpp"
 
+enum class ShaderName{
+    BLOCK_SHADER,
+    LINE_SHADER,
+    SKY_SHADER,
+    TEXT_SHADER
+};
+
+struct ShaderFilesPaths{
+    std::string_view vertex_code;
+    std::string_view fragment_code;
+};
+
+struct GameViewSettings{
+    int width;
+    int height;
+    float fov;
+    int ortho;
+    bool is_fullscreen;
+};
+
+using ShaderNamesMap =  std::unordered_map<ShaderName, ShaderFilesPaths>;
+
 class Model {
 private:
-    //friend class ActionHandler;
-    GameView& game_view;
-
-    struct ShaderWrapper {
-        const Shader &block_shader;
-        const Shader &line_shader;
-        const Shader &sky_shader;
-        const Shader &text_shader;
-    };
+    friend class ActionHandler;
+    GameView game_view;
+    std::unordered_map<ShaderName, const Shader> shaders;
 
     std::unordered_map<glm::ivec2, Chunk> chunks{};
-    ShaderWrapper shaders;
     const Sphere sky;
+    Crosshair crosshair;
+    Player player;
 
-    std::unique_ptr<Player> player{nullptr};
     double previous_timestamp{};
 
     BlockType actual_item{TileBlock::items[0]};
@@ -48,35 +64,25 @@ private:
 
     //std::array<Block, 2> blocks{};
 
-    Crosshair crosshair;
-
-    void load_collision_chunks();
-
-    void load_visible_chunks();
-
+    void load_chunks_in_range();
     void remove_distant_chunks();
-
     void update_chunk_map();
 
     const Chunk & get_player_chunk() const;
 
-    static Crosshair get_crosshair(int width, int height, int scale);
-
-    glm::mat4 get_viewproj(GameView::proj_type pt) const;
+    glm::mat4 get_viewproj(GameView::ProjType pt) const;
 
     void on_left_click();
     void on_right_click();
     void on_middle_click();
 public:
-    Model(const Shader &block_shader, const Shader &line_shader, const Shader &sky_shader,
-          const Shader &text_shader, GameView &game_view);
+    Model(const ShaderNamesMap & shaders_names_map, const GameViewSettings & gvs);
 
     float get_day_time() const;
     float get_daylight() const;
     void switch_flying();
     bool is_flying() const;
-    void delete_player();
-    void set_player(const glm::vec3 &position, const glm::vec2 &rotation, std::string_view name, int id);
+
     Chunk &get_chunk_at(const glm::ivec2 &pq);
     const Chunk &get_chunk_at(const glm::ivec2 &pq) const;
     int highest_block(const glm::vec2 &pq);
@@ -101,20 +107,14 @@ public:
 
     //TileBlock get_actual_item() const;
     void set_actual_item(BlockType item_type);
-
     void set_next_item();
-
     void set_prev_item();
 
-    Player *get_player() const;
     void set_perspective_properties(int fov, int orto);
 
     void handle_input(double dt);
-
     void render_scene();
-
     void swap_pool();
-
     void loop();
 
     GLFWwindow* get_window();
@@ -122,11 +122,8 @@ public:
     std::array<const Chunk *, 6> chunk_neighbors_pointers(const glm::ivec2 &pq) const;
     Block player_hit_test(bool previous) const;
 
-    void update_window();
-    void resolve_keyboard_input(int key, int control, bool cursor_disabled);
     void resolve_mouse_movement(const glm::vec2& offset);
     double resolve_scroll(double scroll_pos, double threshold);
-    void resolve_mouse_button(int button, int control, bool cursor_disabled);
 };
 
 #endif //CPP_MODEL_HPP

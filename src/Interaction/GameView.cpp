@@ -103,17 +103,17 @@ GLFWwindow *GameView::get_window() const {
     return window;
 }
 
-glm::mat4 GameView::get_proj_matrix(GameView::proj_type pt) const {
+glm::mat4 GameView::get_proj_matrix(GameView::ProjType pt) const {
     switch (pt) {
-        case proj_type::PERSP:
+        case ProjType::PERSP:
             return glm::perspective(glm::radians(fov), static_cast<float>(width) / (height), z_near, z_far);
-        case proj_type::ORTHO_3D:
+        case ProjType::ORTHO_3D:
             return glm::ortho(-ortho * get_ratio() ,ortho * get_ratio(),
                               static_cast<float>(-ortho),static_cast<float>(+ortho),
                               -z_far, z_far);
-        case proj_type::UI:
+        case ProjType::UI:
             return glm::ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height), -1.0f, 1.0f);
-        case proj_type::ITEM:
+        case ProjType::ITEM:
             return glm::ortho(-item_box_side() * get_ratio(), item_box_side() * get_ratio(),
                               -item_box_side(), item_box_side(), -1.0f, 1.0f);
     }

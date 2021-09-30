@@ -5,7 +5,6 @@
 #define GLFW_INCLUDE_NONE
 
 #include <iostream>
-#include "trigonometric.hpp"
 #include "ActionHandler.hpp"
 #include "Model.hpp"
 #include "GLFW/glfw3.h"
@@ -21,12 +20,12 @@ void ActionHandler::key_callback(GLFWwindow *window, int key, int scancode, int 
     // indicates if mouse is used for camera motion
     bool cursor_disabled = (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED);
 
-    model_p->resolve_keyboard_input(key, control, cursor_disabled);
+    resolve_keyboard_input(key, control, cursor_disabled);
 }
 
 void ActionHandler::initialize(Model *model_address){
     if(!model_p) {
-        bool initialized = model_address && model_address->get_window() && model_address->get_player();
+        bool initialized = model_address && model_address->get_window();
         if (initialized) {
             model_p = model_address;
 #ifdef DEBUG
@@ -50,28 +49,28 @@ void ActionHandler::mouse_button_callback(GLFWwindow *window, int button, int ac
     int control = mods & (GLFW_MOD_CONTROL | GLFW_MOD_SUPER);
     bool cursor_disabled = (glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED);
 
-    model_p->resolve_mouse_button(button, control, cursor_disabled);
+    resolve_mouse_button(button, control, cursor_disabled);
 }
 
 void ActionHandler::handle_key_pressing(double delta_t) {
     int ortho = (glfwGetKey(model_p->get_window(), 'F') ? 64 : 0);
     int fov = (glfwGetKey(model_p->get_window(), GLFW_KEY_LEFT_SHIFT) ? 15 : 65);
     model_p->set_perspective_properties(fov, ortho);
+    Player& p = model_p->player;
 
     int x_movement{}, z_movement{};
-    auto* player_p = model_p->get_player();
 
     if (glfwGetKey(model_p->get_window(), 'W')) { z_movement--; }
     if (glfwGetKey(model_p->get_window(), 'S')) { z_movement++; }
     if (glfwGetKey(model_p->get_window(), 'A')) { x_movement--; }
     if (glfwGetKey(model_p->get_window(), 'D')) { x_movement++; }
-    if (glfwGetKey(model_p->get_window(), GLFW_KEY_LEFT)) player_p->rotate({-delta_t, 0});
-    if (glfwGetKey(model_p->get_window(), GLFW_KEY_RIGHT)) player_p->rotate({delta_t, 0});
-    if (glfwGetKey(model_p->get_window(), GLFW_KEY_UP)) player_p->rotate({0, delta_t});
-    if (glfwGetKey(model_p->get_window(), GLFW_KEY_DOWN)) player_p->rotate({0, -delta_t});
+    if (glfwGetKey(model_p->get_window(), GLFW_KEY_LEFT)) p.rotate({-delta_t, 0});
+    if (glfwGetKey(model_p->get_window(), GLFW_KEY_RIGHT)) p.rotate({delta_t, 0});
+    if (glfwGetKey(model_p->get_window(), GLFW_KEY_UP)) p.rotate({0, delta_t});
+    if (glfwGetKey(model_p->get_window(), GLFW_KEY_DOWN)) p.rotate({0, -delta_t});
     bool jump_action = glfwGetKey(model_p->get_window(), GLFW_KEY_SPACE);
 
-    player_p->apply_movement(delta_t, model_p->is_flying(), jump_action, {x_movement, z_movement}, model_p->getChunks());
+    p.apply_movement(delta_t, model_p->is_flying(), jump_action, {x_movement, z_movement}, model_p->getChunks());
 }
 
 void ActionHandler::handle_mouse_position() {
@@ -96,7 +95,7 @@ void ActionHandler::set_callbacks() {
     glfwSetScrollCallback(window, scroll_callback);
 
     auto framebuffer_size_callback = [](GLFWwindow* window, int width, int height){
-        model_p->update_window();
+        model_p->game_view.update();
     };
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 }
@@ -107,4 +106,53 @@ void ActionHandler::destroy() {
 
 bool ActionHandler::is_enabled_for(Model *m_ref) {
     return model_p == m_ref;
+}
+
+void ActionHandler::resolve_mouse_button(int button, int control, bool cursor_disabled) {
+    switch(button){
+        case GLFW_MOUSE_BUTTON_LEFT:
+            if(cursor_disabled){
+                control ? model_p->on_right_click() : model_p->on_left_click();
+            }
+            else{
+                // restore camera control
+                glfwSetInputMode(model_p->get_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            }
+            return;
+        case GLFW_MOUSE_BUTTON_RIGHT:
+            if(cursor_disabled && !control) {model_p->on_right_click();}
+            return;
+        case GLFW_MOUSE_BUTTON_MIDDLE:
+            if(cursor_disabled) {model_p->on_middle_click();}
+            return;
+    }
+}
+
+void ActionHandler::resolve_keyboard_input(int key, int control, bool cursor_disabled) {
+    switch(key){
+        case GLFW_KEY_ESCAPE:
+            if(cursor_disabled) {glfwSetInputMode(model_p->get_window(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);}
+            return;
+        case GLFW_KEY_ENTER:
+            control ? model_p->on_right_click() : model_p->on_left_click();
+            return;
+        case GLFW_KEY_TAB:
+            model_p->switch_flying();
+            return;
+        case '0':
+            model_p->set_actual_item(BlockType::GLASS);
+            return;
+        case 'E':
+            model_p->set_next_item();
+            return;
+        case 'R':
+            model_p->set_prev_item();
+            return;
+        default:
+            if (key >= '1' && key <= '9') {
+                // +1 to skip empty
+                model_p->set_actual_item(TileBlock::items[key - '1']);
+            }
+            return;
+    }
 }

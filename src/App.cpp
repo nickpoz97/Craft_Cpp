@@ -11,17 +11,22 @@
 static int load_texture(std::string_view path, GLint clamp_type = GL_REPEAT);
 
 int main() {
-    GameView game_view{WINDOW_WIDTH, WINDOW_WIDTH, INITIAL_FOV, 0, FULLSCREEN};
-    if(!game_view.is_initialized()){
-        return -1;
-    }
+    GameViewSettings gvs{WINDOW_WIDTH, WINDOW_WIDTH, INITIAL_FOV, 0, FULLSCREEN};
+    ShaderNamesMap snm{};
+    snm.emplace(ShaderName::BLOCK_SHADER, ShaderFilesPaths{
+        "../data/shaders/block_vertex.glsl","../data/shaders/block_fragment.glsl"
+    });
+    snm.emplace(ShaderName::LINE_SHADER, ShaderFilesPaths{
+            "../data/shaders/line_vertex.glsl", "../data/shaders/line_fragment.glsl"
+    });
+    snm.emplace(ShaderName::SKY_SHADER, ShaderFilesPaths{
+            "../data/shaders/sky_vertex.glsl", "../data/shaders/sky_fragment.glsl"
+    });
+    snm.emplace(ShaderName::TEXT_SHADER, ShaderFilesPaths{
+            "../data/shaders/text_vertex.glsl", "../data/shaders/text_fragment.glsl"
+    });
 
-    //Shader block_shader{"../data/shaders/testing_cube_v.glsl", "../data/shaders/testing_cube_f.glsl"};
-    Shader block_shader{"../data/shaders/testing_cube_v.glsl", "../data/shaders/testing_cube_f.glsl"};
-    Shader line_shader{"../data/shaders/line_vertex.glsl", "../data/shaders/line_fragment.glsl"};
-    Shader sky_shader{"../data/shaders/sky_vertex.glsl", "../data/shaders/sky_fragment.glsl"};
-    Shader text_shader{"../data/shaders/text_vertex.glsl", "../data/shaders/text_fragment.glsl"};
-
+    Model model{snm, gvs};
     if(Model::load_texture("../data/textures/texture.png") != 0){
         std::cerr << "general texture not loaded";
         return -1;
@@ -34,9 +39,8 @@ int main() {
         std::cerr << "sky texture not loaded";
         return -1;
     }
-    Model model{block_shader, line_shader, sky_shader, text_shader, game_view};
 
-    while(!glfwWindowShouldClose(game_view.get_window())) {
+    while(!glfwWindowShouldClose(model.get_window())) {
         //model.loop();
         model.loop();
     }

@@ -60,9 +60,7 @@ int main(){
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glLogicOp(GL_INVERT);
-        glEnable(GL_COLOR_LOGIC_OP);
-        s.set_viewproj(game_view.get_proj_matrix(GameView::proj_type::UI));
+        s.set_viewproj(game_view.get_proj_matrix(GameView::ProjType::UI));
 
         Crosshair crossHair{game_view.get_width(), game_view.get_height(), game_view.get_scale()};
         crossHair.render_lines();

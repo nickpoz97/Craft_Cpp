@@ -24,6 +24,9 @@ std::vector<Standard2DVertex> Crosshair::get_ends_coordinates(int width, int hei
     };
 }
 
-void Crosshair::update(int width, int height, int scale) {
-    SuperClass::update_buffer(get_ends_coordinates(width, height, scale));
+void Crosshair::render_lines() const {
+    glLogicOp(GL_INVERT);
+    glEnable(GL_COLOR_LOGIC_OP);
+    SuperClass::render_lines();
+    glDisable(GL_COLOR_LOGIC_OP);
 }

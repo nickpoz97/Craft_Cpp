@@ -30,7 +30,7 @@ private:
 
     GLFWwindow* create_window(bool is_fullscreen);
 public:
-    enum class proj_type {
+    enum class ProjType {
         PERSP, UI, ORTHO_3D, ITEM
     };
 
@@ -51,7 +51,7 @@ public:
     void set_fov(int fov_degrees);
     void update();
 
-    [[nodiscard]] glm::mat4 get_proj_matrix(proj_type pt) const;
+    [[nodiscard]] glm::mat4 get_proj_matrix(ProjType pt) const;
 };
 
 
