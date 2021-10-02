@@ -8,8 +8,8 @@
 #include <array>
 #include <thread>
 #include <unordered_map>
-#include "BlockMap.hpp"
 #include "vec2.hpp"
+#include "BlockMap.hpp"
 #include "list"
 #include "RenderableEntity.hpp"
 #include "Vertex.hpp"
@@ -46,16 +46,16 @@ private:
 
     BufferType compute_chunk_geometry(const std::array<const Chunk*, 6> &np) const;
     std::array<glm::ivec3, 8> get_chunk_boundaries() const;
+    const std::array<glm::ivec2, 4> xz_boundaries;
 public:
-    Chunk(const glm::vec2 &pq_coordinates, bool init);
+    Chunk(const glm::ivec2 &pq_coordinates, bool init);
     const glm::ivec2 pq;
 
     static constexpr int SIZE = CHUNK_SIZE;
-    int get_min_x() const;
-    int get_max_x() const;
-    int get_min_z() const;
+    static glm::ivec2 get_min_xz(const glm::ivec2& pq);
+    static glm::ivec2 get_max_xz(const glm::ivec2& pq);
 
-    int get_max_z() const;
+    std::array<glm::ivec2, 4> get_xz_boundaries() const;
 
     static constexpr auto get_y_limit = [](){return Y_SIZE - 2;};
     int getHighestBlock() const;

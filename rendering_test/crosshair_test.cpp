@@ -62,8 +62,8 @@ int main(){
 
         s.set_viewproj(game_view.get_proj_matrix(GameView::ProjType::UI));
 
-        Crosshair crossHair{game_view.get_width(), game_view.get_height(), game_view.get_scale()};
-        crossHair.render_lines();
+        //Crosshair crossHair{game_view.get_width(), game_view.get_height(), game_view.get_scale()};
+        Crosshair{game_view.get_width(), game_view.get_height(), game_view.get_scale()}.render_lines();
 
         glfwSwapBuffers(game_view.get_window());
         glfwPollEvents();

@@ -9,7 +9,13 @@
 #include "noise.hpp"
 #include "CubicObject.hpp"
 
-Chunk::Chunk(const glm::vec2 &pq_coordinates, bool init) : block_map{}, pq{pq_coordinates}, SuperClass{}
+Chunk::Chunk(const glm::ivec2 &pq_coordinates, bool init) : block_map{}, pq{pq_coordinates}, SuperClass{},
+    xz_boundaries{{
+        {get_min_xz(pq_coordinates)[0], get_min_xz(pq_coordinates)[1]},
+        {get_max_xz(pq_coordinates)[0], get_min_xz(pq_coordinates)[1]},
+        {get_min_xz(pq_coordinates)[0], get_max_xz(pq_coordinates)[1]},
+        {get_max_xz(pq_coordinates)[0], get_max_xz(pq_coordinates)[1]}
+    }}
 {
     if(init){ init_chunk();}
 };
@@ -267,7 +273,7 @@ void Chunk::generate_blockmap() {
 }
 
 bool Chunk::is_visible(const glm::mat4 &viewproj) const {
-    glm::ivec3 result{};
+    /*glm::ivec3 result{};
 
     for(const auto& p : get_chunk_boundaries()){
         glm::vec4 clip_point = viewproj * glm::vec4{p, 1};
@@ -279,16 +285,21 @@ bool Chunk::is_visible(const glm::mat4 &viewproj) const {
         }
         result += test_vector;
     }
-    return ((result.x == 0 || result.y == 0) && glm::abs(result.z) < 8);
+    return ((result.x == 0 || result.y == 0 || result.z == 0)) && glm::abs(result.z) < 8)*/;
+    bool in{}, out{};
+    for(const auto& p : xz_boundaries){
+        glm::vec4 clip_point = viewproj * glm::vec4{p[0], 0, p[1], 1};
+        clip_point = glm::abs(clip_point) / clip_point.w;
+
+        bool is_in = clip_point.x < 1 && clip_point.z < 1;
+        if(is_in){
+            return true;
+        }
+    }
+    return false;
 }
 
 std::array<glm::ivec3, 8> Chunk::get_chunk_boundaries() const {
-    std::array<glm::ivec2, 4> xz_boundaries{{
-        {get_min_x(), get_min_z()},
-        {get_max_x(), get_min_z()},
-        {get_min_x(), get_max_z()},
-        {get_max_x(), get_max_z()},
-    }};
     std::array<glm::ivec3, 8> boundaries{};
     auto it{boundaries.begin()};
 
@@ -332,36 +343,25 @@ void Chunk::render_object(const std::array<const Chunk*, 6>& neighbors_refs) con
 }
 
 void Chunk::init_chunk() {
-    init_chunk_threads.emplace_front(&Chunk::generate_blockmap, this);
+    init_chunk_threads.emplace_back(&Chunk::generate_blockmap, this);
 }
 
 void Chunk::wait_threads() {
-    /*while(!init_chunk_threads.empty()){
-        std::thread& t = init_chunk_threads.front();
+    while(!init_chunk_threads.empty()) {
+        std::thread &t = init_chunk_threads.front();
 #ifdef DEBUG
         std::cout << t.get_id() << '\t';
         std::thread::id id{};
 #endif
         t.join();
-        init_chunk_threads.pop_front();*/
-    for(auto& t : init_chunk_threads){
-        t.join();
+        init_chunk_threads.pop_front();
     }
-    init_chunk_threads.clear();
 }
 
-int Chunk::get_min_x() const {
-    return pq.x * Chunk::SIZE - 1;
+glm::ivec2 Chunk::get_min_xz(const glm::ivec2& pq) {
+    return pq * SIZE - 1;
 }
 
-int Chunk::get_max_x() const {
-    return get_min_x() + Chunk::SIZE + 1;
-}
-
-int Chunk::get_min_z() const {
-    return pq.y * Chunk::SIZE - 1;
-}
-
-int Chunk::get_max_z() const{
-    return get_min_z() + Chunk::SIZE + 1;
+glm::ivec2 Chunk::get_max_xz(const glm::ivec2& pq) {
+    return get_min_xz(pq) + SIZE;
 }

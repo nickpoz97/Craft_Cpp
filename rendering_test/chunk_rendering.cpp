@@ -14,7 +14,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void processInput(GLFWwindow *window);
 
-glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraPos   = glm::vec3(0.0f, 20.0f, 0.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -78,8 +78,8 @@ int main() {
 
     Timer t;
     std::list<Chunk> chunks{};
-    for(int dp = -3 ; dp < 3 ; dp++){
-        for(int dq = -3 ; dq < 3 ; dq++){
+    for(int dp = 0 ; dp < 4 ; dp++){
+        for(int dq = 0 ; dq < 4 ; dq++){
             chunks.emplace_back(glm::ivec2{dp,dq}, true);
         }
     }
@@ -95,18 +95,22 @@ int main() {
 #ifdef DEBUG
     std::cout << "debug build\n";
 #endif
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
     while (!glfwWindowShouldClose(game_view.get_window())) {
         processInput(game_view.get_window());
 
         processInput(game_view.get_window());
-        glEnable(GL_DEPTH_TEST);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
         s.set_viewproj(proj * view);
         for (const Chunk &c: chunks) {
-            c.render_object({});
+            if(c.is_visible(view * proj)) {
+                c.render_object({});
+            }
         }
+        //chunks.front().render_object({});
         glfwSwapBuffers(game_view.get_window());
         glfwPollEvents();
     }
