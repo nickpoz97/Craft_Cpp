@@ -9,7 +9,7 @@
 #include <thread>
 #include <unordered_map>
 #include "vec2.hpp"
-#include "BlockMap.hpp"
+#include "map_utils.hpp"
 #include "list"
 #include "RenderableEntity.hpp"
 #include "Vertex.hpp"

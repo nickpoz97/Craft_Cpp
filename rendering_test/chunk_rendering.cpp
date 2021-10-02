@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <Geometry/ChunkMap.hpp>
 #include "../src/Geometry/Chunk.hpp"
 #include "../src/Interaction/GameView.hpp"
 #include "../src/Rendering/Shader.hpp"
@@ -15,7 +16,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void processInput(GLFWwindow *window);
 
 glm::vec3 cameraPos   = glm::vec3(0.0f, 20.0f, 0.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, .0f) - cameraPos;
 glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f, 0.0f);
 
 bool firstMouse = true;
@@ -77,11 +78,14 @@ int main() {
     glm::mat4 proj{game_view.get_proj_matrix(GameView::ProjType::PERSP)};
 
     Timer t;
-    std::list<Chunk> chunks{};
+    ChunkMap chunks{};
     for(int dp = 0 ; dp < 4 ; dp++){
         for(int dq = 0 ; dq < 4 ; dq++){
-            chunks.emplace_back(glm::ivec2{dp,dq}, true);
+            chunks.emplace(glm::ivec2{dp, dq}, Chunk{{dp, dq}, false});
         }
+    }
+    for(auto& pair : chunks){
+        pair.second.init_chunk();
     }
     Chunk::wait_threads();
     std::cout << "Time elapsed: " << t.elapsed() << " seconds\n";
@@ -105,9 +109,10 @@ int main() {
 
         glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
         s.set_viewproj(proj * view);
-        for (const Chunk &c: chunks) {
+        for (const auto & pair: chunks) {
+            const Chunk& c = pair.second;
             if(c.is_visible(view * proj)) {
-                c.render_object({});
+                c.render_object(chunks.chunk_neighbors_pointers(c.pq));
             }
         }
         //chunks.front().render_object({});

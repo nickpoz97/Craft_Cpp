@@ -119,8 +119,8 @@ int Chunk::count_exposed_faces(const MyMap& map, const opaque_matrix_type &opaqu
         std::array<bool, 6> f{
             !opaque[v.x - 1][v.y][v.z],
             !opaque[v.x + 1][v.y][v.z],
-            !opaque[v.x][v.y + 1][v.z],
             !opaque[v.x][v.y - 1][v.z] && (abs_pos.y > 0), // no underground
+            !opaque[v.x][v.y + 1][v.z],
             !opaque[v.x][v.y][v.z - 1],
             !opaque[v.x][v.y][v.z + 1]
         };
