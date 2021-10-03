@@ -4,7 +4,6 @@
 
 #include <numeric>
 #include <iostream>
-
 #include "Chunk.hpp"
 #include "noise.hpp"
 #include "CubicObject.hpp"
@@ -34,8 +33,9 @@ int Chunk::getHighestBlock() const{
     return highest_y;
 }
 
-TileBlock Chunk::get_block(const glm::ivec3& block_pos) const{
-    return TileBlock(block_map.at(block_pos));
+BlockType Chunk::get_block(const glm::ivec3& block_pos) const{
+    auto it = block_map.find(block_pos);
+    return (it == block_map.end()) ? BlockType::EMPTY : it->second;
 }
 
 Chunk::operator bool() const {
@@ -364,4 +364,67 @@ glm::ivec2 Chunk::get_min_xz(const glm::ivec2& pq) {
 
 glm::ivec2 Chunk::get_max_xz(const glm::ivec2& pq) {
     return get_min_xz(pq) + SIZE;
+}
+
+int Chunk::get_min_x() const {
+    return xz_boundaries[0][0];
+}
+
+int Chunk::get_min_z() const {
+    return xz_boundaries[0][1];
+}
+
+int Chunk::get_max_x() const {
+    return xz_boundaries[3][0];
+}
+
+int Chunk::get_max_z() const {
+    return xz_boundaries[3][1];
+}
+
+bool Chunk::check_border(const glm::ivec3 &pos, const::glm::ivec3& direction) const {
+    const glm::ivec3 new_pos = pos + direction;
+    return
+        new_pos.x <= get_min_x() || new_pos.x >= get_max_x() || new_pos.z <= get_min_z() || new_pos.z >= get_max_z();
+}
+
+std::array<bool, 6> Chunk::get_visible_faces(TileBlock w, const glm::ivec3 &pos, const ChunkMap &chunkMap) const {
+    static constexpr std::array<glm::ivec3, 6 >offsets{{
+        {-1, 0, 0},
+        {1, 0, 0},
+        {0, 1, 0},
+        {0, -1, 0},
+        {0, 0, -1},
+        {0, 0, 1},
+    }};
+
+    std::array<bool, 6> visible_faces{};
+    auto visible_faces_it = visible_faces.begin();
+
+    if(w.is_transparent() || is_on_border(pos)){
+        return {};
+    }
+    if(w.is_plant()){
+        return {1,1,0,0,1,1};
+    }
+    auto faces_it = visible_faces.begin();
+    for(const glm::ivec3& o : offsets){
+        TileBlock tileBlock{get_block(pos + o, chunkMap)};
+        *(faces_it++) = tileBlock.is_transparent();
+    }
+    return visible_faces;
+}
+
+bool Chunk::is_on_border(const glm::ivec3& pos) const {
+    return check_border(pos, {});
+}
+
+BlockType Chunk::get_block(const glm::ivec3 &pos, const ChunkMap& chunk_map) const {
+    auto result = chunk_map.find(Chunk::chunked(pos));
+
+    if(result == chunk_map.end()){
+        // this should never happen
+        return BlockType::EMPTY;
+    }
+    return result->second.get_block(pos);
 }

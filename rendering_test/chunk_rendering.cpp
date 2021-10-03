@@ -3,7 +3,6 @@
 //
 
 #include <iostream>
-#include <Geometry/ChunkMap.hpp>
 #include "../src/Geometry/Chunk.hpp"
 #include "../src/Interaction/GameView.hpp"
 #include "../src/Rendering/Shader.hpp"
@@ -112,7 +111,7 @@ int main() {
         for (const auto & pair: chunks) {
             const Chunk& c = pair.second;
             if(c.is_visible(view * proj)) {
-                c.render_object(chunks.chunk_neighbors_pointers(c.pq));
+                c.render_object({});
             }
         }
         //chunks.front().render_object({});

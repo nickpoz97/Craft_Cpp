@@ -20,7 +20,7 @@ static constexpr int ALIGN_RIGHT = 2;
 
 // config
 static constexpr bool SHOW_LIGHT = true;
-static constexpr bool SHOW_PLANTS = true;
+static constexpr bool SHOW_PLANTS = false;
 static constexpr bool SHOW_TREES = true;
 static constexpr bool SHOW_CLOUDS = true;
 

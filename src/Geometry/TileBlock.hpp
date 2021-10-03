@@ -79,7 +79,7 @@ struct TileCube {
 
     class Iterator : public std::iterator<std::output_iterator_tag, int>{
     public:
-        Iterator(const int* tile_pointer, bool is_plant);
+        Iterator(const int* tile_pointer);
         int operator*();
         const int* operator->();
         Iterator& operator++();
@@ -87,12 +87,10 @@ struct TileCube {
         bool operator!=(const Iterator& b);
     private:
         const int* tile_pointer;
-        const bool is_plant;
-        int face_index{};
     };
 
-    Iterator begin(bool is_plant) const;
-    Iterator end(bool is_plant) const;
+    Iterator begin() const;
+    Iterator end() const;
 };
 
 class TileBlock{
@@ -102,7 +100,7 @@ public:
     static const std::array<TileCube, 256> tiles;
     [[nodiscard]] BlockType get_index() const;
 
-    explicit TileBlock(BlockType block_type);
+    TileBlock(BlockType block_type);
     TileBlock() = default;
     TileBlock& operator=(const TileBlock& tileBlock) = default;
     TileBlock(const TileBlock& other) = default;
@@ -114,10 +112,10 @@ public:
     [[nodiscard]] bool is_empty() const;
     [[nodiscard]] bool is_user_buildable() const;
 
-    explicit operator int() const;
+    operator BlockType() const;
 
-    TileCube::Iterator begin();
-    TileCube::Iterator end();
+    TileCube::Iterator begin() const;
+    TileCube::Iterator end() const;
 
     static constexpr std::array items{
             GRASS,

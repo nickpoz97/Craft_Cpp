@@ -268,9 +268,9 @@ std::pair<bool, glm::vec3> Player::collide(int height, const std::unordered_map<
 
     for(int y_step = 0; y_step < height ; ++y_step){
         glm::bvec3 enable{
-                c.get_block(block_pos[0] + glm::vec3{signs.x, 0, 0} * pad).is_obstacle(),
-                c.get_block(block_pos[1] + glm::vec3{0, signs.y, 0} * pad).is_obstacle(),
-                c.get_block(block_pos[2] + glm::vec3{0, 0, signs.z} * pad).is_obstacle()
+                TileBlock{c.get_block(block_pos[0] + glm::vec3{signs.x, 0, 0} * pad)}.is_obstacle(),
+                TileBlock{c.get_block(block_pos[1] + glm::vec3{0, signs.y, 0} * pad)}.is_obstacle(),
+                TileBlock{c.get_block(block_pos[2] + glm::vec3{0, 0, signs.z} * pad)}.is_obstacle()
         };
 
         collision_point.x = (enable.x) ? int_pos.x + signs.x * pad : collision_point.x;

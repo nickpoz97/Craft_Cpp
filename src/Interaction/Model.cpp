@@ -95,7 +95,7 @@ Chunk &Model::get_chunk_at(const glm::ivec2 &pq){
 
 TileBlock Model::get_block(const glm::ivec3 position) {
     const Chunk& chunk = get_chunk_at(Chunk::chunked(position));
-    return (chunk) ? chunk.get_block(position) : TileBlock{};
+    return chunk.get_block(position);
 }
 
 void Model::builder_block(const glm::ivec3 &pos, BlockType w = BlockType::EMPTY)  {

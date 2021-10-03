@@ -129,8 +129,8 @@ bool TileBlock::is_empty() const {
     return tilecube_index == BlockType::EMPTY;
 }
 
-TileBlock::operator int() const {
-    return static_cast<int>(tilecube_index);
+TileBlock::operator BlockType() const {
+    return tilecube_index;
 }
 
 BlockType TileBlock::get_index() const {
@@ -143,25 +143,24 @@ bool TileBlock::is_user_buildable() const {
     return is_destructable();
 }
 
-TileCube::Iterator TileBlock::begin() {
-    return tiles[get_index()].begin(is_plant());
+TileCube::Iterator TileBlock::begin() const {
+    return tiles[get_index()].begin();
 }
 
-TileCube::Iterator TileBlock::end() {
-    return tiles[get_index()].end(is_plant());
+TileCube::Iterator TileBlock::end() const {
+    return tiles[get_index()].end();
 }
 
-TileCube::Iterator TileCube::begin(bool is_plant) const{
-    return {reinterpret_cast<const int*>(this), is_plant};
+TileCube::Iterator TileCube::begin() const{
+    return {reinterpret_cast<const int*>(this)};
 }
 
-TileCube::Iterator TileCube::end(bool is_plant) const{
+TileCube::Iterator TileCube::end() const{
     const int* begin_ref{reinterpret_cast<const int*>(this)};
-    int n_tiles = is_plant ? 4 : 6;
-    return {begin_ref + n_tiles, is_plant};
+    return {begin_ref + 6};
 }
 
-TileCube::Iterator::Iterator(const int *tile_pointer, bool is_plant) : tile_pointer{tile_pointer}, is_plant{is_plant} {}
+TileCube::Iterator::Iterator(const int *tile_pointer) : tile_pointer{tile_pointer} {}
 
 int TileCube::Iterator::operator*() {
     return *tile_pointer;
@@ -172,9 +171,7 @@ const int *TileCube::Iterator::operator->() {
 }
 
 TileCube::Iterator &TileCube::Iterator::operator++() {
-    bool skip_updown = is_plant && (face_index == 1);
-    tile_pointer += skip_updown ? 3 : 1;
-    face_index += skip_updown ? 3 : 1;
+    ++tile_pointer;
     return *this;
 }
 

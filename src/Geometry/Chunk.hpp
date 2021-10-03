@@ -15,6 +15,9 @@
 #include "Vertex.hpp"
 #include "../costants.hpp"
 
+class Chunk;
+using ChunkMap = std::unordered_map<glm::ivec2, Chunk>;
+
 class Chunk : public RenderableEntity<CubeVertex>{
 private:
     static inline std::list<std::thread> init_chunk_threads{};
@@ -47,21 +50,29 @@ private:
     BufferType compute_chunk_geometry(const std::array<const Chunk*, 6> &np) const;
     std::array<glm::ivec3, 8> get_chunk_boundaries() const;
     const std::array<glm::ivec2, 4> xz_boundaries;
+
+    bool check_border(const glm::ivec3 &pos, const::glm::ivec3& direction) const;
+    bool is_on_border(const glm::ivec3& pos) const;
+    std::array<bool, 6> get_visible_faces(TileBlock w, const glm::ivec3 &pos, const ChunkMap &chunkMap) const;
+    BlockType get_block(const glm::ivec3 &pos, const ChunkMap& chunk_map) const;
 public:
     Chunk(const glm::ivec2 &pq_coordinates, bool init);
     const glm::ivec2 pq;
+
+    int get_min_x() const;
+    int get_min_z() const;
+    int get_max_x() const;
+    int get_max_z() const;
 
     static constexpr int SIZE = CHUNK_SIZE;
     static glm::ivec2 get_min_xz(const glm::ivec2& pq);
     static glm::ivec2 get_max_xz(const glm::ivec2& pq);
 
-    std::array<glm::ivec2, 4> get_xz_boundaries() const;
-
     static constexpr auto get_y_limit = [](){return Y_SIZE - 2;};
     int getHighestBlock() const;
-    TileBlock get_block(const glm::ivec3& block_pos) const;
+    BlockType get_block(const glm::ivec3& block_pos) const;
 
-    explicit operator bool() const;
+    operator bool() const;
 
     void set_block(const glm::ivec3& position, BlockType w);
     //bool is_visible(const Frustum& frustum) const;
