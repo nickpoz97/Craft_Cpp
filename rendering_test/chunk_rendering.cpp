@@ -81,13 +81,18 @@ int main() {
     ChunkMap chunks{};
     for(int dp = -5 ; dp < 5 ; dp++){
         for(int dq = -5 ; dq < 5 ; dq++){
-            chunks.emplace(glm::ivec2{dp, dq}, Chunk{{dp, dq}, false});
+            chunks.emplace(glm::ivec2{dp, dq}, Chunk{{dp, dq}, false, chunks});
         }
     }
     for(auto& pair : chunks){
         pair.second.init_chunk();
     }
     Chunk::wait_threads();
+
+    std::list<std::thread> rendering_threads{};
+    for(auto& pair : chunks){
+        pair.second.update_buffer();
+    }
     std::cout << "Time elapsed: " << t.elapsed() << " seconds\n";
 
 
@@ -111,9 +116,9 @@ int main() {
         s.set_viewproj(proj * view);
         for (const auto & pair: chunks) {
             const Chunk& c = pair.second;
-            if(c.is_visible(view * proj)) {
+            if(c.is_visible(proj * view)) {
                 //fmt::print("pq: {}{}, min_x: {}, max_x: {}, min_z: {}, max_z: {}\n", c.pq.x, c.pq.y ,c.get_min_x(), c.get_max_x(), c.get_min_z(), c.get_max_x());
-                c.render_object(chunks);
+                c.render_object();
             }
         }
         //chunks.front().render_object({});

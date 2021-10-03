@@ -8,8 +8,9 @@
 #include "noise.hpp"
 #include "CubicObject.hpp"
 
-Chunk::Chunk(const glm::ivec2 &pq_coordinates, bool init) : block_map{}, pq{pq_coordinates}, SuperClass{},
-    xz_boundaries{{
+Chunk::Chunk(const glm::ivec2 &pq_coordinates, bool init, const ChunkMap &chunkMap)
+        : block_map{}, pq{pq_coordinates}, SuperClass{}, chunkMap{chunkMap},
+          xz_boundaries{{
         {get_min_xz(pq_coordinates)[0], get_min_xz(pq_coordinates)[1]},
         {get_max_xz(pq_coordinates)[0], get_min_xz(pq_coordinates)[1]},
         {get_min_xz(pq_coordinates)[0], get_max_xz(pq_coordinates)[1]},
@@ -43,8 +44,8 @@ Chunk::operator bool() const {
     return !block_map.empty();
 }
 
-Chunk::BufferType Chunk::compute_chunk_geometry(const ChunkMap &chunkMap) const {
-    int n_faces = count_exposed_faces(chunkMap);
+Chunk::BufferType Chunk::compute_chunk_geometry() const {
+    int n_faces = count_exposed_faces();
     // each visible face has INDICES_FACE_COUNT indices that represent the triangle
     BufferType local_buffer = std::vector<CubeVertex>(n_faces * INDICES_FACE_COUNT);
     auto v_it = local_buffer.begin();
@@ -54,17 +55,17 @@ Chunk::BufferType Chunk::compute_chunk_geometry(const ChunkMap &chunkMap) const 
         const TileBlock& tileBlock{kv.second};
 
         // generate geometry of actual block (value returned by function is first free position in buffer)
-        v_it = generate_block_geometry(v_it, block_pos, tileBlock, get_visible_faces(kv.second, kv.first, chunkMap));
+        v_it = generate_block_geometry(v_it, block_pos, tileBlock, get_visible_faces(kv.second, kv.first));
     }
 
     return local_buffer;
 }
 
-int Chunk::count_exposed_faces(const ChunkMap &chunkMap) const {
+int Chunk::count_exposed_faces() const {
     int n_faces = 0;
 
     for(const auto& pair : block_map) {
-        const auto& visible_faces = get_visible_faces(pair.second, pair.first, chunkMap);
+        const auto& visible_faces = get_visible_faces(pair.second, pair.first);
         n_faces += std::accumulate(visible_faces.begin(), visible_faces.end(), 0);
     }
     return n_faces;
@@ -83,8 +84,9 @@ Chunk::BufferType::iterator Chunk::generate_block_geometry(BufferType::iterator 
     return cube.end();
 }
 
-void Chunk::update_buffer(const ChunkMap &chunkMap) const {
-    SuperClass::update_buffer(compute_chunk_geometry(chunkMap));
+void Chunk::update_buffer() const {
+    SuperClass::update_buffer(compute_chunk_geometry());
+    dirty = false;
 }
 
 bool Chunk::is_dirty() const {
@@ -157,7 +159,6 @@ void Chunk::generate_blockmap() {
             }
         }
     }
-    dirty = true;
 }
 
 bool Chunk::is_visible(const glm::mat4 &viewproj) const {
@@ -212,9 +213,9 @@ glm::ivec2 Chunk::chunked(const glm::vec3& position) {
     };
 }
 
-void Chunk::render_object(const ChunkMap &chunkMap) const{
+void Chunk::render_object() const{
     if(dirty && !block_map.empty()){
-        update_buffer(chunkMap);
+        update_buffer();
     }
     dirty = false;
     SuperClass ::render_object();
@@ -266,7 +267,7 @@ bool Chunk::check_border(const glm::ivec3 &pos, const::glm::ivec3& direction) co
         new_pos.x <= get_min_x() || new_pos.x >= get_max_x() || new_pos.z <= get_min_z() || new_pos.z >= get_max_z();
 }
 
-std::array<bool, 6> Chunk::get_visible_faces(TileBlock w, const glm::ivec3 &pos, const ChunkMap &chunkMap) const {
+std::array<bool, 6> Chunk::get_visible_faces(TileBlock w, const glm::ivec3 &pos) const {
     //return {1,1,1,1,1,1};
     static constexpr std::array<glm::ivec3, 6 >offsets{{
         {-1, 0, 0},
