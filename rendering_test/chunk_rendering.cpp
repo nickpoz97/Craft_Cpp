@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <fmt/ostream.h>
 #include "../src/Geometry/Chunk.hpp"
 #include "../src/Interaction/GameView.hpp"
 #include "../src/Rendering/Shader.hpp"
@@ -78,8 +79,8 @@ int main() {
 
     Timer t;
     ChunkMap chunks{};
-    for(int dp = 0 ; dp < 4 ; dp++){
-        for(int dq = 0 ; dq < 4 ; dq++){
+    for(int dp = -5 ; dp < 5 ; dp++){
+        for(int dq = -5 ; dq < 5 ; dq++){
             chunks.emplace(glm::ivec2{dp, dq}, Chunk{{dp, dq}, false});
         }
     }
@@ -111,7 +112,8 @@ int main() {
         for (const auto & pair: chunks) {
             const Chunk& c = pair.second;
             if(c.is_visible(view * proj)) {
-                c.render_object({});
+                //fmt::print("pq: {}{}, min_x: {}, max_x: {}, min_z: {}, max_z: {}\n", c.pq.x, c.pq.y ,c.get_min_x(), c.get_max_x(), c.get_min_z(), c.get_max_x());
+                c.render_object(chunks);
             }
         }
         //chunks.front().render_object({});

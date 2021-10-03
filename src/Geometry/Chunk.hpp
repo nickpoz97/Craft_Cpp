@@ -24,8 +24,8 @@ private:
     using SuperClass = RenderableEntity<CubeVertex>;
     using BufferType = std::vector<CubeVertex>;
 
-    using MyMap = std::unordered_map<glm::ivec3, BlockType>;
-    MyMap block_map{};
+    using BlockMap = std::unordered_map<glm::ivec3, BlockType>;
+    BlockMap block_map{};
     mutable bool dirty{false};
 
     // XZ_SIZE is the size of 3 chunks
@@ -37,17 +37,12 @@ private:
     using opaque_matrix_type = std::array<std::array<std::array<bool,XZ_SIZE>,Y_SIZE>,XZ_SIZE>;
     using height_matrix_type = std::array<std::array<char,XZ_SIZE>,XZ_SIZE>;
 
-    void populate_opaque_and_height_matrix(
-        const std::array<const Chunk*, 6> &np,
-        const glm::ivec3 &offset,
-        opaque_matrix_type &opaque,
-        height_matrix_type &highest
-    ) const;
-    int count_exposed_faces(const MyMap& map, const opaque_matrix_type &opaque, const glm::ivec3& offset) const;
-    BufferType::iterator generate_block_geometry(const opaque_matrix_type &opaque, BufferType::iterator vertex_it, const glm::ivec3& block_abs_pos,
-                                                             const height_matrix_type &highest, const glm::ivec3& v, TileBlock w) const;
+    int count_exposed_faces(const ChunkMap &chunkMap) const;
+    BufferType::iterator
+    generate_block_geometry(BufferType::iterator vertex_it, const glm::ivec3 &block_pos, TileBlock tileBlock,
+                            const std::array<bool, 6>& visible_faces) const;
 
-    BufferType compute_chunk_geometry(const std::array<const Chunk*, 6> &np) const;
+    BufferType compute_chunk_geometry(const ChunkMap &chunkMap) const;
     std::array<glm::ivec3, 8> get_chunk_boundaries() const;
     const std::array<glm::ivec2, 4> xz_boundaries;
 
@@ -77,13 +72,13 @@ public:
     void set_block(const glm::ivec3& position, BlockType w);
     //bool is_visible(const Frustum& frustum) const;
     bool is_visible(const glm::mat4 &viewproj) const;
-    void update_buffer(const std::array<const Chunk*, 6> &np) const;
+    void update_buffer(const ChunkMap &chunkMap) const;
     bool is_dirty() const;
 
     static glm::ivec2 chunked(const glm::vec3& position);
     static int chunked(int val);
 
-    void render_object(const std::array<const Chunk*, 6>& neighbors_refs) const;
+    void render_object(const ChunkMap &chunkMap) const;
     void init_chunk();
     static void wait_threads();
     void generate_blockmap();

@@ -49,7 +49,13 @@ public:
     void print_vertex_info();
 };
 
-using Plant = CubicObject<4>;
+class Plant : public CubicObject<4>{
+private:
+    using super = CubicObject<4>;
+public:
+    Plant(const BlockType &block_type, const glm::vec3 &center_position,
+          float asy_rotation, cube_vertex_iterator_t vertices_it);
+};
 
 class Cube : public CubicObject<6>{
 private:

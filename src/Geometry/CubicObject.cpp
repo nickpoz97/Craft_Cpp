@@ -38,21 +38,23 @@ CubicObject<n_faces>::CubicObject(const BlockType &block_type, const std::array<
     auto face_uvs_it = uvs.begin();
     auto face_nrm_it = normals.begin();
     auto tile_it = tile_block.begin();
+    auto increment_geometry_iterators = [&](){++face_v_it; ++face_uvs_it; ++face_nrm_it; ++tile_it;};
+
     auto visible_faces_it = visible_faces.begin();
 
     for(auto face_ind_it{indices.begin()} ; face_ind_it != indices.end() ; ++face_ind_it){
         // test if face is visible
         if (!*(visible_faces_it++)) {
+            increment_geometry_iterators();
             continue;
         }
         float du = static_cast<float>(*tile_it % 16) * S;
         float dv = static_cast<float>(*tile_it / 16) * S;
-        ++tile_it;
 
         //obtain arrays of actual face elements
-        const auto& face_vertices = *(face_v_it++);
-        const glm::vec3& face_normal = *(face_nrm_it++);
-        const auto& face_uvs = *(face_uvs_it++);
+        const auto& face_vertices = *(face_v_it);
+        const glm::vec3& face_normal = *(face_nrm_it);
+        const auto& face_uvs = *(face_uvs_it);
         // iterate through actual face indices
         for(int i : *face_ind_it) {
             auto& actual_vertex = *(vertices_it++);
@@ -67,6 +69,7 @@ CubicObject<n_faces>::CubicObject(const BlockType &block_type, const std::array<
                     dv + (face_uvs[i].y ? B : A)
             };
         }
+        increment_geometry_iterators();
     }
 }
 
@@ -183,3 +186,8 @@ const CubicObject<4>::UvsMatrix CubicObject<4>::uvs{{
 
 template class CubicObject<6>;
 template class CubicObject<4>;
+
+Plant::Plant(const BlockType &block_type, const glm::vec3 &center_position, float asy_rotation,
+             cube_vertex_iterator_t vertices_it) :
+             super{block_type, {1,1,1,1}, center_position, asy_rotation, vertices_it}
+             {}

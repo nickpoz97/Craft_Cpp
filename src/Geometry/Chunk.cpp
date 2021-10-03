@@ -43,21 +43,8 @@ Chunk::operator bool() const {
     return !block_map.empty();
 }
 
-Chunk::BufferType Chunk::compute_chunk_geometry(const std::array<const Chunk*, 6> &np) const {
-    opaque_matrix_type opaque{};
-    height_matrix_type highest{};
-
-    // offset is the beginning of the chunk
-    glm::ivec3 offset{
-        pq.x * Chunk::SIZE - Chunk::SIZE - 1,
-        -1,
-        pq.y * Chunk::SIZE - Chunk::SIZE - 1
-    };
-
-    // this matrices store info about visibility
-    populate_opaque_and_height_matrix(np, offset, opaque, highest);
-
-    int n_faces = count_exposed_faces(block_map, opaque, offset);
+Chunk::BufferType Chunk::compute_chunk_geometry(const ChunkMap &chunkMap) const {
+    int n_faces = count_exposed_faces(chunkMap);
     // each visible face has INDICES_FACE_COUNT indices that represent the triangle
     BufferType local_buffer = std::vector<CubeVertex>(n_faces * INDICES_FACE_COUNT);
     auto v_it = local_buffer.begin();
@@ -67,136 +54,37 @@ Chunk::BufferType Chunk::compute_chunk_geometry(const std::array<const Chunk*, 6
         const TileBlock& tileBlock{kv.second};
 
         // generate geometry of actual block (value returned by function is first free position in buffer)
-        v_it = generate_block_geometry(opaque, v_it, block_pos, highest, block_pos - offset, tileBlock);
+        v_it = generate_block_geometry(v_it, block_pos, tileBlock, get_visible_faces(kv.second, kv.first, chunkMap));
     }
 
     return local_buffer;
 }
 
-void Chunk::populate_opaque_and_height_matrix(const std::array<const Chunk*, 6> &np,
-                                              const glm::ivec3 &offset,
-                                              opaque_matrix_type &opaque,
-                                              height_matrix_type &highest) const{
-    // analyze neighbors maps
-    for(const auto* neighbor_ref : np){
-        // check if neighbor is not present or not instantiated
-        if(!neighbor_ref || get_chunk_distance(*this, *neighbor_ref) > 1){
-            continue;
-        }
-        // kv is key-value (position-item)
-        for(const auto& kv : neighbor_ref->block_map){
-            const glm::ivec3& block_pos{kv.first};
-            const TileBlock& tileBlock{kv.second};
-            // v is the pos relative to the beginning of the chunk (o)
-            auto v = block_pos - offset;
-
-#ifdef DEBUG
-            //assert(opaque[v.x][v.y][v.z] == 0);
-#endif
-            opaque[v.x][v.y][v.z] = !tileBlock.is_transparent();
-            if (opaque[v.x][v.y][v.z]) {
-                // update highest block in the xz position
-                highest[v.x][v.z] = glm::max(highest[v.x][v.z], static_cast<char>(v.y));
-            }
-        }
-    }
-}
-
-int Chunk::count_exposed_faces(const MyMap& map, const opaque_matrix_type &opaque, const glm::ivec3& offset) const {
-    int miny = 256;
-    int maxy = 0;
+int Chunk::count_exposed_faces(const ChunkMap &chunkMap) const {
     int n_faces = 0;
 
-    for(const auto& kv : map) {
-        glm::ivec3 abs_pos{kv.first};
-        TileBlock tileBlock{kv.second};
-        /*if(tileBlock.is_empty()){
-            continue;
-        }*/
-        auto v = abs_pos - offset;
-
-        // if block next to this face is opaque, no need to render
-        std::array<bool, 6> f{
-            !opaque[v.x - 1][v.y][v.z],
-            !opaque[v.x + 1][v.y][v.z],
-            !opaque[v.x][v.y - 1][v.z] && (abs_pos.y > 0), // no underground
-            !opaque[v.x][v.y + 1][v.z],
-            !opaque[v.x][v.y][v.z - 1],
-            !opaque[v.x][v.y][v.z + 1]
-        };
-
-        // count if almost one side is visible
-        int total = std::accumulate(f.begin(), f.end(), 0);
-#ifdef DEBUG
-        assert(total >= 0 && total <= 6);
-#endif
-        if(total == 0){
-            continue;
-        }
-        if(tileBlock.is_plant()){
-            total = 4;
-        }
-
-        n_faces += total;
+    for(const auto& pair : block_map) {
+        const auto& visible_faces = get_visible_faces(pair.second, pair.first, chunkMap);
+        n_faces += std::accumulate(visible_faces.begin(), visible_faces.end(), 0);
     }
     return n_faces;
 }
 
-Chunk::BufferType::iterator Chunk::generate_block_geometry(const opaque_matrix_type &opaque,
-                                                                       BufferType::iterator vertex_it,
-                                                                       const glm::ivec3& block_abs_pos,
-                                                                       const height_matrix_type &highest,
-                                                                       const glm::ivec3& v,
-                                                                       TileBlock w) const {
-    std::array<bool, 6> f{
-            !opaque[v.x - 1][v.y][v.z],
-            !opaque[v.x + 1][v.y][v.z],
-            !opaque[v.x][v.y + 1][v.z],
-            !opaque[v.x][v.y - 1][v.z] && (block_abs_pos.y > 0), // no underground
-            !opaque[v.x][v.y][v.z - 1],
-            !opaque[v.x][v.y][v.z + 1]
-    };
-#ifdef DEBUG
-    auto begin_it = vertex_it;
-#endif
-
-    if(w.is_plant()){
-        Plant plant{w.get_index(), {1, 1, 1, 1}, block_abs_pos, simplex2(block_abs_pos.x, block_abs_pos.z, 4, 0.5, 2) * 360, vertex_it};
-#ifdef DEBUG
-        assert(begin_it + 4 * INDICES_FACE_COUNT == plant.end());
-#endif
+Chunk::BufferType::iterator Chunk::generate_block_geometry(BufferType::iterator vertex_it, const glm::ivec3 &block_pos, TileBlock tileBlock,
+                               const std::array<bool, 6>& visible_faces) const {
+    if(tileBlock.is_plant()){
+        Plant plant{tileBlock.get_index(), block_pos, simplex2(block_pos.x, block_pos.z, 4, 0.5, 2) * 360, vertex_it};
         return plant.end();
     }
-
-    else /*if(!w.is_empty())*/{
-        // TODO check vertex_it
-        Cube cube{w.get_index(), f, block_abs_pos, vertex_it};
-#ifdef DEBUG
-        int visible_faces = std::accumulate(f.begin(), f.end(), 0);
-        assert(begin_it + visible_faces * INDICES_FACE_COUNT == cube.end());
-#endif
-        return cube.end();
-    }
-    /*else{
+    if(tileBlock.is_empty() || visible_faces.empty()){
         return vertex_it;
-    }*/
+    }
+    Cube cube{tileBlock.get_index(), visible_faces, block_pos, vertex_it};
+    return cube.end();
 }
 
-/*bool Chunk::is_visible(const Frustum& frustum) const {
-    for(const auto& p : xz_boundaries){
-        bool is_inside = frustum.is_inside(p + static_cast<float>(min_y));
-        if(is_inside) {return true;}
-    }
-    for(const auto& p : xz_boundaries){
-        bool is_inside = frustum.is_inside(p + static_cast<float>(max_y));
-        if(is_inside) {return true;}
-    }
-    return false;
-}*/
-
-void Chunk::update_buffer(const std::array<const Chunk*, 6> &np) const {
-    SuperClass::update_buffer(compute_chunk_geometry(np));
-    dirty = false;
+void Chunk::update_buffer(const ChunkMap &chunkMap) const {
+    SuperClass::update_buffer(compute_chunk_geometry(chunkMap));
 }
 
 bool Chunk::is_dirty() const {
@@ -223,7 +111,7 @@ void Chunk::generate_blockmap() {
                 w = BlockType::SAND;
             }
             for(int y = 0 ; y < h ; y++){
-                block_map[{x, y, z}] = static_cast<BlockType>(w * !on_edge_flag);
+                set_block({x, y, z}, static_cast<BlockType>(w * !on_edge_flag));
             }
             if(w == BlockType::GRASS && !on_edge_flag) {
                 if (SHOW_PLANTS) {
@@ -273,20 +161,6 @@ void Chunk::generate_blockmap() {
 }
 
 bool Chunk::is_visible(const glm::mat4 &viewproj) const {
-    /*glm::ivec3 result{};
-
-    for(const auto& p : get_chunk_boundaries()){
-        glm::vec4 clip_point = viewproj * glm::vec4{p, 1};
-        clip_point /= clip_point.w;
-
-        glm::ivec3 test_vector = glm::clamp(glm::ivec3{clip_point}, {-1, -1, -1}, {1, 1, 1});
-        if(test_vector == glm::ivec3{}){
-            return true;
-        }
-        result += test_vector;
-    }
-    return ((result.x == 0 || result.y == 0 || result.z == 0)) && glm::abs(result.z) < 8)*/;
-    bool in{}, out{};
     for(const auto& p : xz_boundaries){
         glm::vec4 clip_point = viewproj * glm::vec4{p[0], 0, p[1], 1};
         clip_point = glm::abs(clip_point) / clip_point.w;
@@ -314,6 +188,10 @@ std::array<glm::ivec3, 8> Chunk::get_chunk_boundaries() const {
 }
 
 void Chunk::set_block(const glm::ivec3& position, BlockType w) {
+    if(TileBlock(w).is_empty()){
+        block_map.erase(position);
+        return;
+    }
     block_map[position] = w;
     dirty = true;
 }
@@ -334,9 +212,9 @@ glm::ivec2 Chunk::chunked(const glm::vec3& position) {
     };
 }
 
-void Chunk::render_object(const std::array<const Chunk*, 6>& neighbors_refs) const{
+void Chunk::render_object(const ChunkMap &chunkMap) const{
     if(dirty && !block_map.empty()){
-        update_buffer(neighbors_refs);
+        update_buffer(chunkMap);
     }
     dirty = false;
     SuperClass ::render_object();
@@ -363,7 +241,7 @@ glm::ivec2 Chunk::get_min_xz(const glm::ivec2& pq) {
 }
 
 glm::ivec2 Chunk::get_max_xz(const glm::ivec2& pq) {
-    return get_min_xz(pq) + SIZE;
+    return get_min_xz(pq) + SIZE + 1;
 }
 
 int Chunk::get_min_x() const {
@@ -389,6 +267,7 @@ bool Chunk::check_border(const glm::ivec3 &pos, const::glm::ivec3& direction) co
 }
 
 std::array<bool, 6> Chunk::get_visible_faces(TileBlock w, const glm::ivec3 &pos, const ChunkMap &chunkMap) const {
+    //return {1,1,1,1,1,1};
     static constexpr std::array<glm::ivec3, 6 >offsets{{
         {-1, 0, 0},
         {1, 0, 0},
@@ -398,16 +277,16 @@ std::array<bool, 6> Chunk::get_visible_faces(TileBlock w, const glm::ivec3 &pos,
         {0, 0, 1},
     }};
 
-    std::array<bool, 6> visible_faces{};
-    auto visible_faces_it = visible_faces.begin();
-
     if(w.is_transparent() || is_on_border(pos)){
         return {};
     }
     if(w.is_plant()){
         return {1,1,0,0,1,1};
     }
+
+    std::array<bool, 6> visible_faces{};
     auto faces_it = visible_faces.begin();
+
     for(const glm::ivec3& o : offsets){
         TileBlock tileBlock{get_block(pos + o, chunkMap)};
         *(faces_it++) = tileBlock.is_transparent();

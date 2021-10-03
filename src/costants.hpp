@@ -21,8 +21,8 @@ static constexpr int ALIGN_RIGHT = 2;
 // config
 static constexpr bool SHOW_LIGHT = true;
 static constexpr bool SHOW_PLANTS = false;
-static constexpr bool SHOW_TREES = true;
-static constexpr bool SHOW_CLOUDS = true;
+static constexpr bool SHOW_TREES = false;
+static constexpr bool SHOW_CLOUDS = false;
 
 static constexpr int WINDOW_WIDTH = 1024;
 static constexpr int WINDOW_HEIGTH = 768;
