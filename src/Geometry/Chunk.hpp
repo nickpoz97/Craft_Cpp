@@ -25,10 +25,11 @@ private:
     using SuperClass = RenderableEntity<CubeVertex>;
     using BufferType = std::vector<CubeVertex>;
 
-    mutable BufferType local_buffer{};
     using BlockMap = std::unordered_map<glm::ivec3, BlockType>;
+    mutable BufferType local_buffer;
     BlockMap block_map{};
-    mutable bool dirty{false};
+    mutable bool render_ready{false};
+    mutable bool local_buffer_ready{false};
 
     static constexpr int Y_SIZE = 258;
 

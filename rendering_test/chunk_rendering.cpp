@@ -87,7 +87,6 @@ int main() {
     for(auto& pair : chunks){
         pair.second.init_chunk();
     }
-    Chunk::wait_threads();
     std::cout << "Time elapsed: " << t.elapsed() << " seconds\n";
 
 

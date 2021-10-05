@@ -57,6 +57,7 @@ void Chunk::compute_chunk_geometry() const {
         // generate geometry of actual block (value returned by function is first free position in buffer)
         v_it = generate_block_geometry(v_it, block_pos, tileBlock, get_visible_faces(kv.second, kv.first));
     }
+    std::cout << "chunk geometry computed\n";
 }
 
 int Chunk::count_exposed_faces() const {
@@ -83,13 +84,9 @@ Chunk::BufferType::iterator Chunk::generate_block_geometry(BufferType::iterator 
 }
 
 void Chunk::update_buffer() const {
-    compute_chunk_geometry();
     SuperClass::update_buffer(local_buffer);
-    dirty = false;
-}
-
-bool Chunk::is_dirty() const {
-    return dirty;
+    render_ready = true;
+    std::cout << "buffer updated\n";
 }
 
 void Chunk::generate_blockmap() {
@@ -158,6 +155,9 @@ void Chunk::generate_blockmap() {
             }
         }
     }
+    std::cout << "chunk initialized\n";
+    compute_chunk_geometry();
+    local_buffer_ready = true;
 }
 
 bool Chunk::is_visible(const glm::mat4 &viewproj) const {
@@ -193,7 +193,6 @@ void Chunk::set_block(const glm::ivec3& position, BlockType w) {
         return;
     }
     block_map[position] = w;
-    dirty = true;
 }
 
 int get_chunk_distance(const Chunk &c1, const Chunk &c2) {
@@ -213,15 +212,16 @@ glm::ivec2 Chunk::chunked(const glm::vec3& position) {
 }
 
 void Chunk::render_object() const{
-    if(dirty && !block_map.empty()){
-        update_buffer();
+    if(local_buffer_ready) {
+        if(!render_ready){
+            update_buffer();
+        }
+        SuperClass::render_object();
     }
-    dirty = false;
-    SuperClass ::render_object();
 }
 
 void Chunk::init_chunk() {
-    init_chunk_threads.emplace_back(&Chunk::generate_blockmap, this);
+    init_chunk_threads.emplace_back(&Chunk::generate_blockmap, this).detach();
 }
 
 void Chunk::wait_threads() {
@@ -277,12 +277,12 @@ std::array<bool, 6> Chunk::get_visible_faces(TileBlock w, const glm::ivec3 &pos)
     }};
 
     return {
-        TileBlock{get_block(pos + offsets[0], chunkMap)}.is_transparent(),
-        TileBlock{get_block(pos + offsets[1], chunkMap)}.is_transparent(),
-        TileBlock{get_block(pos + offsets[2], chunkMap)}.is_transparent(),
-        TileBlock{get_block(pos + offsets[3], chunkMap)}.is_transparent(),
-        TileBlock{get_block(pos + offsets[4], chunkMap)}.is_transparent(),
-        TileBlock{get_block(pos + offsets[5], chunkMap)}.is_transparent(),
+        TileBlock{get_block(pos + offsets[0])}.is_transparent(),
+        TileBlock{get_block(pos + offsets[1])}.is_transparent(),
+        TileBlock{get_block(pos + offsets[2])}.is_transparent(),
+        TileBlock{get_block(pos + offsets[3])}.is_transparent(),
+        TileBlock{get_block(pos + offsets[4])}.is_transparent(),
+        TileBlock{get_block(pos + offsets[5])}.is_transparent(),
     };
 }
 
