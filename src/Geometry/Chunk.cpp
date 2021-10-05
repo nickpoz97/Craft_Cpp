@@ -44,10 +44,10 @@ Chunk::operator bool() const {
     return !block_map.empty();
 }
 
-Chunk::BufferType Chunk::compute_chunk_geometry() const {
+void Chunk::compute_chunk_geometry() const {
     int n_faces = count_exposed_faces();
     // each visible face has INDICES_FACE_COUNT indices that represent the triangle
-    BufferType local_buffer = std::vector<CubeVertex>(n_faces * INDICES_FACE_COUNT);
+    local_buffer = std::vector<CubeVertex>(n_faces * INDICES_FACE_COUNT);
     auto v_it = local_buffer.begin();
 
     for(const auto& kv : block_map){
@@ -57,8 +57,6 @@ Chunk::BufferType Chunk::compute_chunk_geometry() const {
         // generate geometry of actual block (value returned by function is first free position in buffer)
         v_it = generate_block_geometry(v_it, block_pos, tileBlock, get_visible_faces(kv.second, kv.first));
     }
-
-    return local_buffer;
 }
 
 int Chunk::count_exposed_faces() const {
@@ -85,7 +83,8 @@ Chunk::BufferType::iterator Chunk::generate_block_geometry(BufferType::iterator 
 }
 
 void Chunk::update_buffer() const {
-    SuperClass::update_buffer(compute_chunk_geometry());
+    compute_chunk_geometry();
+    SuperClass::update_buffer(local_buffer);
     dirty = false;
 }
 
@@ -268,7 +267,6 @@ bool Chunk::check_border(const glm::ivec3 &pos, const::glm::ivec3& direction) co
 }
 
 std::array<bool, 6> Chunk::get_visible_faces(TileBlock w, const glm::ivec3 &pos) const {
-    //return {1,1,1,1,1,1};
     static constexpr std::array<glm::ivec3, 6 >offsets{{
         {-1, 0, 0},
         {1, 0, 0},
@@ -278,21 +276,14 @@ std::array<bool, 6> Chunk::get_visible_faces(TileBlock w, const glm::ivec3 &pos)
         {0, 0, 1},
     }};
 
-    if(w.is_transparent() || is_on_border(pos)){
-        return {};
-    }
-    if(w.is_plant()){
-        return {1,1,0,0,1,1};
-    }
-
-    std::array<bool, 6> visible_faces{};
-    auto faces_it = visible_faces.begin();
-
-    for(const glm::ivec3& o : offsets){
-        TileBlock tileBlock{get_block(pos + o, chunkMap)};
-        *(faces_it++) = tileBlock.is_transparent();
-    }
-    return visible_faces;
+    return {
+        TileBlock{get_block(pos + offsets[0], chunkMap)}.is_transparent(),
+        TileBlock{get_block(pos + offsets[1], chunkMap)}.is_transparent(),
+        TileBlock{get_block(pos + offsets[2], chunkMap)}.is_transparent(),
+        TileBlock{get_block(pos + offsets[3], chunkMap)}.is_transparent(),
+        TileBlock{get_block(pos + offsets[4], chunkMap)}.is_transparent(),
+        TileBlock{get_block(pos + offsets[5], chunkMap)}.is_transparent(),
+    };
 }
 
 bool Chunk::is_on_border(const glm::ivec3& pos) const {

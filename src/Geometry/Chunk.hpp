@@ -25,6 +25,7 @@ private:
     using SuperClass = RenderableEntity<CubeVertex>;
     using BufferType = std::vector<CubeVertex>;
 
+    mutable BufferType local_buffer{};
     using BlockMap = std::unordered_map<glm::ivec3, BlockType>;
     BlockMap block_map{};
     mutable bool dirty{false};
@@ -36,7 +37,7 @@ private:
     generate_block_geometry(BufferType::iterator vertex_it, const glm::ivec3 &block_pos, TileBlock tileBlock,
                             const std::array<bool, 6>& visible_faces) const;
 
-    BufferType compute_chunk_geometry() const;
+    void compute_chunk_geometry() const;
     std::array<glm::ivec3, 8> get_chunk_boundaries() const;
     const std::array<glm::ivec2, 4> xz_boundaries;
 

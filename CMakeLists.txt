@@ -4,6 +4,10 @@ project(cpp)
 set(CMAKE_CXX_STANDARD 17)
 file(MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 set(CMAKE_BUILD_TYPE Debug)
+
+add_compile_options(-pg)
+add_link_options(-pg)
+
 #set(CMAKE_BUILD_TYPE Release)
 #add_compile_definitions(DEBUG)
 
@@ -26,6 +30,9 @@ add_executable(app ${SOURCE_FILES} ${MAIN})
 add_executable(rendering_test ${SOURCE_FILES} rendering_test/crosshair_test.cpp)
 add_executable(item_rendering ${SOURCE_FILES} rendering_test/item_rendering.cpp)
 add_executable(chunk_rendering ${SOURCE_FILES} rendering_test/chunk_rendering.cpp)
+
+#target_compile_options(chunk_rendering PUBLIC ${CMAKE_CXX_FLAGS})
+#target_link_options(chunk_rendering PUBLIC ${CMAKE_CXX_FLAGS})
 
 set(TEST_MAIN test/main_test.cpp)
 

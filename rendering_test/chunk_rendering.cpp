@@ -88,11 +88,6 @@ int main() {
         pair.second.init_chunk();
     }
     Chunk::wait_threads();
-
-    std::list<std::thread> rendering_threads{};
-    for(auto& pair : chunks){
-        pair.second.update_buffer();
-    }
     std::cout << "Time elapsed: " << t.elapsed() << " seconds\n";
 
 
