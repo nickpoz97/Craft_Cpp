@@ -12,11 +12,15 @@
 
 class DemoInteraction {
 private:
+    static inline DemoInteraction* actualInstance{nullptr};
     glm::vec2 mousePos;
     const GLFWwindow* const window;
     FlyingCamera& flyingCamera;
+    static constexpr float mouseSensitivity{0.1};
 public:
-    DemoInteraction(FlyingCamera& flyingCamera);
+    DemoInteraction(const GLFWwindow* window, FlyingCamera& flyingCamera, const glm::ivec2& initialMousePos);
+    ~DemoInteraction();
+    static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 };
 
 
