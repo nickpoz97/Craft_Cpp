@@ -13,15 +13,14 @@
 
 class GameView {
 private:
-    GLFWwindow *window{nullptr};
+    static inline bool initialized = false;
+    static inline GLFWwindow *window{nullptr};
 
     int width;
     int height;
     int scale;
     int ortho;
     float fov;
-
-    bool initialized = false;
 
     static constexpr float z_near = 0.125f;
     static constexpr float z_far = static_cast<float>(RENDER_CHUNK_RADIUS) * 32 + 64;
@@ -42,9 +41,9 @@ public:
     [[nodiscard]] int get_scale() const;
     [[nodiscard]] int get_fov() const;
     [[nodiscard]] int get_ortho() const;
-    [[nodiscard]] GLFWwindow* get_window() const;
+    [[nodiscard]] static GLFWwindow* getWindow();
     [[nodiscard]] float get_ratio() const;
-    [[nodiscard]] bool is_initialized() const;
+    [[nodiscard]] static bool isInitialized();
     [[nodiscard]] float item_box_side() const;
 
     void set_ortho(int ortho_size);

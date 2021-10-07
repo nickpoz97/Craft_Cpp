@@ -83,7 +83,6 @@ scale{compute_scale_factor(width, height)}{
     glfwSwapInterval(VSYNC);
 
     initialized = true;
-    check_gl_error();
 }
 
 GLFWwindow *GameView::create_window(bool is_fullscreen) {
@@ -99,7 +98,7 @@ GLFWwindow *GameView::create_window(bool is_fullscreen) {
     return glfwCreateWindow(width, height, "Craft Cpp", monitor, nullptr);
 }
 
-GLFWwindow *GameView::get_window() const {
+GLFWwindow *GameView::getWindow() {
     return window;
 }
 
@@ -127,7 +126,7 @@ float GameView::get_ratio() const{
     return width/height;
 }
 
-bool GameView::is_initialized() const {
+bool GameView::isInitialized() {
     return initialized;
 }
 

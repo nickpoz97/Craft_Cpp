@@ -107,9 +107,12 @@ void Chunk::generate_blockmap() {
             if (h <= t) {
                 h = t;
                 w = BlockType::SAND;
+                set_block({x, h-1, z}, static_cast<BlockType>(w * !on_edge_flag));
             }
-            for(int y = 0 ; y < h ; y++){
-                set_block({x, y, z}, static_cast<BlockType>(w * !on_edge_flag));
+            else {
+                for (int y = t; y < h; y++) {
+                    set_block({x, y, z}, static_cast<BlockType>(w * !on_edge_flag));
+                }
             }
             if(w == BlockType::GRASS && !on_edge_flag) {
                 if (SHOW_PLANTS) {
@@ -280,7 +283,7 @@ std::array<bool, 6> Chunk::get_visible_faces(TileBlock w, const glm::ivec3 &pos)
         TileBlock{get_block(pos + offsets[0])}.is_transparent(),
         TileBlock{get_block(pos + offsets[1])}.is_transparent(),
         TileBlock{get_block(pos + offsets[2])}.is_transparent(),
-        TileBlock{get_block(pos + offsets[3])}.is_transparent(),
+        false, //pos.y > 0 && TileBlock{get_block(pos + offsets[3])}.is_transparent(),
         TileBlock{get_block(pos + offsets[4])}.is_transparent(),
         TileBlock{get_block(pos + offsets[5])}.is_transparent(),
     };
