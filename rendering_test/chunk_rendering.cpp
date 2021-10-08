@@ -4,12 +4,11 @@
 
 #include <iostream>
 #include <fmt/ostream.h>
+#include <Interaction/Scene.hpp>
 #include "../src/Geometry/Chunk.hpp"
 #include "../src/Interaction/GameView.hpp"
 #include "../src/Rendering/Shader.hpp"
 #include "gtc/matrix_transform.hpp"
-#include "../src/Interaction/Model.hpp"
-#include "../src/Geometry/Item.hpp"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -53,39 +52,51 @@ public:
     }
 };
 
-
+std::array<glm::ivec2,9> offsets{{
+        {0,0},
+    {0,1},
+    {0,-1},
+    {1,0},
+    {-1, 0},
+    {1,1},
+    {-1,-1},
+    {1,-1},
+    {-1,1}
+}};
 
 int main() {
-    GameView game_view{800, 600, 45, 0, false};
+    auto* gameView{GameView::setInstance(800, 600, 45)};
 
-    if (!game_view.is_initialized()) {
+    if (!gameView) {
         return -1;
     }
-    glfwSetFramebufferSizeCallback(game_view.get_window(), framebuffer_size_callback);
-    glfwSetCursorPosCallback(game_view.get_window(), mouse_callback);
-    glfwSetInputMode(game_view.get_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    GLFWwindow* window{gameView->getWindow()};
+
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     Shader s{"../data/shaders/block_vertex.glsl", "../data/shaders/block_fragment.glsl"};
     s.use();
 
-    if (Model::load_texture("../data/textures/texture.png") != 0) {
+    if (Scene::load_texture("../data/textures/texture.png") != 0) {
         std::cerr << "general texture not loaded";
         return -1;
     }
 
     s.set_sampler(0);
 
-    glm::mat4 proj{game_view.get_proj_matrix(GameView::ProjType::PERSP)};
+    glm::mat4 proj{gameView->get_proj_matrix(GameView::ProjType::PERSP)};
 
     Timer t;
     ChunkMap chunks{};
-    for(int dp = -5 ; dp < 5 ; dp++){
-        for(int dq = -5 ; dq < 5 ; dq++){
-            chunks.emplace(glm::ivec2{dp, dq}, Chunk{{dp, dq}, false, chunks});
+    glm::ivec2 player_chunk = Chunk::chunked(cameraPos);
+
+    for(int i = 1 ; i <= 1 ; i++) {
+        for (const auto &o: offsets) {
+            auto insertion = chunks.try_emplace(glm::ivec2{player_chunk + o * i}, Chunk{player_chunk + o * i});
+            if(insertion.second) { insertion.first->second.init_chunk(); }
         }
-    }
-    for(auto& pair : chunks){
-        pair.second.init_chunk();
     }
     std::cout << "Time elapsed: " << t.elapsed() << " seconds\n";
 
@@ -100,10 +111,8 @@ int main() {
 #endif
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-    while (!glfwWindowShouldClose(game_view.get_window())) {
-        processInput(game_view.get_window());
-
-        processInput(game_view.get_window());
+    while (!glfwWindowShouldClose(window)) {
+        processInput(window);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
@@ -116,9 +125,10 @@ int main() {
             }
         }
         //chunks.front().render_object({});
-        glfwSwapBuffers(game_view.get_window());
+        glfwSwapBuffers(window);
         glfwPollEvents();
     }
+    Chunk::wait_threads();
     return 0;
 }
 

@@ -5,13 +5,11 @@
 #define GLFW_INCLUDE_NONE
 
 #include <iostream>
-
+#include "GameView.hpp"
 #include "trigonometric.hpp"
 #include "gtc/matrix_transform.hpp"
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
-#include "GameView.hpp"
-#include "../Rendering/GLError.hpp"
 
 int GameView::compute_scale_factor(int width, int height) {
     int result = width / height;
@@ -82,7 +80,8 @@ scale{compute_scale_factor(width, height)}{
 
     glfwSwapInterval(VSYNC);
 
-    initialized = true;
+    auto framebuffer_size_callback = [](GLFWwindow* window, int width, int height){actualInstance->update();};
+    glfwSetFramebufferSizeCallback(GameView::getWindow(), framebuffer_size_callback);
 }
 
 GLFWwindow *GameView::create_window(bool is_fullscreen) {
@@ -126,15 +125,26 @@ float GameView::get_ratio() const{
     return width/height;
 }
 
-bool GameView::isInitialized() {
-    return initialized;
+bool GameView::isInstantiated() {
+    return actualInstance.get();
 }
 
-GameView::~GameView() {
+void GameView::freeGLFWResources() {
     glfwTerminate();
 }
 
 float GameView::item_box_side() const {
     float size = 64 * scale;
     return height / size / 2;
+}
+
+GameView *GameView::getActualInstance() {
+    return actualInstance.get();
+}
+
+GameView* GameView::setInstance(int width, int height, float fov, int ortho, bool is_fullscreen) {
+    if(!actualInstance){
+        actualInstance.reset(new GameView{width, height, fov, ortho, is_fullscreen});
+    }
+    return actualInstance.get();
 }

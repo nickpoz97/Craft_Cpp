@@ -10,7 +10,9 @@
 TEST_CASE("Chunk instantiation (not initialized) and block insertion", "[instantiation]"){
     auto pq_coords = GENERATE(glm::vec2{4.7,6.9}, glm::vec2{9,10});
     auto obstacle_block_pos = GENERATE(glm::vec3{5.1, 4.3, 9.6}, glm::vec3{6, 8, 9});
-    Chunk c{pq_coords, false};
+    Chunk c{pq_coords, false}
+    (<#initializer#>, <#initializer#>)
+    (<#initializer#>, false, <#initializer#>);
     REQUIRE(!c.is_dirty());
 
     c.set_block(obstacle_block_pos, BlockType::SAND);
@@ -40,7 +42,7 @@ TEST_CASE("Chunk instantiation with initialization", "[instantiation][chunk_init
         }
     }
     Chunk::wait_threads();
-    for(Chunk& c : chunk_list) {
+    for(Chunk &c(<#initializer#>, <#initializer#>): chunk_list) {
         REQUIRE(c.is_dirty());
         REQUIRE(c.getHighestBlock() <= Chunk::get_y_limit());
         for (int x = c.get_min_x(); x <= c.get_max_x(); x++) {
@@ -105,7 +107,9 @@ TEST_CASE("Visibility formula"){
 }
 
 TEST_CASE("Chunk visibility", "[vertex_operations]"){
-    Chunk c_in{{1, 1}, true};
+    Chunk c_in{{1, 1}, true}
+    (<#initializer#>, <#initializer#>)
+    (<#initializer#>, false, <#initializer#>);
     Chunk::wait_threads();
     auto p = glm::perspective(
         90.0f,
@@ -121,7 +125,9 @@ TEST_CASE("Chunk visibility", "[vertex_operations]"){
     );
     REQUIRE(c_in.is_visible(p * v));
 
-    Chunk c_out{{-1, -1}, true};
+    Chunk c_out{{-1, -1}, true}
+    (<#initializer#>, <#initializer#>)
+    (<#initializer#>, false, <#initializer#>);
     Chunk::wait_threads();
     REQUIRE(!c_out.is_visible(p * v));
 }

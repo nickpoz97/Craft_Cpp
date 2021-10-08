@@ -8,8 +8,8 @@
 #include "noise.hpp"
 #include "CubicObject.hpp"
 
-Chunk::Chunk(const glm::ivec2 &pq_coordinates, bool init, const ChunkMap &chunkMap)
-        : block_map{}, pq{pq_coordinates}, SuperClass{}, chunkMap{chunkMap},
+Chunk::Chunk(const glm::ivec2 &pq_coordinates)
+        : block_map{}, pq{pq_coordinates}, SuperClass{},
           xz_boundaries{{
         {get_min_xz(pq_coordinates)[0], get_min_xz(pq_coordinates)[1]},
         {get_max_xz(pq_coordinates)[0], get_min_xz(pq_coordinates)[1]},
@@ -17,7 +17,6 @@ Chunk::Chunk(const glm::ivec2 &pq_coordinates, bool init, const ChunkMap &chunkM
         {get_max_xz(pq_coordinates)[0], get_max_xz(pq_coordinates)[1]}
     }}
 {
-    if(init){ init_chunk();}
 };
 
 int Chunk::getHighestBlock() const{
@@ -224,7 +223,7 @@ void Chunk::render_object() const{
 }
 
 void Chunk::init_chunk() {
-    init_chunk_threads.emplace_back(&Chunk::generate_blockmap, this).detach();
+    init_chunk_threads.emplace_back(&Chunk::generate_blockmap, this);
 }
 
 void Chunk::wait_threads() {
@@ -291,14 +290,4 @@ std::array<bool, 6> Chunk::get_visible_faces(TileBlock w, const glm::ivec3 &pos)
 
 bool Chunk::is_on_border(const glm::ivec3& pos) const {
     return check_border(pos, {});
-}
-
-BlockType Chunk::get_block(const glm::ivec3 &pos, const ChunkMap& chunk_map) const {
-    auto result = chunk_map.find(Chunk::chunked(pos));
-
-    if(result == chunk_map.end()){
-        // this should never happen
-        return BlockType::EMPTY;
-    }
-    return result->second.get_block(pos);
 }

@@ -7,14 +7,15 @@
 
 #define GLFW_INCLUDE_NONE
 
+#include <memory>
 #include "mat4x4.hpp"
 #include "GLFW/glfw3.h"
 #include "../costants.hpp"
 
 class GameView {
 private:
-    static inline bool initialized = false;
-    static inline GLFWwindow *window{nullptr};
+    static inline std::unique_ptr<GameView> actualInstance{nullptr};
+    GLFWwindow *window;
 
     int width;
     int height;
@@ -28,29 +29,31 @@ private:
     static int compute_scale_factor(int width, int height);
 
     GLFWwindow* create_window(bool is_fullscreen);
+    GameView(int width, int height, float fov, int ortho = false, bool is_fullscreen = false);
 public:
-    enum class ProjType {
+    enum ProjType {
         PERSP, UI, ORTHO_3D, ITEM
     };
-
-    GameView(int width, int height, float fov, int ortho, bool is_fullscreen);
-    ~GameView();
+    static GameView* setInstance(int width, int height, float fov, int ortho = false, bool is_fullscreen = false);
 
     [[nodiscard]] int get_width() const;
     [[nodiscard]] int get_height() const;
     [[nodiscard]] int get_scale() const;
     [[nodiscard]] int get_fov() const;
     [[nodiscard]] int get_ortho() const;
-    [[nodiscard]] static GLFWwindow* getWindow();
+    [[nodiscard]] GLFWwindow* getWindow();
     [[nodiscard]] float get_ratio() const;
-    [[nodiscard]] static bool isInitialized();
+    [[nodiscard]] static bool isInstantiated();
     [[nodiscard]] float item_box_side() const;
+    [[nodiscard]] static GameView* getActualInstance();
 
     void set_ortho(int ortho_size);
     void set_fov(int fov_degrees);
     void update();
 
     [[nodiscard]] glm::mat4 get_proj_matrix(ProjType pt) const;
+
+    static void freeGLFWResources();
 };
 
 

@@ -6,7 +6,7 @@
 #include "gtx/rotate_vector.hpp"
 #include "Geometry/Chunk.hpp"
 
-FlyingCamera::FlyingCamera(const glm::vec3 &camPos, const glm::vec2& &orientation) : pos{camPos} {
+FlyingCamera::FlyingCamera(const glm::vec3 &camPos, const glm::vec2& orientation, float camSpeed) : pos{camPos}, speed{camSpeed} {
     rotate(orientation.x, orientation.y);
 }
 
@@ -28,27 +28,27 @@ glm::mat4 FlyingCamera::getViewMatrix() const{
     return glm::lookAt(pos, pos + getFrontVector(), up);
 }
 
-void FlyingCamera::shiftRight(float amount) {
-    pos += glm::normalize(glm::cross(getFrontVector(), up)) * amount;
+void FlyingCamera::shiftRight(float weight) {
+    pos += glm::normalize(glm::cross(getFrontVector(), up)) * speed * weight;
 }
 
-void FlyingCamera::shift_up(float amount) {
-    pos.y += amount;
+void FlyingCamera::shift_up(float weight) {
+    pos.y += speed * weight;
 }
 
-void FlyingCamera::shift_front(float amount) {
+void FlyingCamera::shiftFront(float weight) {
     // front norm is 1
-    pos += getFrontVector() * amount;
+    pos += getFrontVector() * speed * weight;
 }
 
-glm::vec2 FlyingCamera::getPq() const{
+glm::ivec2 FlyingCamera::getPq() const{
     return Chunk::chunked(pos);
 }
 
 glm::vec3 FlyingCamera::getFrontVector() const {
-    return {
+    return glm::normalize(glm::vec3{
         glm::cos(glm::radians(yaw)) * glm::cos(glm::radians(pitch)),
         glm::sin(glm::radians(pitch)),
         glm::cos(glm::radians(yaw)) * glm::sin(glm::radians(pitch))
-    };
+    });
 }

@@ -20,7 +20,6 @@ using ChunkMap = std::unordered_map<glm::ivec2, Chunk>;
 
 class Chunk : public RenderableEntity<CubeVertex>{
 private:
-    const ChunkMap& chunkMap;
     static inline std::list<std::thread> init_chunk_threads{};
     using SuperClass = RenderableEntity<CubeVertex>;
     using BufferType = std::vector<CubeVertex>;
@@ -45,9 +44,8 @@ private:
     bool check_border(const glm::ivec3 &pos, const::glm::ivec3& direction) const;
     bool is_on_border(const glm::ivec3& pos) const;
     std::array<bool, 6> get_visible_faces(TileBlock w, const glm::ivec3 &pos) const;
-    BlockType get_block(const glm::ivec3 &pos, const ChunkMap& chunk_map) const;
 public:
-    Chunk(const glm::ivec2 &pq_coordinates, bool init, const ChunkMap &chunkMap);
+    Chunk(const glm::ivec2 &pq_coordinates);
     const glm::ivec2 pq;
 
     int get_min_x() const;

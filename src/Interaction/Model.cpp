@@ -83,7 +83,7 @@ void Model::set_block(const glm::ivec3 &pos, BlockType w) {
 Chunk &Model::get_chunk_at(const glm::ivec2 &pq){
     // need to create new chunk if not present
     // inserted pair is an iterator to the already present element or the new one
-    const auto &inserted_pair{chunks.try_emplace(pq, Chunk{pq, false, chunks}).first};
+    const auto &inserted_pair{chunks.try_emplace(pq, <#initializer#>).first};
     // Chunk object is returned
     return inserted_pair->second;
 }
@@ -316,7 +316,7 @@ void Model::load_chunks_in_range() {
     for(int dp = -CREATE_CHUNK_RADIUS ; dp <= CREATE_CHUNK_RADIUS ; dp++){
         for(int dq = -CREATE_CHUNK_RADIUS ; dq <= CREATE_CHUNK_RADIUS ; dq++) {
             glm::vec2 pq_coordinate{player_chunk.x + dp, player_chunk.y + dq};
-            auto result = chunks.try_emplace(pq_coordinate, Chunk{pq_coordinate, false, chunks});
+            auto result = chunks.try_emplace(pq_coordinate, <#initializer#>);
             if(result.second){
                 Chunk& c = result.first->second;
                 c.init_chunk();

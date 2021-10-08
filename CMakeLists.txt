@@ -3,7 +3,6 @@ project(cpp)
 
 set(CMAKE_CXX_STANDARD 17)
 file(MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
-set(CMAKE_BUILD_TYPE Debug)
 
 add_compile_options(-pg)
 add_link_options(-pg)
@@ -19,7 +18,11 @@ link_libraries(${CMAKE_DL_LIBS} glfw fmt)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
 
 file(GLOB GEOMETRY_FILES src/Geometry/*.cpp)
-file(GLOB INTERACTION_FILES src/Interaction/*.cpp)
+set(INTERACTION_FILES src/Interaction/CameraControl.cpp
+        src/Interaction/FlyingCamera.cpp
+        src/Interaction/GameView.cpp
+        src/Interaction/Scene.cpp
+)
 file(GLOB RENDERING_FILES src/Rendering/*.cpp deps/glad/src/*.c)
 file(GLOB CATCH_TEST_FILES ${PROJECT_SOURCE_DIR}/test/*.cpp)
 file(GLOB RENDERING_TEST_FILES ${PROJECT_SOURCE_DIR}/rendering_test/*)
@@ -27,8 +30,8 @@ set(SOURCE_FILES ${GEOMETRY_FILES} ${INTERACTION_FILES} ${RENDERING_FILES} deps/
 set(MAIN src/App.cpp)
 
 add_executable(app ${SOURCE_FILES} ${MAIN})
-add_executable(rendering_test ${SOURCE_FILES} rendering_test/crosshair_test.cpp)
-add_executable(item_rendering ${SOURCE_FILES} rendering_test/item_rendering.cpp)
+#add_executable(rendering_test ${SOURCE_FILES} rendering_test/crosshair_test.cpp)
+#add_executable(item_rendering ${SOURCE_FILES} rendering_test/item_rendering.cpp)
 add_executable(chunk_rendering ${SOURCE_FILES} rendering_test/chunk_rendering.cpp)
 
 #target_compile_options(chunk_rendering PUBLIC ${CMAKE_CXX_FLAGS})

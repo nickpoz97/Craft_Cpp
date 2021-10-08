@@ -4,12 +4,12 @@
 
 #ifndef CPP_COSTANTS_HPP
 static constexpr int MAX_CHUNKS = 500;
-static constexpr int CHUNK_SIZE = 32;
+static constexpr int CHUNK_SIZE = 64;
 
 static constexpr int INDICES_FACE_COUNT = 6;
 static constexpr int VERTICES_FACE_COUNT = 4;
 static constexpr float N = 0.5f;
-static constexpr int RENDER_CHUNK_RADIUS = 2;
+static constexpr int RENDER_CHUNK_RADIUS = 10;
 static constexpr int CREATE_CHUNK_RADIUS = 4;
 static constexpr int DELETE_CHUNK_RADIUS = 14;
 
