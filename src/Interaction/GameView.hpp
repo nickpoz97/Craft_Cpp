@@ -53,7 +53,8 @@ public:
 
     [[nodiscard]] glm::mat4 get_proj_matrix(ProjType pt) const;
 
-    static void freeGLFWResources();
+    ~GameView();
+    static void clear();
 };
 
 

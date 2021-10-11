@@ -129,7 +129,7 @@ bool GameView::isInstantiated() {
     return actualInstance.get();
 }
 
-void GameView::freeGLFWResources() {
+GameView::~GameView() {
     glfwTerminate();
 }
 
@@ -147,4 +147,8 @@ GameView* GameView::setInstance(int width, int height, float fov, int ortho, boo
         actualInstance.reset(new GameView{width, height, fov, ortho, is_fullscreen});
     }
     return actualInstance.get();
+}
+
+void GameView::clear() {
+    actualInstance.reset(nullptr);
 }

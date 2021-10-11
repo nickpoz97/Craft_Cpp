@@ -18,11 +18,10 @@ int main() {
         return -1;
     }
 
-    /*while(!glfwWindowShouldClose(GameView::getActualInstance()->getWindow())) {
+    while(!glfwWindowShouldClose(GameView::getActualInstance()->getWindow())) {
         //model.loop();
         scene.loop();
-    }*/
-    Chunk::wait_threads();
-    GameView::freeGLFWResources();
+    }
+    Scene::clear();
     return 0;
 }

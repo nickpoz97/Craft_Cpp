@@ -38,14 +38,18 @@ void Scene::loadChunkNeighborhood(){
 }
 
 void Scene::loop() {
-    shadersMap.at(ShaderName::BLOCK_SHADER).use();
+    Shader& s{shadersMap.at(ShaderName::BLOCK_SHADER)};
+    s.use();
+    glm::mat4 viewProj{gameView->get_proj_matrix(GameView::PERSP) * camera.getViewMatrix()};
+    s.set_viewproj(viewProj);
+    s.set_sampler(0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     cameraControl->processKeyboardInput();
     loadChunkNeighborhood();
     for(const auto& pair : chunkMap){
         const Chunk& c{pair.second};
-        if(pair.second.is_visible(gameView->get_proj_matrix(GameView::PERSP) * camera.getViewMatrix())){
+        if(pair.second.is_visible(viewProj)){
             c.render_object();
         }
         glfwSwapBuffers(gameView->getWindow());
@@ -56,10 +60,10 @@ void Scene::loop() {
 Scene *
 Scene::setInstance(const GameViewSettings &gvs, const glm::ivec3 &cameraPos, const glm::vec2 &cameraOrientation,
                    const ShaderNamesMap &snm) {
-    if(!scene){
-        scene.reset(new Scene{gvs, cameraPos, cameraOrientation, snm});
+    if(!actualInstance){
+        actualInstance.reset(new Scene{gvs, cameraPos, cameraOrientation, snm});
     }
-    return scene.get();
+    return actualInstance.get();
 }
 
 int Scene::load_texture(std::string_view path, GLint clamp_type) {
@@ -89,4 +93,10 @@ int Scene::load_texture(std::string_view path, GLint clamp_type) {
     stbi_image_free(data);
     ++texture_index;
     return 0;
+}
+
+void Scene::clear() {
+    Chunk::wait_threads();
+    actualInstance.reset(nullptr);
+    GameView::clear();
 }

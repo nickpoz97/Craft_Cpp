@@ -34,7 +34,7 @@ using ShaderNamesMap =  std::unordered_map<ShaderName, ShaderFilesPaths>;
 
 class Scene {
 private:
-    static inline std::unique_ptr<Scene> scene{nullptr};
+    static inline std::unique_ptr<Scene> actualInstance{nullptr};
     GameView* gameView;
     CameraControl* cameraControl;
     FlyingCamera camera;
@@ -46,6 +46,7 @@ public:
     static Scene* setInstance(const GameViewSettings& gvs, const glm::ivec3& cameraPos, const glm::vec2& cameraOrientation, const ShaderNamesMap& snm);
     void loop();
     static int load_texture(std::string_view path, GLint clamp_type = GL_REPEAT);
+    static void clear();
 };
 
 
