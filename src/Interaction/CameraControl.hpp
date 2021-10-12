@@ -8,19 +8,19 @@
 #include <memory>
 #include <vec2.hpp>
 #include "GLFW/glfw3.h"
-#include "FlyingCamera.hpp"
+#include "Camera.hpp"
 #include "GameView.hpp"
 
 class CameraControl {
 private:
     static inline std::unique_ptr<CameraControl> actualInstance{nullptr};
-    glm::vec2 mousePos;
-    FlyingCamera& flyingCamera;
+    glm::vec2 lastMousePos;
+    Camera& flyingCamera;
     static constexpr float mouseSensitivity{0.1};
     double lastFrameTime{};
-    CameraControl(FlyingCamera& flyingCamera, const glm::ivec2& initialMousePos);
+    CameraControl(Camera &flyingCamera, const glm::ivec2 &initialMousePos, GLFWwindow *window);
 public:
-    static CameraControl * setInstance(FlyingCamera& flyingCamera);
+    static CameraControl * setInstance(Camera& flyingCamera);
     static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
     void processKeyboardInput() ;
 };

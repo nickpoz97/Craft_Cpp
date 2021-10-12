@@ -41,7 +41,7 @@ public:
     [[nodiscard]] int get_scale() const;
     [[nodiscard]] int get_fov() const;
     [[nodiscard]] int get_ortho() const;
-    [[nodiscard]] GLFWwindow* getWindow();
+    [[nodiscard]] static GLFWwindow* getWindow();
     [[nodiscard]] float get_ratio() const;
     [[nodiscard]] static bool isInstantiated();
     [[nodiscard]] float item_box_side() const;

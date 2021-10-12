@@ -2,29 +2,30 @@
 // Created by ultimatenick on 07/10/21.
 //
 
-#ifndef CPP_FLYINGCAMERA_HPP
-#define CPP_FLYINGCAMERA_HPP
+#ifndef CPP_CAMERA_HPP
+#define CPP_CAMERA_HPP
 
 #include "vec3.hpp"
 #include "mat4x4.hpp"
 
-class FlyingCamera {
+class Camera {
 private:
     glm::vec3 pos;
-    float pitch{};
-    float yaw{};
+    glm::vec3 direction;
+    float pitch{0.0f};
+    float yaw{-90.0f};
     float speed;
 
     static constexpr glm::vec3 up{0, 1, 0};
     [[nodiscard]] glm::vec3 getFrontVector() const;
 public:
-    FlyingCamera(const glm::vec3& camPos, const glm::vec2& orientation, float camSpeed = 0.05);
-    FlyingCamera() = delete;
-    FlyingCamera(const FlyingCamera& flyingCamera) = default;
-    FlyingCamera(FlyingCamera&& flyingCamera) = default;
+    Camera(const glm::vec3& camPos, const glm::vec3& direction, float camSpeed = 0.05);
+    Camera() = delete;
+    Camera(const Camera& flyingCamera) = default;
+    Camera(Camera&& flyingCamera) = default;
 
-    FlyingCamera& operator=(const FlyingCamera& flyingCamera) = default;
-    FlyingCamera& operator=(FlyingCamera&& flyingCamera) = default;
+    Camera& operator=(const Camera& flyingCamera) = default;
+    Camera& operator=(Camera&& flyingCamera) = default;
 
     void rotate(float yawOffset, float pitchOffset);
     void rotate(const glm::vec2& offset);
@@ -38,4 +39,4 @@ public:
 };
 
 
-#endif //CPP_FLYINGCAMERA_HPP
+#endif //CPP_CAMERA_HPP

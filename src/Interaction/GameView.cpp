@@ -79,9 +79,6 @@ scale{compute_scale_factor(width, height)}{
     }
 
     glfwSwapInterval(VSYNC);
-
-    auto framebuffer_size_callback = [](GLFWwindow* window, int width, int height){actualInstance->update();};
-    glfwSetFramebufferSizeCallback(GameView::getWindow(), framebuffer_size_callback);
 }
 
 GLFWwindow *GameView::create_window(bool is_fullscreen) {
@@ -98,7 +95,7 @@ GLFWwindow *GameView::create_window(bool is_fullscreen) {
 }
 
 GLFWwindow *GameView::getWindow() {
-    return window;
+    return actualInstance->window;
 }
 
 glm::mat4 GameView::get_proj_matrix(GameView::ProjType pt) const {
@@ -145,6 +142,8 @@ GameView *GameView::getActualInstance() {
 GameView* GameView::setInstance(int width, int height, float fov, int ortho, bool is_fullscreen) {
     if(!actualInstance){
         actualInstance.reset(new GameView{width, height, fov, ortho, is_fullscreen});
+        auto framebuffer_size_callback = [](GLFWwindow* window, int width, int height){actualInstance->update();};
+        glfwSetFramebufferSizeCallback(getWindow(), framebuffer_size_callback);
     }
     return actualInstance.get();
 }

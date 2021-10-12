@@ -12,14 +12,13 @@ int main() {
         "../data/shaders/block_vertex.glsl","../data/shaders/block_fragment.glsl"
     });
 
-    Scene& scene{*Scene::setInstance(gvs, {}, {90.0f, 0.0f}, snm)};
+    Scene& scene{*Scene::setInstance(gvs, {0, 20, 0}, {0,-1,1}, snm)};
     if(Scene::load_texture("../data/textures/texture.png") != 0){
         std::cerr << "general texture not loaded";
         return -1;
     }
 
-    while(!glfwWindowShouldClose(GameView::getActualInstance()->getWindow())) {
-        //model.loop();
+    while(!glfwWindowShouldClose(GameView::getWindow())) {
         scene.loop();
     }
     Scene::clear();

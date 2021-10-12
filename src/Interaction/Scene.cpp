@@ -8,10 +8,10 @@
 #include "Scene.hpp"
 #include "stb_image.h"
 
-Scene::Scene(const GameViewSettings &gvs, const glm::ivec3 &cameraPos, const glm::vec2 &cameraOrientation,
+Scene::Scene(const GameViewSettings &gvs, const glm::vec3 &cameraPos, const glm::vec3 &cameraDirection,
              const ShaderNamesMap& snm) :
         gameView{GameView::setInstance(gvs.windowSize.x, gvs.windowSize.y, gvs.fov)},
-        camera(cameraPos, cameraOrientation),
+        camera{cameraPos, cameraDirection},
         cameraControl{CameraControl::setInstance(camera)}{
     glfwSetInputMode(gameView->getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -20,11 +20,12 @@ Scene::Scene(const GameViewSettings &gvs, const glm::ivec3 &cameraPos, const glm
     glEnable(GL_CULL_FACE);
     auto& shaderPaths{snm.at(ShaderName::BLOCK_SHADER)};
     shadersMap.emplace(ShaderName::BLOCK_SHADER, Shader{shaderPaths.vertex_code, shaderPaths.fragment_code});
+
     loadChunkNeighborhood();
 }
 
 void Scene::loadChunkNeighborhood(){
-    for(int dp = -1 ; dp <= 1 ; dp++){
+    /*for(int dp = -1 ; dp <= 1 ; dp++){
         for(int dq = -1 ; dq <= 1 ; dq++){
             const glm::ivec2 chunkPq{camera.getPq() + glm::ivec2{dp, dq}};
             auto result = chunkMap.try_emplace(chunkPq, Chunk{chunkPq});
@@ -34,34 +35,37 @@ void Scene::loadChunkNeighborhood(){
                 (record->second).init_chunk();
             }
         }
-    }
+    }*/
+    auto result = chunkMap.emplace(glm::ivec2{0,0}, Chunk{{0, 0}});
+    result.first->second.init_chunk();
 }
 
 void Scene::loop() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     Shader& s{shadersMap.at(ShaderName::BLOCK_SHADER)};
     s.use();
+    s.set_sampler(0);
+
     glm::mat4 viewProj{gameView->get_proj_matrix(GameView::PERSP) * camera.getViewMatrix()};
     s.set_viewproj(viewProj);
-    s.set_sampler(0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     cameraControl->processKeyboardInput();
-    loadChunkNeighborhood();
+
+    //loadChunkNeighborhood();
     for(const auto& pair : chunkMap){
         const Chunk& c{pair.second};
-        if(pair.second.is_visible(viewProj)){
+        //if(pair.second.is_visible(viewProj)){
             c.render_object();
-        }
+        //}
         glfwSwapBuffers(gameView->getWindow());
         glfwPollEvents();
     }
 }
 
 Scene *
-Scene::setInstance(const GameViewSettings &gvs, const glm::ivec3 &cameraPos, const glm::vec2 &cameraOrientation,
+Scene::setInstance(const GameViewSettings &gvs, const glm::vec3 &cameraPos, const glm::vec3 &cameraDirection,
                    const ShaderNamesMap &snm) {
     if(!actualInstance){
-        actualInstance.reset(new Scene{gvs, cameraPos, cameraOrientation, snm});
+        actualInstance.reset(new Scene{gvs, cameraPos, cameraDirection, snm});
     }
     return actualInstance.get();
 }

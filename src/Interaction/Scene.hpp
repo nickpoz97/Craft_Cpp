@@ -10,7 +10,7 @@
 #include "vec3.hpp"
 #include "GameView.hpp"
 #include "CameraControl.hpp"
-#include "FlyingCamera.hpp"
+#include "Camera.hpp"
 #include "Geometry/Chunk.hpp"
 
 enum class ShaderName{
@@ -37,13 +37,13 @@ private:
     static inline std::unique_ptr<Scene> actualInstance{nullptr};
     GameView* gameView;
     CameraControl* cameraControl;
-    FlyingCamera camera;
+    Camera camera;
     std::unordered_map<ShaderName, Shader> shadersMap{};
     ChunkMap chunkMap{};
     void loadChunkNeighborhood();
-    Scene(const GameViewSettings& gvs, const glm::ivec3& cameraPos, const glm::vec2& cameraOrientation, const ShaderNamesMap& snm);
+    Scene(const GameViewSettings& gvs, const glm::vec3& cameraPos, const glm::vec3 &cameraDirection, const ShaderNamesMap& snm);
 public:
-    static Scene* setInstance(const GameViewSettings& gvs, const glm::ivec3& cameraPos, const glm::vec2& cameraOrientation, const ShaderNamesMap& snm);
+    static Scene* setInstance(const GameViewSettings& gvs, const glm::vec3& cameraPos, const glm::vec3& cameraDirection, const ShaderNamesMap& snm);
     void loop();
     static int load_texture(std::string_view path, GLint clamp_type = GL_REPEAT);
     static void clear();

@@ -19,7 +19,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
 
 file(GLOB GEOMETRY_FILES src/Geometry/*.cpp)
 set(INTERACTION_FILES src/Interaction/CameraControl.cpp
-        src/Interaction/FlyingCamera.cpp
+        src/Interaction/Camera.cpp
         src/Interaction/GameView.cpp
         src/Interaction/Scene.cpp
 )
