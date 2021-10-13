@@ -17,6 +17,13 @@ void CameraControl::mouseCallback(GLFWwindow *window, double xpos, double ypos) 
         std::cerr << "CameraControl not instantiated, mouseCallback not available\n";
         return;
     }
+    static bool firstMouse{true};
+    if(firstMouse){
+        actualInstance->lastMousePos.x = xpos;
+        actualInstance->lastMousePos.y = ypos;
+        firstMouse = false;
+        return;
+    }
 
     glm::vec2 offset{
         xpos - actualInstance->lastMousePos.x,
@@ -39,7 +46,7 @@ void CameraControl::processKeyboardInput() {
     float deltaTime = static_cast<bool>(lastFrameTime) ? static_cast<float>(actualFrameTime - lastFrameTime) : 0;
     lastFrameTime = actualFrameTime;
 
-    GLFWwindow* window{GameView::getActualInstance()->getWindow()};
+    GLFWwindow* window{GameView::getWindow()};
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);

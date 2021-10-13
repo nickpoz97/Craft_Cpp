@@ -12,14 +12,14 @@ class Camera {
 private:
     glm::vec3 pos;
     glm::vec3 direction;
-    float pitch{0.0f};
-    float yaw{-90.0f};
+    float pitch;
+    float yaw;
     float speed;
 
     static constexpr glm::vec3 up{0, 1, 0};
     [[nodiscard]] glm::vec3 getFrontVector() const;
 public:
-    Camera(const glm::vec3& camPos, const glm::vec3& direction, float camSpeed = 0.05);
+    Camera(const glm::vec3& camPos, const glm::vec3& camDirection, float camSpeed = 5);
     Camera() = delete;
     Camera(const Camera& flyingCamera) = default;
     Camera(Camera&& flyingCamera) = default;
@@ -36,6 +36,7 @@ public:
     void shiftFront(float weight);
     glm::mat4 getViewMatrix() const;
     glm::ivec2 getPq() const;
+    void printCameraInfo() const;
 };
 
 
