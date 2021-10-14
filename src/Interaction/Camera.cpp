@@ -71,3 +71,7 @@ void Camera::printCameraInfo() const{
     fmt::print("yaw: {}, pitch: {}, direction:({},{},{})\n",
                yaw, pitch, direction.x, direction.y, direction.z);
 }
+
+const glm::vec3 &Camera::getPos() const {
+    return pos;
+}

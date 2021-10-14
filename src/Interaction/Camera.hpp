@@ -11,6 +11,7 @@
 class Camera {
 private:
     glm::vec3 pos;
+
     glm::vec3 direction;
     float pitch;
     float yaw;
@@ -19,7 +20,7 @@ private:
     static constexpr glm::vec3 up{0, 1, 0};
     [[nodiscard]] glm::vec3 getFrontVector() const;
 public:
-    Camera(const glm::vec3& camPos, const glm::vec3& camDirection, float camSpeed = 5);
+    Camera(const glm::vec3& camPos, const glm::vec3& camDirection, float camSpeed = 10);
     Camera() = delete;
     Camera(const Camera& flyingCamera) = default;
     Camera(Camera&& flyingCamera) = default;
@@ -37,6 +38,7 @@ public:
     glm::mat4 getViewMatrix() const;
     glm::ivec2 getPq() const;
     void printCameraInfo() const;
+    const glm::vec3 &getPos() const;
 };
 
 

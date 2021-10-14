@@ -18,14 +18,14 @@ Scene::Scene(const GameViewSettings &gvs, const glm::vec3 &cameraPos, const glm:
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-    auto& shaderPaths{snm.at(ShaderName::BLOCK_SHADER)};
-    shadersMap.emplace(ShaderName::BLOCK_SHADER, Shader{shaderPaths.vertex_code, shaderPaths.fragment_code});
+    auto& shaderPath{snm.at(ShaderName::BLOCK_SHADER)};
+    shadersMap.emplace(ShaderName::BLOCK_SHADER, Shader{shaderPath.vertex_code, shaderPath.fragment_code});
 
     loadChunkNeighborhood();
 }
 
 void Scene::loadChunkNeighborhood(){
-    /*for(int dp = -1 ; dp <= 1 ; dp++){
+    for(int dp = -1 ; dp <= 1 ; dp++){
         for(int dq = -1 ; dq <= 1 ; dq++){
             const glm::ivec2 chunkPq{camera.getPq() + glm::ivec2{dp, dq}};
             auto result = chunkMap.try_emplace(chunkPq, Chunk{chunkPq});
@@ -35,30 +35,34 @@ void Scene::loadChunkNeighborhood(){
                 (record->second).init_chunk();
             }
         }
-    }*/
-    auto result = chunkMap.emplace(glm::ivec2{0,0}, Chunk{{0, 0}});
+    }
+    /*auto result = chunkMap.emplace(glm::ivec2{0,0}, Chunk{{0, 0}});
     result.first->second.init_chunk();
+
+    result = chunkMap.emplace(glm::ivec2{1,0}, Chunk{{1, 0}});
+    result.first->second.init_chunk();*/
 }
 
 void Scene::loop() {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    Shader& s{shadersMap.at(ShaderName::BLOCK_SHADER)};
-    s.use();
-    s.set_sampler(0);
-
-    glm::mat4 viewProj{gameView->get_proj_matrix(GameView::PERSP) * camera.getViewMatrix()};
-    s.set_viewproj(viewProj);
     cameraControl->processKeyboardInput();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    //loadChunkNeighborhood();
+    const Shader& s{shadersMap.at(ShaderName::BLOCK_SHADER)};
+    glm::mat4 viewProj{gameView->get_proj_matrix(GameView::PERSP) * camera.getViewMatrix()};
+    s.use();
+    s.set_viewproj(viewProj);
+    s.set_sampler(0);
+    s.set_camera(camera.getPos());
+
+    loadChunkNeighborhood();
     for(const auto& pair : chunkMap){
-        const Chunk& c{pair.second};
+        const Chunk& c = pair.second;
         if(pair.second.is_visible(viewProj)){
             c.render_object();
         }
-        glfwSwapBuffers(gameView->getWindow());
-        glfwPollEvents();
     }
+    glfwSwapBuffers(GameView::getWindow());
+    glfwPollEvents();
 }
 
 Scene *

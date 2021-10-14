@@ -72,7 +72,7 @@ int main() {
     }
     GLFWwindow* window{gameView->getWindow()};
 
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    //glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
