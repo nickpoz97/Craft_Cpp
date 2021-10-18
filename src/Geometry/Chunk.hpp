@@ -76,6 +76,8 @@ public:
     void init_chunk();
     static void wait_threads();
     void generate_blockmap();
+    // first is top-left, going counterclockwise
+    std::unordered_map<glm::ivec3, bool> getLightObstacles(const glm::ivec3 &blockPos) const;
 };
 
 int get_chunk_distance(const Chunk &c1, const Chunk &c2);

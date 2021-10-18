@@ -4,6 +4,7 @@
 
 #include <numeric>
 #include <iostream>
+#include <map>
 #include "Chunk.hpp"
 #include "noise.hpp"
 #include "CubicObject.hpp"
@@ -74,12 +75,18 @@ int Chunk::count_exposed_faces() const {
 Chunk::BufferType::iterator Chunk::generate_block_geometry(BufferType::iterator vertex_it, const glm::ivec3 &block_pos, TileBlock tileBlock,
                                const std::array<bool, 6>& visible_faces) const {
     if(tileBlock.is_plant()){
-        Plant plant{tileBlock.get_index(), block_pos, simplex2(block_pos.x, block_pos.z, 4, 0.5, 2) * 360, vertex_it};
+        Plant plant{
+            tileBlock.get_index(),
+            block_pos,
+            simplex2(block_pos.x, block_pos.z,4, 0.5, 2) * 360,
+            vertex_it
+        };
         return plant.end();
     }
     if(tileBlock.is_empty() || visible_faces.empty()){
         return vertex_it;
     }
+    getLightObstacles(block_pos);
     Cube cube{tileBlock.get_index(), visible_faces, block_pos, vertex_it};
     return cube.end();
 }
@@ -296,4 +303,19 @@ std::array<bool, 6> Chunk::get_visible_faces(TileBlock w, const glm::ivec3 &pos)
 
 bool Chunk::is_on_border(const glm::ivec3& pos) const {
     return check_border(pos, {});
+}
+
+std::unordered_map<glm::ivec3, bool> Chunk::getLightObstacles(const glm::ivec3 &blockPos) const{
+    std::unordered_map<glm::ivec3, bool> lightObstacles{};
+
+    for(int ox = -1; ox <= 1 ; ++ox){
+        for(int oy = -1; oy <= 1 ; ++oy){
+            for(int oz = -1; oz <= 1 ; ++oz){
+                glm::ivec3 offset{ox,oy,oz};
+                lightObstacles.emplace(offset, !TileBlock{get_block(blockPos + offset)}.is_transparent());
+            }
+        }
+    }
+
+    return lightObstacles;
 }
