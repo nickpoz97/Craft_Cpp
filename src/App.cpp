@@ -13,7 +13,7 @@ int main() {
     });
 
     Scene& scene{*Scene::setInstance(gvs, {0, 20, 0}, {0,-1,1}, snm)};
-    if(Scene::load_texture("../data/textures/texture.png") != 0){
+    if(scene.load_texture("../data/textures/texture.png") != 0){
         std::cerr << "general texture not loaded";
         return -1;
     }

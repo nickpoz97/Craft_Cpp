@@ -35,7 +35,7 @@ public:
 
     static constexpr int max_indices = INDICES_FACE_COUNT * n_faces;
 
-    CubicObject(const BlockType &block_type, const std::array<bool, n_faces> &visible_faces, const glm::vec3 &center_position,
+    CubicObject(const BlockType &block_type, const std::array<bool, 6> &visible_faces, const glm::vec3 &center_position,
                 float asy_rotation, cube_vertex_iterator_t vertices_it);
 
     static const PositionsMatrix local_vertex_positions;

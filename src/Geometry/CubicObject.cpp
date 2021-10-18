@@ -24,16 +24,13 @@ template<>
 const float CubicObject<4>::B = S;
 
 template<unsigned n_faces>
-CubicObject<n_faces>::CubicObject(const BlockType &block_type, const std::array<bool, n_faces> &visible_faces,
+CubicObject<n_faces>::CubicObject(const BlockType &block_type, const std::array<bool, 6> &visible_faces,
                                   const glm::vec3 &center_position,
                                   float asy_rotation, cube_vertex_iterator_t vertices_it) :
         begin_iterator{vertices_it},
         n_vertices{static_cast<size_t>(std::accumulate(visible_faces.begin(), visible_faces.end(), 0) * INDICES_FACE_COUNT)}{
     TileBlock tile_block{block_type};
 
-#ifdef DEBUG
-    //assert(glm::round(center_position) == center_position);
-#endif
     auto face_v_it = local_vertex_positions.begin();
     auto face_uvs_it = uvs.begin();
     auto face_nrm_it = normals.begin();
@@ -45,7 +42,12 @@ CubicObject<n_faces>::CubicObject(const BlockType &block_type, const std::array<
     for(auto face_ind_it{indices.begin()} ; face_ind_it != indices.end() ; ++face_ind_it){
         // test if face is visible
         if (!*(visible_faces_it++)) {
-            increment_geometry_iterators();
+            if(n_faces != 4){
+                increment_geometry_iterators();
+            }
+            else{
+                ++tile_it;
+            }
             continue;
         }
         float du = static_cast<float>(*tile_it % 16) * S;
@@ -189,5 +191,5 @@ template class CubicObject<4>;
 
 Plant::Plant(const BlockType &block_type, const glm::vec3 &center_position, float asy_rotation,
              cube_vertex_iterator_t vertices_it) :
-             super{block_type, {1,1,1,1}, center_position, asy_rotation, vertices_it}
+             super{block_type, {1,1,0,0,1,1}, center_position, asy_rotation, vertices_it}
              {}

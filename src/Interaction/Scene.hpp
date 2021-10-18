@@ -45,7 +45,7 @@ private:
 public:
     static Scene* setInstance(const GameViewSettings& gvs, const glm::vec3& cameraPos, const glm::vec3& cameraDirection, const ShaderNamesMap& snm);
     void loop();
-    static int load_texture(std::string_view path, GLint clamp_type = GL_REPEAT);
+    int load_texture(std::string_view path, GLint clamp_type = GL_REPEAT);
     static void clear();
 };
 

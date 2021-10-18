@@ -15,7 +15,7 @@ Scene::Scene(const GameViewSettings &gvs, const glm::vec3 &cameraPos, const glm:
         cameraControl{CameraControl::setInstance(camera)}{
     glfwSetInputMode(gameView->getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.1f, 0.1f, 0.5f, 1.0f);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     auto& shaderPath{snm.at(ShaderName::BLOCK_SHADER)};
@@ -25,8 +25,8 @@ Scene::Scene(const GameViewSettings &gvs, const glm::vec3 &cameraPos, const glm:
 }
 
 void Scene::loadChunkNeighborhood(){
-    for(int dp = -1 ; dp <= 1 ; dp++){
-        for(int dq = -1 ; dq <= 1 ; dq++){
+    for(int dp = -CREATE_CHUNK_RADIUS ; dp <= CREATE_CHUNK_RADIUS ; dp++){
+        for(int dq = -CREATE_CHUNK_RADIUS ; dq <= CREATE_CHUNK_RADIUS ; dq++){
             const glm::ivec2 chunkPq{camera.getPq() + glm::ivec2{dp, dq}};
             auto result = chunkMap.try_emplace(chunkPq, Chunk{chunkPq});
             bool isInserted{result.second};

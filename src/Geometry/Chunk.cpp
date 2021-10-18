@@ -56,7 +56,9 @@ void Chunk::compute_chunk_geometry() const {
         // generate geometry of actual block (value returned by function is first free position in buffer)
         v_it = generate_block_geometry(v_it, block_pos, tileBlock, get_visible_faces(kv.second, kv.first));
     }
+#ifndef NDEBUG
     std::cout << "chunk geometry computed\n";
+#endif
 }
 
 int Chunk::count_exposed_faces() const {
@@ -85,7 +87,9 @@ Chunk::BufferType::iterator Chunk::generate_block_geometry(BufferType::iterator 
 void Chunk::update_buffer() const {
     SuperClass::update_buffer(local_buffer);
     render_ready = true;
+#ifndef NDEBUG
     std::cout << "buffer updated\n";
+#endif
 }
 
 void Chunk::generate_blockmap() {
@@ -157,7 +161,9 @@ void Chunk::generate_blockmap() {
             }
         }
     }
+#ifndef NDEBUG
     std::cout << "chunk initialized\n";
+#endif
     compute_chunk_geometry();
     local_buffer_ready = true;
 }
@@ -282,7 +288,7 @@ std::array<bool, 6> Chunk::get_visible_faces(TileBlock w, const glm::ivec3 &pos)
         TileBlock{get_block(pos + offsets[0])}.is_transparent(),
         TileBlock{get_block(pos + offsets[1])}.is_transparent(),
         TileBlock{get_block(pos + offsets[2])}.is_transparent(),
-        false, //pos.y > 0 && TileBlock{get_block(pos + offsets[3])}.is_transparent(),
+        w == BlockType::CLOUD || w == BlockType::LEAVES, //pos.y > 0 && TileBlock{get_block(pos + offsets[3])}.is_transparent(),
         TileBlock{get_block(pos + offsets[4])}.is_transparent(),
         TileBlock{get_block(pos + offsets[5])}.is_transparent(),
     };
