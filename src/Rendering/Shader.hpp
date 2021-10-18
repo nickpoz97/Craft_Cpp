@@ -22,9 +22,9 @@ private:
 
     static void _set_extra_uniform(int u_location, int val) ;
     static void _set_extra_uniform(int u_location, float val) ;
-    void _set_extra_uniform(int u_location, const glm::vec3& val) const;
-    void _set_extra_uniform(int u_location, const glm::vec2& val) const;
-    static void _set_extra_uniform(int u_location, const glm::mat4& val) ;
+    static void _set_extra_uniform(int u_location, const glm::vec3& val);
+    static void _set_extra_uniform(int u_location, const glm::vec2& val);
+    static void _set_extra_uniform(int u_location, const glm::mat4& val);
 
     static void check_compile_errors(GLuint shader, std::string type);
     void set_pi() const;
@@ -40,7 +40,7 @@ public:
     void set_viewproj(const glm::mat4& m) const;
 
     template<typename GLtype>
-    void set_extra_uniform(std::string_view uniform_name, GLtype value) const;
+    void set_extra_uniform(std::string_view uniform_name, const GLtype& value) const;
 };
 
 

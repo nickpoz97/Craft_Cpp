@@ -79,7 +79,7 @@ void Shader::set_timer(float timer) const{
 }
 
 template<typename GLtype>
-void Shader::set_extra_uniform(std::string_view uniform_name, GLtype value) const{
+void Shader::set_extra_uniform(std::string_view uniform_name, const GLtype& value) const{
     _set_extra_uniform(glGetUniformLocation(id, uniform_name.data()), value);
 }
 
@@ -118,7 +118,7 @@ void Shader::_set_extra_uniform(int u_location, int val) {
     glUniform1i(u_location, val);
 }
 
-void Shader::_set_extra_uniform(int u_location, const glm::vec3& val) const{
+void Shader::_set_extra_uniform(int u_location, const glm::vec3& val) {
     glUniform3fv(u_location, 1, glm::value_ptr(val));
 }
 
@@ -130,7 +130,7 @@ void Shader::set_pi() const{
     set_extra_uniform("PI", glm::pi<float>());
 }
 
-template void Shader::set_extra_uniform(std::string_view id, float value) const;
-template void Shader::set_extra_uniform(std::string_view id, int value) const;
-template void Shader::set_extra_uniform(std::string_view id, const glm::vec3& value) const;
-template void Shader::set_extra_uniform(std::string_view id, const glm::mat4& value) const;
+template void Shader::set_extra_uniform<float>(std::string_view id, const float& value) const;
+template void Shader::set_extra_uniform<int>(std::string_view id, const int& value) const;
+template void Shader::set_extra_uniform<glm::vec3>(std::string_view id, const glm::vec3& value) const;
+template void Shader::set_extra_uniform<glm::mat4>(std::string_view id, const glm::mat4& value) const;

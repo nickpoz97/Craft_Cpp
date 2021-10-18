@@ -40,6 +40,7 @@ private:
     Camera camera;
     std::unordered_map<ShaderName, Shader> shadersMap{};
     ChunkMap chunkMap{};
+
     void loadChunkNeighborhood();
     Scene(const GameViewSettings& gvs, const glm::vec3& cameraPos, const glm::vec3 &cameraDirection, const ShaderNamesMap& snm);
 public:

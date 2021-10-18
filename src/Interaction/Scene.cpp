@@ -19,6 +19,7 @@ Scene::Scene(const GameViewSettings &gvs, const glm::vec3 &cameraPos, const glm:
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
     auto& shaderPath{snm.at(ShaderName::BLOCK_SHADER)};
+
     shadersMap.emplace(ShaderName::BLOCK_SHADER, Shader{shaderPath.vertex_code, shaderPath.fragment_code});
 
     loadChunkNeighborhood();
@@ -53,6 +54,9 @@ void Scene::loop() {
     s.set_viewproj(viewProj);
     s.set_sampler(0);
     s.set_camera(camera.getPos());
+    s.set_extra_uniform("fog_distance", static_cast<float>(RENDER_CHUNK_RADIUS * CHUNK_SIZE));
+
+    s.set_extra_uniform("sky_color", glm::vec3{0.2, 0.2, 0.5});
 
     loadChunkNeighborhood();
     for(const auto& pair : chunkMap){
