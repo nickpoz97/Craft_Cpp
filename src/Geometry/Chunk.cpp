@@ -76,18 +76,18 @@ Chunk::BufferType::iterator Chunk::generate_block_geometry(BufferType::iterator 
                                const std::array<bool, 6>& visible_faces) const {
     if(tileBlock.is_plant()){
         Plant plant{
-            tileBlock.get_index(),
-            block_pos,
-            simplex2(block_pos.x, block_pos.z,4, 0.5, 2) * 360,
-            vertex_it
+                tileBlock.get_index(),
+                block_pos,
+                simplex2(block_pos.x, block_pos.z, 4, 0.5, 2) * 360,
+                vertex_it,
+                getLightObstacles(block_pos),
         };
         return plant.end();
     }
     if(tileBlock.is_empty() || visible_faces.empty()){
         return vertex_it;
     }
-    getLightObstacles(block_pos);
-    Cube cube{tileBlock.get_index(), visible_faces, block_pos, vertex_it};
+    Cube cube{tileBlock.get_index(), visible_faces, block_pos, vertex_it, getLightObstacles(block_pos)};
     return cube.end();
 }
 

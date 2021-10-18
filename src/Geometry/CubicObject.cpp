@@ -3,12 +3,13 @@
 //
 
 #include <numeric>
+#include <forward_list>
 #include <fmt/ostream.h>
 #include <gtx/rotate_vector.hpp>
 
 #include "vec3.hpp"
 #include "CubicObject.hpp"
-#include "../costants.hpp"
+#include "map_utils.hpp"
 #include "trigonometric.hpp"
 
 template<>
@@ -26,7 +27,9 @@ const float CubicObject<4>::B = S;
 template<unsigned n_faces>
 CubicObject<n_faces>::CubicObject(const BlockType &block_type, const std::array<bool, 6> &visible_faces,
                                   const glm::vec3 &center_position,
-                                  float asy_rotation, cube_vertex_iterator_t vertices_it) :
+                                  float asy_rotation,
+                                  const std::unordered_map<glm::ivec3, bool>& lightObstacles,
+                                  cube_vertex_iterator_t vertices_it) :
         begin_iterator{vertices_it},
         n_vertices{static_cast<size_t>(std::accumulate(visible_faces.begin(), visible_faces.end(), 0) * INDICES_FACE_COUNT)}{
     TileBlock tile_block{block_type};
@@ -70,6 +73,22 @@ CubicObject<n_faces>::CubicObject(const BlockType &block_type, const std::array<
                     du + (face_uvs[i].x ? B : A),
                     dv + (face_uvs[i].y ? B : A)
             };
+            actual_vertex.ao = 0.0f;
+
+            if(!lightObstacles.empty()) {
+                std::forward_list<glm::ivec3> obstaclesCoords{};
+
+                glm::ivec3 directions = face_vertices[i] - face_normal;
+                if (directions.x != 0) obstaclesCoords.push_front(face_normal + glm::vec3{directions.x, 0, 0});
+                if (directions.y != 0) obstaclesCoords.push_front(face_normal + glm::vec3{0, directions.y, 0});
+                if (directions.z != 0) obstaclesCoords.push_front(face_normal + glm::vec3{0, 0, directions.z});
+
+                for (const auto &aoCoord: obstaclesCoords) {
+                    actual_vertex.ao += lightObstacles.at(static_cast<glm::ivec3>(aoCoord));
+                }
+                actual_vertex.ao += static_cast<float>(!tile_block.is_transparent());
+                actual_vertex.ao = 1 / actual_vertex.ao;
+            }
         }
         increment_geometry_iterators();
     }
@@ -90,8 +109,8 @@ glm::vec3 CubicObject<n_faces>::rotate_asy(const glm::vec3 &v, float angle_degre
 }
 
 Cube::Cube(const BlockType &block_type, const std::array<bool, 6> &visible_faces, const glm::vec3 &position,
-           cube_vertex_iterator_t vertices_it) :
-                super(block_type, visible_faces, position, 0, vertices_it)
+           cube_vertex_iterator_t vertices_it, const std::unordered_map<glm::ivec3, bool> &lightObstacles) :
+                super(block_type, visible_faces, position, 0, lightObstacles, vertices_it)
            {}
 
 template<unsigned n_faces>
@@ -172,7 +191,7 @@ const CubicObject<4>::NormalMatrix CubicObject<4>::normals{{
 
 template<>
 const CubicObject<4>::IndicesMatrix CubicObject<4>::indices{{
-{0, 3, 2, 0, 1, 3},
+    {0, 3, 2, 0, 1, 3},
     {0, 3, 1, 0, 2, 3},
     {0, 3, 2, 0, 1, 3},
     {0, 3, 1, 0, 2, 3}
@@ -190,6 +209,6 @@ template class CubicObject<6>;
 template class CubicObject<4>;
 
 Plant::Plant(const BlockType &block_type, const glm::vec3 &center_position, float asy_rotation,
-             cube_vertex_iterator_t vertices_it) :
-             super{block_type, {1,1,0,0,1,1}, center_position, asy_rotation, vertices_it}
+             cube_vertex_iterator_t vertices_it, const std::unordered_map<glm::ivec3, bool> &lightObstacles) :
+             super{block_type, {1,1,0,0,1,1}, center_position, asy_rotation, lightObstacles, vertices_it}
              {}

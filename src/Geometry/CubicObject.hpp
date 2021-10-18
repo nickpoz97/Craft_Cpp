@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <array>
+#include <unordered_map>
 
 #include "vec3.hpp"
 #include "mat4x4.hpp"
@@ -36,7 +37,7 @@ public:
     static constexpr int max_indices = INDICES_FACE_COUNT * n_faces;
 
     CubicObject(const BlockType &block_type, const std::array<bool, 6> &visible_faces, const glm::vec3 &center_position,
-                float asy_rotation, cube_vertex_iterator_t vertices_it);
+                float asy_rotation, const std::unordered_map<glm::ivec3, bool>& lightObstacles, cube_vertex_iterator_t vertices_it);
 
     static const PositionsMatrix local_vertex_positions;
     static const UvsMatrix uvs;
@@ -53,16 +54,16 @@ class Plant : public CubicObject<4>{
 private:
     using super = CubicObject<4>;
 public:
-    Plant(const BlockType &block_type, const glm::vec3 &center_position,
-          float asy_rotation, cube_vertex_iterator_t vertices_it);
+    Plant(const BlockType &block_type, const glm::vec3 &center_position, float asy_rotation,
+          cube_vertex_iterator_t vertices_it, const std::unordered_map<glm::ivec3, bool> &lightObstacles);
 };
 
 class Cube : public CubicObject<6>{
 private:
     using super = CubicObject<6>;
 public:
-    Cube(const BlockType& block_type, const std::array<bool, 6> &visible_faces, const glm::vec3& position,
-         cube_vertex_iterator_t vertices_it);
+    Cube(const BlockType &block_type, const std::array<bool, 6> &visible_faces, const glm::vec3 &position,
+         cube_vertex_iterator_t vertices_it, const std::unordered_map<glm::ivec3, bool> &lightObstacles);
 };
 
 #endif //CPP_CUBICOBJECT_HPP

@@ -3,6 +3,7 @@
 in vec2 fragment_uv;
 in float diffuse_intensity;
 in float fog_factor;
+in float aoFrag;
 
 uniform float timer;
 uniform float daylight;
@@ -23,6 +24,7 @@ void main() {
 
     //float light_intensity = 1.0;
     diffuse_color *= diffuse_intensity;
+    diffuse_color *= aoFrag;
 
     //vec3 sky_color = vec3(texture2D(sky_sampler, vec2(timer, fog_height)));
     // the more fog factor is high, the more diffuse_color goes towards sky_color
