@@ -11,10 +11,17 @@ int main() {
     snm.emplace(ShaderName::BLOCK_SHADER, ShaderFilesPaths{
         "../data/shaders/block_vertex.glsl","../data/shaders/block_fragment.glsl"
     });
+    snm.emplace(ShaderName::TEXT_SHADER, ShaderFilesPaths{
+            "../data/shaders/text_vertex.glsl","../data/shaders/text_fragment.glsl"
+    });
 
     Scene& scene{*Scene::setInstance(gvs, {0, 20, 0}, {0,-1,1}, snm)};
-    if(scene.load_texture("../data/textures/texture.png") != 0){
+    if(scene.load_texture("../data/textures/texture.png", TextureName::GENERAL, 0) != 0){
         std::cerr << "general texture not loaded";
+        return -1;
+    }
+    if(scene.load_texture("../data/textures/font.png", TextureName::FONT, 0) != 0){
+        std::cerr << "font texture not loaded";
         return -1;
     }
 

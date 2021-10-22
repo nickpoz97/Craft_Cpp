@@ -15,9 +15,12 @@
 
 enum class ShaderName{
     BLOCK_SHADER,
-    LINE_SHADER,
-    SKY_SHADER,
     TEXT_SHADER
+};
+
+enum class TextureName{
+    FONT,
+    GENERAL
 };
 
 struct ShaderFilesPaths{
@@ -38,8 +41,12 @@ private:
     GameView* gameView;
     CameraControl* cameraControl;
     Camera camera;
-    std::unordered_map<ShaderName, Shader> shadersMap{};
+    std::unordered_map<ShaderName, Shader> shaders{};
+    std::array<int, 2> textureSamplers;
     ChunkMap chunkMap{};
+
+    void render_text(int justify, const glm::vec2 &position, float n, std::string_view text) const;
+    void showInfoText() const;
 
     void loadChunkNeighborhood();
     void deleteDistantChunks();
@@ -49,7 +56,7 @@ private:
 public:
     static Scene* setInstance(const GameViewSettings& gvs, const glm::vec3& cameraPos, const glm::vec3& cameraDirection, const ShaderNamesMap& snm);
     void loop();
-    int load_texture(std::string_view path, GLint clamp_type = GL_REPEAT);
+    int load_texture(std::string_view path, TextureName textureName, GLint clamp_type = GL_REPEAT);
     void clear();
 };
 

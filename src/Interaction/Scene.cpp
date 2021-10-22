@@ -5,6 +5,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 
 #include <iostream>
+#include <Geometry/Text2D.hpp>
+#include <fmt/format.h>
 #include "Scene.hpp"
 #include "stb_image.h"
 
@@ -21,9 +23,10 @@ Scene::Scene(const GameViewSettings &gvs, const glm::vec3 &cameraPos, const glm:
     glClearColor(0.1f, 0.1f, 0.5f, 1.0f);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-    auto& shaderPath{snm.at(ShaderName::BLOCK_SHADER)};
 
-    shadersMap.emplace(ShaderName::BLOCK_SHADER, Shader{shaderPath.vertex_code, shaderPath.fragment_code});
+    for(auto& pair : snm){
+        shaders.emplace(pair.first, Shader{pair.second.vertex_code, pair.second.fragment_code});
+    }
 
     loadChunkNeighborhood();
 }
@@ -62,11 +65,11 @@ void Scene::loop() {
     cameraControl->processKeyboardInput();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    const Shader& s{shadersMap.at(ShaderName::BLOCK_SHADER)};
+    const Shader& s{shaders.at(ShaderName::BLOCK_SHADER)};
     glm::mat4 viewProj{gameView->get_proj_matrix(GameView::PERSP) * camera.getViewMatrix()};
     s.use();
     s.set_viewproj(viewProj);
-    s.set_sampler(0);
+    s.set_sampler(textureSamplers[static_cast<int>(TextureName::GENERAL)]);
     s.set_camera(camera.getPos());
     s.set_extra_uniform("fog_distance", static_cast<float>(RENDER_CHUNK_RADIUS * CHUNK_SIZE));
 
@@ -79,6 +82,7 @@ void Scene::loop() {
             c.render_object();
         }
     }
+    showInfoText();
     glfwSwapBuffers(GameView::getWindow());
     glfwPollEvents();
     deleteDistantChunks();
@@ -93,7 +97,7 @@ Scene::setInstance(const GameViewSettings &gvs, const glm::vec3 &cameraPos, cons
     return actualInstance.get();
 }
 
-int Scene::load_texture(std::string_view path, GLint clamp_type) {
+int Scene::load_texture(std::string_view path, TextureName textureName, GLint clamp_type) {
     unsigned texture_id;
     glGenTextures(1, &texture_id);
 
@@ -118,7 +122,7 @@ int Scene::load_texture(std::string_view path, GLint clamp_type) {
     glGenerateMipmap(GL_TEXTURE_2D);
 
     stbi_image_free(data);
-    ++texture_index;
+    textureSamplers[static_cast<int>(textureName)] = texture_index++;
     return 0;
 }
 
@@ -132,4 +136,29 @@ void Scene::waitThreads() const{
     for(const auto& pair : chunkMap){
         pair.second.wait_thread();
     }
+}
+
+void Scene::render_text(int justify, const glm::vec2 &position, float n, std::string_view text) const{
+    const Shader& shader = shaders.at(ShaderName::TEXT_SHADER);
+
+    shader.use();
+    shader.set_viewproj(gameView->get_proj_matrix(GameView::ProjType::UI));
+    shader.set_sampler(textureSamplers[static_cast<int>(TextureName::FONT)]);
+    const glm::vec2 justified_position{position - glm::vec2{n * justify * (text.size() - 1) / 2, 0}};
+    Text2D text2d{justified_position, n, text};
+    text2d.render_object();
+}
+
+void Scene::showInfoText() const{
+    float ts = 12 * gameView->get_scale();
+    float tx = ts / 2;
+    float ty = gameView->get_height() - ts;
+
+    const glm::ivec2& pq{camera.getPq()};
+    const glm::vec3& pos{camera.getPos()};
+
+    std::string s{fmt::format("nChunks: {} ,camPq: ({},{}) ,camPos: ({},{},{})\n",
+        chunkMap.size(), pq.x, pq.y, pos.x, pos.y, pos.z)};
+
+    render_text(ALIGN_LEFT, {tx, ty}, ts, s);
 }
