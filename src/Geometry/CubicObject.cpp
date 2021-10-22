@@ -73,22 +73,23 @@ CubicObject<n_faces>::CubicObject(const BlockType &block_type, const std::array<
                     du + (face_uvs[i].x ? B : A),
                     dv + (face_uvs[i].y ? B : A)
             };
-            actual_vertex.ao = 0.0f;
+            actual_vertex.ao = 1.0f;
 
-            if(!lightObstacles.empty()) {
-                std::forward_list<glm::ivec3> obstaclesCoords{};
+            std::forward_list<glm::ivec3> obstaclesCoords{};
 
-                glm::ivec3 directions = face_vertices[i] - face_normal;
-                if (directions.x != 0) obstaclesCoords.push_front(face_normal + glm::vec3{directions.x, 0, 0});
-                if (directions.y != 0) obstaclesCoords.push_front(face_normal + glm::vec3{0, directions.y, 0});
-                if (directions.z != 0) obstaclesCoords.push_front(face_normal + glm::vec3{0, 0, directions.z});
-
-                for (const auto &aoCoord: obstaclesCoords) {
-                    actual_vertex.ao += lightObstacles.at(static_cast<glm::ivec3>(aoCoord));
-                }
-                actual_vertex.ao += static_cast<float>(!tile_block.is_transparent());
-                actual_vertex.ao = 1 / actual_vertex.ao;
+            glm::ivec3 directions = face_vertices[i] - face_normal;
+            if (directions.x != 0) obstaclesCoords.push_front(face_normal + glm::vec3{directions.x, 0, 0});
+            if (directions.y != 0) obstaclesCoords.push_front(face_normal + glm::vec3{0, directions.y, 0});
+            if (directions.z != 0) obstaclesCoords.push_front(face_normal + glm::vec3{0, 0, directions.z});
+            if(directions.x != 0 && directions.z != 0) {
+                obstaclesCoords.push_front(face_normal + glm::vec3{directions.x, 0, directions.z});
             }
+
+            for (const auto &aoCoord: obstaclesCoords) {
+                actual_vertex.ao += actual_vertex.ao * lightObstacles.at(static_cast<glm::ivec3>(aoCoord));
+            }
+            //actual_vertex.ao *= static_cast<float>(!tile_block.is_transparent())
+        actual_vertex.ao = 1 / actual_vertex.ao;
         }
         increment_geometry_iterators();
     }
