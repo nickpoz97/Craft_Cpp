@@ -25,7 +25,7 @@ int Chunk::getHighestBlock() const{
 
     // choose the highest block in the block_map
     for(const auto& block : block_map){
-        const glm::vec3& block_pos{block.first};
+        const glm::ivec3& block_pos{block.first};
         const TileBlock block_type{block.second};
 
         if(block_type.is_obstacle() && block_pos.y > highest_y)

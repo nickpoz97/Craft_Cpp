@@ -79,7 +79,7 @@ int main() {
     Shader s{"../data/shaders/block_vertex.glsl", "../data/shaders/block_fragment.glsl"};
     s.use();
 
-    if (Scene::load_texture("../data/textures/texture.png") != 0) {
+    if (Scene::load_texture("../data/textures/texture.png", 0, TextureName::GENERAL) != 0) {
         std::cerr << "general texture not loaded";
         return -1;
     }
