@@ -49,7 +49,7 @@ void Scene::deleteDistantChunks(){
     auto it = chunkMap.begin();
     while(it != chunkMap.end()){
         Chunk& c{it->second};
-        if(get_chunk_distance(c, camera.getPq()) >= DELETE_CHUNK_RADIUS){
+        if(get_chunk_distance(c.pq, camera.getPq()) >= DELETE_CHUNK_RADIUS){
             c.wait_thread();
             auto eraseIt = it;
             ++it;

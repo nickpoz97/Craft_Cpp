@@ -88,7 +88,6 @@ CubicObject<n_faces>::CubicObject(const BlockType &block_type, const std::array<
             for (const auto &aoCoord: obstaclesCoords) {
                 actual_vertex.ao += actual_vertex.ao * lightObstacles.at(static_cast<glm::ivec3>(aoCoord));
             }
-            //actual_vertex.ao *= static_cast<float>(!tile_block.is_transparent())
         actual_vertex.ao = 1 / actual_vertex.ao;
         }
         increment_geometry_iterators();

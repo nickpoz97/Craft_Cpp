@@ -3,6 +3,7 @@
 //
 
 #include "CubeWireframe.hpp"
+#include "Interaction/GameView.hpp"
 
 decltype(CubeWireframe::local_vertex_positions) CubeWireframe::local_vertex_positions{{
     {-1, -1, -1},
@@ -24,7 +25,8 @@ decltype(CubeWireframe::indices) CubeWireframe::indices{
     }
 };
 
-CubeWireframe::CubeWireframe(const glm::vec3 &position) : SuperClass{generate_local_buffer(position)} {}
+CubeWireframe::CubeWireframe(const glm::vec3 &position) :
+        gpu_Buffer{GameView::isInstantiated()}, SuperClass{generate_local_buffer(position)} {}
 
 std::vector<Standard3DVertex> CubeWireframe::generate_local_buffer(const glm::vec3 &position) {
     std::vector<Standard3DVertex> vertices(N_INDICES);

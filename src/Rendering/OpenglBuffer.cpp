@@ -6,18 +6,21 @@
 
 #include "vec3.hpp"
 #include "OpenglBuffer.hpp"
-#include "../Geometry/Vertex.hpp"
 
 template<typename VertexType>
-OpenglBuffer<VertexType>::OpenglBuffer(){
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
+OpenglBuffer<VertexType>::OpenglBuffer(bool openGLReady) {
+    if(openGLReady) {
+        glGenVertexArrays(1, &VAO);
+        glGenBuffers(1, &VBO);
+    }
 }
 
 template<typename VertexType>
 OpenglBuffer<VertexType>::~OpenglBuffer() {
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
+    if(VAO && VBO) {
+        glDeleteVertexArrays(1, &VAO);
+        glDeleteBuffers(1, &VBO);
+    }
 }
 
 template<typename VertexType>
@@ -76,12 +79,6 @@ void OpenglBuffer<VertexType>::_store_data(int size, const GLfloat *data) const{
 }
 
 template<typename VertexType>
-template<size_t n_values>
-void OpenglBuffer<VertexType>::store_data(const std::array<VertexType, n_values> &buffer) const {
-    _store_data(sizeof(buffer), reinterpret_cast<GLfloat*>(buffer.data()));
-}
-
-template<typename VertexType>
 void OpenglBuffer<VertexType>::bind_buffer() const {
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBindVertexArray(VAO);
@@ -91,6 +88,24 @@ template<typename VertexType>
 void OpenglBuffer<VertexType>::unbind_buffer() const {
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+template<typename VertexType>
+OpenglBuffer<VertexType>::OpenglBuffer(OpenglBuffer<VertexType> &&other) noexcept :
+    VAO{other.VAO}, VBO{other.VBO}, n_indices{other.n_indices}{
+
+    other.VAO = 0;
+    other.VBO = 0;
+}
+
+template<typename VertexType>
+OpenglBuffer<VertexType> &OpenglBuffer<VertexType>::operator=(OpenglBuffer<VertexType> &&other) noexcept {
+    VAO = other.VAO;
+    VBO = other.VBO;
+    other.VAO = 0;
+    other.VBO = 0;
+
+    return *this;
 }
 
 template class OpenglBuffer<Standard2DVertex>;

@@ -11,12 +11,9 @@
 
 Chunk::Chunk(const glm::ivec2 &pq_coordinates)
         : block_map{}, pq{pq_coordinates}, SuperClass{},
-          xz_boundaries{{
-        {get_min_xz(pq_coordinates)[0], get_min_xz(pq_coordinates)[1]},
-        {get_max_xz(pq_coordinates)[0], get_min_xz(pq_coordinates)[1]},
-        {get_min_xz(pq_coordinates)[0], get_max_xz(pq_coordinates)[1]},
-        {get_max_xz(pq_coordinates)[0], get_max_xz(pq_coordinates)[1]}
-    }}
+          xz_boundaries{
+            computeXZBoundaries(pq_coordinates)
+          }
 {
 };
 
@@ -210,8 +207,8 @@ void Chunk::set_block(const glm::ivec3& position, BlockType w) {
     block_map[position] = w;
 }
 
-int get_chunk_distance(const Chunk &c1, const Chunk &c2) {
-    glm::ivec2 delta = c1.pq - c2.pq;
+int get_chunk_distance(const glm::ivec2 &pq1, const glm::ivec2 &pq2) {
+    glm::ivec2 delta = pq1 - pq2;
     return glm::max(glm::abs(delta.x), glm::abs(delta.y));
 }
 
@@ -308,11 +305,23 @@ std::unordered_map<glm::ivec3, bool> Chunk::getLightObstacles(const glm::ivec3 &
     return lightObstacles;
 }
 
-bool Chunk::isErasable() const {
+bool Chunk::isInit() const {
     // check if thread has finished buffer modification
     return local_buffer_ready;
 }
 
 void Chunk::wait_thread() const{
     init_chunk_thread.join();
+}
+
+std::array<glm::ivec2, 4> Chunk::computeXZBoundaries(const glm::ivec2 &pq) {
+    auto min{get_min_xz(pq)};
+    auto max{get_max_xz(pq)};
+
+    return {{
+        { min[0], min[1] },
+        { max[0], min[1] },
+        { min[0], max[1] },
+        { max[0], max[1] }
+    }};
 }

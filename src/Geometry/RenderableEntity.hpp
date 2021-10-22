@@ -16,11 +16,15 @@
 template<typename VertexType>
 class RenderableEntity{
 private:
-    mutable std::unique_ptr<OpenglBuffer<VertexType>> gpu_buffer{nullptr};
+    mutable OpenglBuffer<VertexType> gpu_buffer;
 public:
+    explicit RenderableEntity();
     explicit RenderableEntity(const std::vector<VertexType>& local_buffer);
-    explicit RenderableEntity() = default;
-    //template<size_t n_values> explicit RenderableEntity(const std::array<VertexType, n_values>& local_buffer);
+    explicit RenderableEntity(const RenderableEntity& other) = delete;
+    RenderableEntity(RenderableEntity&& other) noexcept ;
+    RenderableEntity<VertexType>& operator= (const std::vector<VertexType>& local_buffer) = delete;
+    RenderableEntity<VertexType>& operator= (RenderableEntity&& other) noexcept ;
+
     void update_buffer(const std::vector<VertexType>& local_buffer) const;
     void render_object() const;
     void render_lines() const;

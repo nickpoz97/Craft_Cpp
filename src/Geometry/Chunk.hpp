@@ -44,7 +44,7 @@ private:
     bool check_border(const glm::ivec3 &pos, const::glm::ivec3& direction) const;
     std::array<bool, 6> get_visible_faces(TileBlock w, const glm::ivec3 &pos) const;
 public:
-    Chunk(const glm::ivec2 &pq_coordinates);
+    explicit Chunk(const glm::ivec2 &pq_coordinates);
     const glm::ivec2 pq;
 
     int get_min_x() const;
@@ -53,6 +53,7 @@ public:
     int get_max_z() const;
 
     static constexpr int SIZE = CHUNK_SIZE;
+    static std::array<glm::ivec2, 4> computeXZBoundaries(const glm::ivec2& pq);
     static glm::ivec2 get_min_xz(const glm::ivec2& pq);
     static glm::ivec2 get_max_xz(const glm::ivec2& pq);
 
@@ -66,8 +67,7 @@ public:
     //bool is_visible(const Frustum& frustum) const;
     bool is_visible(const glm::mat4 &viewproj) const;
     void update_buffer() const;
-    bool is_dirty() const;
-    bool isErasable() const;
+    bool isInit() const;
 
     static glm::ivec2 chunked(const glm::vec3& position);
     static int chunked(int val);
@@ -81,6 +81,6 @@ public:
     bool is_on_border(const glm::ivec3& pos) const;
 };
 
-int get_chunk_distance(const Chunk &c1, const Chunk &c2);
+int get_chunk_distance(const glm::ivec2 &pq1, const glm::ivec2 &pq2);
 
 #endif //CPP_CHUNK_HPP

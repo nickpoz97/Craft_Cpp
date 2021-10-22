@@ -68,13 +68,16 @@ private:
         get_n_ao_elements<VertexType>()
     };
 public:
-    OpenglBuffer();
+    explicit OpenglBuffer(bool openGLReady);
+    explicit OpenglBuffer() = delete;
+    explicit OpenglBuffer(const OpenglBuffer<VertexType>& other) = delete;
+    OpenglBuffer(OpenglBuffer<VertexType>&& other) noexcept ;
+    OpenglBuffer<VertexType>& operator= (const OpenglBuffer<VertexType>& other) = delete;
+    OpenglBuffer<VertexType>& operator= (OpenglBuffer<VertexType>&& other) noexcept;
+
     ~OpenglBuffer();
 
     void store_data(const std::vector<VertexType>& buffer) const;
-
-    template<size_t n_values>
-    void store_data(const std::array<VertexType, n_values>& buffer) const;
 
     void draw_triangles() const;
     void draw_lines() const;
