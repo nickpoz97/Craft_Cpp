@@ -21,6 +21,6 @@ int main() {
     while(!glfwWindowShouldClose(GameView::getWindow())) {
         scene.loop();
     }
-    Scene::clear();
+    scene.clear();
     return 0;
 }

@@ -40,11 +40,22 @@ void Scene::loadChunkNeighborhood(){
             }
         }
     }
-    /*auto result = chunkMap.emplace(glm::ivec2{0,0}, Chunk{{0, 0}});
-    result.first->second.init_chunk();
+}
 
-    result = chunkMap.emplace(glm::ivec2{1,0}, Chunk{{1, 0}});
-    result.first->second.init_chunk();*/
+void Scene::deleteDistantChunks(){
+    auto it = chunkMap.begin();
+    while(it != chunkMap.end()){
+        Chunk& c{it->second};
+        if(get_chunk_distance(c, camera.getPq()) >= DELETE_CHUNK_RADIUS){
+            c.wait_thread();
+            auto eraseIt = it;
+            ++it;
+            chunkMap.erase(eraseIt);
+        }
+        else{
+            ++it;
+        }
+    }
 }
 
 void Scene::loop() {
@@ -70,6 +81,7 @@ void Scene::loop() {
     }
     glfwSwapBuffers(GameView::getWindow());
     glfwPollEvents();
+    deleteDistantChunks();
 }
 
 Scene *
@@ -111,7 +123,13 @@ int Scene::load_texture(std::string_view path, GLint clamp_type) {
 }
 
 void Scene::clear() {
-    Chunk::wait_threads();
+    waitThreads();
     actualInstance.reset(nullptr);
     GameView::clear();
+}
+
+void Scene::waitThreads() const{
+    for(const auto& pair : chunkMap){
+        pair.second.wait_thread();
+    }
 }

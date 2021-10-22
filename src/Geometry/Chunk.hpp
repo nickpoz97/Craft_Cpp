@@ -20,7 +20,7 @@ using ChunkMap = std::unordered_map<glm::ivec2, Chunk>;
 
 class Chunk : public RenderableEntity<CubeVertex>{
 private:
-    static inline std::list<std::thread> init_chunk_threads{};
+    mutable std::thread init_chunk_thread{};
     using SuperClass = RenderableEntity<CubeVertex>;
     using BufferType = std::vector<CubeVertex>;
 
@@ -68,16 +68,17 @@ public:
     bool is_visible(const glm::mat4 &viewproj) const;
     void update_buffer() const;
     bool is_dirty() const;
+    bool isErasable() const;
 
     static glm::ivec2 chunked(const glm::vec3& position);
     static int chunked(int val);
 
     void render_object() const;
     void init_chunk();
-    static void wait_threads();
     void generate_blockmap();
     // first is top-left, going counterclockwise
     std::unordered_map<glm::ivec3, bool> getLightObstacles(const glm::ivec3 &blockPos) const;
+    void wait_thread() const;
 };
 
 int get_chunk_distance(const Chunk &c1, const Chunk &c2);

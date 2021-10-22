@@ -236,19 +236,7 @@ void Chunk::render_object() const{
 }
 
 void Chunk::init_chunk() {
-    init_chunk_threads.emplace_back(&Chunk::generate_blockmap, this);
-}
-
-void Chunk::wait_threads() {
-    while(!init_chunk_threads.empty()) {
-        std::thread &t = init_chunk_threads.front();
-#ifdef DEBUG
-        std::cout << t.get_id() << '\t';
-        std::thread::id id{};
-#endif
-        t.join();
-        init_chunk_threads.pop_front();
-    }
+    init_chunk_thread = std::thread(&Chunk::generate_blockmap, this);
 }
 
 glm::ivec2 Chunk::get_min_xz(const glm::ivec2& pq) {
@@ -318,4 +306,13 @@ std::unordered_map<glm::ivec3, bool> Chunk::getLightObstacles(const glm::ivec3 &
     }
 
     return lightObstacles;
+}
+
+bool Chunk::isErasable() const {
+    // check if thread has finished buffer modification
+    return local_buffer_ready;
+}
+
+void Chunk::wait_thread() const{
+    init_chunk_thread.join();
 }

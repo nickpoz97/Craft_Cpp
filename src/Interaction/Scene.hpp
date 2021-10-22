@@ -42,12 +42,15 @@ private:
     ChunkMap chunkMap{};
 
     void loadChunkNeighborhood();
+    void deleteDistantChunks();
+    void waitThreads() const;
+
     Scene(const GameViewSettings& gvs, const glm::vec3& cameraPos, const glm::vec3 &cameraDirection, const ShaderNamesMap& snm);
 public:
     static Scene* setInstance(const GameViewSettings& gvs, const glm::vec3& cameraPos, const glm::vec3& cameraDirection, const ShaderNamesMap& snm);
     void loop();
     int load_texture(std::string_view path, GLint clamp_type = GL_REPEAT);
-    static void clear();
+    void clear();
 };
 
 
