@@ -27,6 +27,7 @@ private:
     using BlockMap = std::unordered_map<glm::ivec3, BlockType>;
     mutable BufferType local_buffer;
     BlockMap block_map{};
+
     mutable bool render_ready{false};
     mutable bool local_buffer_ready{false};
 
@@ -61,13 +62,14 @@ public:
     int getHighestBlock() const;
     BlockType get_block(const glm::ivec3& block_pos) const;
 
-    operator bool() const;
-
     void set_block(const glm::ivec3& position, BlockType w);
     //bool is_visible(const Frustum& frustum) const;
     bool is_visible(const glm::mat4 &viewproj) const;
     void update_buffer() const;
-    bool isInit() const;
+    bool isLocalBufferReady() const;
+
+    // thread not running and not initialized
+    bool needInitCall() const;
 
     static glm::ivec2 chunked(const glm::vec3& position);
     static int chunked(int val);

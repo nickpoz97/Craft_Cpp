@@ -36,11 +36,6 @@ BlockType Chunk::get_block(const glm::ivec3& block_pos) const{
     return (it == block_map.end()) ? BlockType::EMPTY : it->second;
 }
 
-Chunk::operator bool() const {
-    // check if Chunk contains at least 1 block
-    return !block_map.empty();
-}
-
 void Chunk::compute_chunk_geometry() const {
     int n_faces = count_exposed_faces();
     // each visible face has INDICES_FACE_COUNT indices that represent the triangle
@@ -57,6 +52,7 @@ void Chunk::compute_chunk_geometry() const {
 #ifndef NDEBUG
     std::cout << "chunk geometry computed\n";
 #endif
+    local_buffer_ready = true;
 }
 
 int Chunk::count_exposed_faces() const {
@@ -169,7 +165,6 @@ void Chunk::generate_blockmap() {
     std::cout << "chunk initialized\n";
 #endif
     compute_chunk_geometry();
-    local_buffer_ready = true;
 }
 
 bool Chunk::is_visible(const glm::mat4 &viewproj) const {
@@ -305,7 +300,7 @@ std::unordered_map<glm::ivec3, bool> Chunk::getLightObstacles(const glm::ivec3 &
     return lightObstacles;
 }
 
-bool Chunk::isInit() const {
+bool Chunk::isLocalBufferReady() const {
     // check if thread has finished buffer modification
     return local_buffer_ready;
 }
@@ -324,4 +319,8 @@ std::array<glm::ivec2, 4> Chunk::computeXZBoundaries(const glm::ivec2 &pq) {
         { min[0], max[1] },
         { max[0], max[1] }
     }};
+}
+
+bool Chunk::needInitCall() const {
+    return !(init_chunk_thread.joinable() || isLocalBufferReady());
 }

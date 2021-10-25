@@ -35,12 +35,14 @@ void Scene::loadChunkNeighborhood(){
     for(int dp = -CREATE_CHUNK_RADIUS ; dp <= CREATE_CHUNK_RADIUS ; dp++){
         for(int dq = -CREATE_CHUNK_RADIUS ; dq <= CREATE_CHUNK_RADIUS ; dq++){
             const glm::ivec2 chunkPq{camera.getPq() + glm::ivec2{dp, dq}};
-            auto result = chunkMap.try_emplace(chunkPq, Chunk{chunkPq});
-            bool isInserted{result.second};
-            auto record{result.first};
-            if(isInserted) {
-                (record->second).init_chunk();
-            }
+            chunkMap.try_emplace(chunkPq, Chunk{chunkPq});
+        }
+    }
+
+    for(auto& pair : chunkMap){
+        Chunk& c = pair.second;
+        if(c.needInitCall()){
+            c.init_chunk();
         }
     }
 }
