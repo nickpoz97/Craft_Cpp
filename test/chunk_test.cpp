@@ -13,17 +13,14 @@ TEST_CASE("Chunk instantiation (not initialized) and block insertion", "[instant
 
     Chunk c{pq_coords};
     // empty chunk
-    REQUIRE(!static_cast<bool>(c));
+    REQUIRE(!c.isLocalBufferReady());
     REQUIRE(c.get_block(obstacle_block_pos) == BlockType::EMPTY);
 
     c.set_block(obstacle_block_pos, BlockType::SAND);
     REQUIRE(c.get_block(obstacle_block_pos) == BlockType::SAND);
-    // chunk with 1 block
-    REQUIRE(static_cast<bool>(c));
 
     c.set_block(obstacle_block_pos, BlockType::EMPTY);
     REQUIRE(c.get_block(obstacle_block_pos) == BlockType::EMPTY);
-    REQUIRE(!static_cast<bool>(c));
 
     c.set_block(obstacle_block_pos, BlockType::STONE);
     c.set_block(obstacle_block_pos + glm::ivec3{2,0,0}, BlockType::CLOUD);
@@ -41,7 +38,7 @@ TEST_CASE("Chunk instantiation with initialization", "[instantiation][chunk_init
     }
     for(const Chunk &c : chunk_list) {
         c.wait_thread();
-        REQUIRE(static_cast<bool>(c));
+        REQUIRE(c.isLocalBufferReady());
         REQUIRE(c.getHighestBlock() <= Chunk::get_y_limit());
         for (int x = c.get_min_x(); x <= c.get_max_x(); x++) {
             for (int z = c.get_min_z(); z <= c.get_max_z(); z++) {

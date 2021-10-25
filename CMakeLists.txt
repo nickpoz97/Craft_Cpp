@@ -4,11 +4,10 @@ project(cpp)
 set(CMAKE_CXX_STANDARD 17)
 file(MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O1 -fsanitize=address -fno-omit-frame-pointer")
+
 add_compile_options(-pg)
 add_link_options(-pg)
-
-#set(CMAKE_BUILD_TYPE Release)
-#add_compile_definitions(DEBUG)
 
 add_subdirectory(deps/glfw)
 add_subdirectory(deps/fmt)

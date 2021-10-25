@@ -11,7 +11,7 @@
 #include "vec2.hpp"
 #include "vec3.hpp"
 
-std::size_t hash_int(int key);
+std::size_t hash_int(int val);
 
 template<>
 struct std::hash<glm::ivec3>{

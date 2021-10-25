@@ -8,7 +8,8 @@
 #include "Chunk.hpp"
 
 
-std::size_t hash_int(int key) {
+std::size_t hash_int(int val) {
+    std::size_t key = static_cast<std::size_t>(val);
     key = ~key + (key << 15);
     key = key ^ (key >> 12);
     key = key + (key << 2);
