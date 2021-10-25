@@ -10,10 +10,10 @@
 #include "Scene.hpp"
 #include "stb_image.h"
 
-Scene::Scene(const GameViewSettings &gvs, const glm::vec3 &cameraPos, const glm::vec3 &cameraDirection,
+Scene::Scene(const GameViewSettings &gvs, const glm::vec3 &cameraPos, const glm::vec2 &cameraRotation,
              const ShaderNamesMap& snm) :
         gameView{GameView::setInstance(gvs.windowSize.x, gvs.windowSize.y, gvs.fov)},
-        camera{cameraPos, cameraDirection},
+        camera{cameraPos, cameraRotation},
         cameraControl{CameraControl::setInstance(camera)}{
     glfwSetInputMode(gameView->getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 #ifdef CURSOR_ENABLED
@@ -91,10 +91,9 @@ void Scene::loop() {
 }
 
 Scene *
-Scene::setInstance(const GameViewSettings &gvs, const glm::vec3 &cameraPos, const glm::vec3 &cameraDirection,
-                   const ShaderNamesMap &snm) {
+Scene::setInstance(const GameViewSettings& gvs, const glm::vec3& cameraPos, const glm::vec2 &cameraRotation, const ShaderNamesMap& snm) {
     if(!actualInstance){
-        actualInstance.reset(new Scene{gvs, cameraPos, cameraDirection, snm});
+        actualInstance.reset(new Scene{gvs, cameraPos, cameraRotation, snm});
     }
     return actualInstance.get();
 }
@@ -158,9 +157,11 @@ void Scene::showInfoText() const{
 
     const glm::ivec2& pq{camera.getPq()};
     const glm::vec3& pos{camera.getPos()};
+    const glm::vec3& front{camera.getFrontVector()};
 
-    std::string s{fmt::format("nChunks: {} ,camPq: ({},{}) ,camPos: ({},{},{})\n",
-        chunkMap.size(), pq.x, pq.y, pos.x, pos.y, pos.z)};
+    std::string s{fmt::format("nChunks: {} ,camPq: ({},{}) ,camPos: ({:.2f},{:.2f},{:.2f}), "
+                              "front: ({:.2f},{:.2f},{:.2f})\n",
+        chunkMap.size(), pq.x, pq.y, pos.x, pos.y, pos.z, front.x, front.y, front.z)};
 
     render_text(ALIGN_LEFT, {tx, ty}, ts, s);
 }

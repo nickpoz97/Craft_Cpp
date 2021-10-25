@@ -15,7 +15,7 @@ int main() {
             "../data/shaders/text_vertex.glsl","../data/shaders/text_fragment.glsl"
     });
 
-    Scene& scene{*Scene::setInstance(gvs, {0, 20, 0}, {0,-1,1}, snm)};
+    Scene& scene{*Scene::setInstance(gvs, {0, 20, 0}, {-90,-10}, snm)};
     if(scene.load_texture("../data/textures/texture.png", TextureName::GENERAL, 0) != 0){
         std::cerr << "general texture not loaded";
         return -1;

@@ -52,9 +52,9 @@ private:
     void deleteDistantChunks();
     void waitThreads() const;
 
-    Scene(const GameViewSettings& gvs, const glm::vec3& cameraPos, const glm::vec3 &cameraDirection, const ShaderNamesMap& snm);
+    Scene(const GameViewSettings& gvs, const glm::vec3& cameraPos, const glm::vec2 &cameraRotation, const ShaderNamesMap& snm);
 public:
-    static Scene* setInstance(const GameViewSettings& gvs, const glm::vec3& cameraPos, const glm::vec3& cameraDirection, const ShaderNamesMap& snm);
+    static Scene* setInstance(const GameViewSettings& gvs, const glm::vec3& cameraPos, const glm::vec2 &cameraRotation, const ShaderNamesMap& snm);
     void loop();
     int load_texture(std::string_view path, TextureName textureName, GLint clamp_type = GL_REPEAT);
     void clear();

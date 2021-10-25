@@ -7,16 +7,16 @@
 #include "Geometry/Chunk.hpp"
 #include "fmt/format.h"
 
-Camera::Camera(const glm::vec3 &camPos, const glm::vec3& camDirection, float camSpeed) :
+Camera::Camera(const glm::vec3 &camPos, const glm::vec2& rotation, float camSpeed) :
     pos{camPos},
-    speed{camSpeed},
-    direction{glm::normalize(camDirection)},
-    pitch{glm::asin(direction.y)},
-    yaw{glm::acos(direction.x + direction.z)}
+    yaw{rotation[0]},
+    pitch{rotation[1]},
+    speed{camSpeed}
     {
 #ifndef NDEBUG
     printCameraInfo();
 #endif
+        rotate(yaw, pitch);
 }
 
 void Camera::rotate(float yawOffset, float pitchOffset) {
@@ -74,4 +74,8 @@ void Camera::printCameraInfo() const{
 
 const glm::vec3 &Camera::getPos() const {
     return pos;
+}
+
+const glm::vec3 &Camera::getDirection() const {
+    return direction;
 }

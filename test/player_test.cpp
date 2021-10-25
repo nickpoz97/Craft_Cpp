@@ -3,17 +3,18 @@
 //
 
 #include "catch.hpp"
-#include "Interaction/Player.hpp"
+#include "Interaction/Camera.hpp"
 #include "vec3.hpp"
 #include "vec2.hpp"
 
 TEST_CASE("Player instantiation", "[instantiation]")
 {
-    auto position{GENERATE(glm::vec3{},glm::vec3{53,14,78})};
+    auto position{GENERATE(glm::vec3{0,20,0},glm::vec3{53,14,78})};
+    auto direction{GENERATE(glm::vec3{1,-1,1},glm::vec3{1,0,0})};
 
     SECTION("Using arbitrary position and default rotation") {
-        Player p{"name", 0, position, {}};
-        REQUIRE(p.get_position() == position);
+        Camera p{position, direction, 5};
+        REQUIRE(p.getPos() == position);
         REQUIRE(p.get_orientation_degrees() == glm::vec2{});
         REQUIRE(p.get_camera_direction_vector() == glm::vec3{1.0, 0.0, 0.0});
     }
