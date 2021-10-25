@@ -16,7 +16,7 @@ Scene::Scene(const GameViewSettings &gvs, const glm::vec3 &cameraPos, const glm:
         camera{cameraPos, cameraDirection},
         cameraControl{CameraControl::setInstance(camera)}{
     glfwSetInputMode(gameView->getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-#ifndef NDEBUG
+#ifdef CURSOR_ENABLED
     glfwSetInputMode(gameView->getWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 #endif
 
