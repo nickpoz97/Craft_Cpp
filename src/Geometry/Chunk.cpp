@@ -69,7 +69,7 @@ Chunk::BufferType::iterator Chunk::generate_block_geometry(BufferType::iterator 
                                const std::array<bool, 6>& visible_faces) const {
     if(tileBlock.is_plant()){
         Plant plant{
-                tileBlock.get_index(),
+                tileBlock.getBlockType(),
                 block_pos,
                 simplex2(block_pos.x, block_pos.z, 4, 0.5, 2) * 360,
                 vertex_it,
@@ -80,7 +80,7 @@ Chunk::BufferType::iterator Chunk::generate_block_geometry(BufferType::iterator 
     if(tileBlock.is_empty() || visible_faces.empty()){
         return vertex_it;
     }
-    Cube cube{tileBlock.get_index(), visible_faces, block_pos, vertex_it, getLightObstacles(block_pos)};
+    Cube cube{tileBlock.getBlockType(), visible_faces, block_pos, vertex_it, getLightObstacles(block_pos)};
     return cube.end();
 }
 
@@ -113,7 +113,7 @@ void Chunk::generate_blockmap() {
                 set_block({x, h-1, z}, static_cast<BlockType>(w * !on_edge_flag));
             }
             else {
-                for (int y = t; y < h; y++) {
+                for (int y = t - 1; y < h; y++) {
                     set_block({x, y, z}, static_cast<BlockType>(w * !on_edge_flag));
                 }
             }

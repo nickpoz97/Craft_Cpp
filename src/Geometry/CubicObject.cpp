@@ -73,20 +73,25 @@ CubicObject<n_faces>::CubicObject(const BlockType &block_type, const std::array<
                     du + (face_uvs[i].x ? B : A),
                     dv + (face_uvs[i].y ? B : A)
             };
+#ifndef NDEBUG
+            assert(lightObstacles.size() == 0 || lightObstacles.size() == 27);
+#endif
+
             actual_vertex.ao = 1.0f;
 
-            std::forward_list<glm::ivec3> obstaclesCoords{};
+            if(!lightObstacles.empty()){
+                std::forward_list<glm::ivec3> obstaclesCoords{};
 
-            glm::ivec3 directions = face_vertices[i] - face_normal;
-            if (directions.x != 0) obstaclesCoords.push_front(face_normal + glm::vec3{directions.x, 0, 0});
-            if (directions.y != 0) obstaclesCoords.push_front(face_normal + glm::vec3{0, directions.y, 0});
-            if (directions.z != 0) obstaclesCoords.push_front(face_normal + glm::vec3{0, 0, directions.z});
-            if(directions.x != 0 && directions.z != 0) {
-                obstaclesCoords.push_front(face_normal + glm::vec3{directions.x, 0, directions.z});
-            }
-
-            for (const auto &aoCoord: obstaclesCoords) {
-                actual_vertex.ao += actual_vertex.ao * lightObstacles.at(static_cast<glm::ivec3>(aoCoord));
+                glm::ivec3 directions = face_vertices[i] - face_normal;
+                if (directions.x != 0) obstaclesCoords.push_front(face_normal + glm::vec3{directions.x, 0, 0});
+                if (directions.y != 0) obstaclesCoords.push_front(face_normal + glm::vec3{0, directions.y, 0});
+                if (directions.z != 0) obstaclesCoords.push_front(face_normal + glm::vec3{0, 0, directions.z});
+                if(directions.x != 0 && directions.z != 0) {
+                    obstaclesCoords.push_front(face_normal + glm::vec3{directions.x, 0, directions.z});
+                }
+                for (const auto &aoCoord: obstaclesCoords) {
+                    actual_vertex.ao += actual_vertex.ao * lightObstacles.at(static_cast<glm::ivec3>(aoCoord));
+                }
             }
         actual_vertex.ao = 1 / actual_vertex.ao;
         }

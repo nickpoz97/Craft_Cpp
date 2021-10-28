@@ -33,7 +33,7 @@ TEST_CASE("Chunk instantiation with initialization", "[instantiation][chunk_init
 
     for(int p_offset = 0 ; p_offset < 2 ; p_offset++){
         for(int q_offset = 0 ; q_offset < 2 ; q_offset++){
-            chunk_list.emplace_front(pq_coords + glm::ivec2{p_offset, q_offset});
+            chunk_list.emplace_front(pq_coords + glm::ivec2{p_offset, q_offset}).init_chunk();
         }
     }
     for(const Chunk &c : chunk_list) {
@@ -51,7 +51,7 @@ TEST_CASE("Chunk instantiation with initialization", "[instantiation][chunk_init
                     auto tb = TileBlock{c.get_block({x, y, z})};
                     empty_found = empty_found || tb.is_empty();
                     bool assertion = (tb.is_user_buildable() && !empty_found) ||
-                        (!tb.is_user_buildable() && empty_found);
+                        (!tb.is_user_buildable() && empty_found) || tb.getBlockType() == BlockType::LEAVES;
                     REQUIRE(assertion);
                 }
             }

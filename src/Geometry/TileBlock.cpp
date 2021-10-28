@@ -133,7 +133,7 @@ TileBlock::operator BlockType() const {
     return tilecube_index;
 }
 
-BlockType TileBlock::get_index() const {
+BlockType TileBlock::getBlockType() const {
     return tilecube_index;
 }
 
@@ -144,11 +144,11 @@ bool TileBlock::is_user_buildable() const {
 }
 
 TileCube::Iterator TileBlock::begin() const {
-    return tiles[get_index()].begin();
+    return tiles[getBlockType()].begin();
 }
 
 TileCube::Iterator TileBlock::end() const {
-    return tiles[get_index()].end();
+    return tiles[getBlockType()].end();
 }
 
 TileCube::Iterator TileCube::begin() const{
