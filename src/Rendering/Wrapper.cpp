@@ -2,7 +2,7 @@
 // Created by ultimatenick on 01/09/21.
 //
 
-#include "Wrapper.hpp"
+#include "Rendering/Wrapper.hpp"
 
 template<typename WrapperType>
 Wrapper<WrapperType>::Iterator::Iterator(value_type* actual_attribute) : actual_attribute{actual_attribute} {}

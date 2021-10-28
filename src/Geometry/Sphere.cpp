@@ -2,10 +2,10 @@
 // Created by ultimatenick on 08/08/21.
 //
 
-#include <cmath>
+#include <glm/exponential.hpp>
 
-#include "Sphere.hpp"
-#include "ext/scalar_constants.hpp"
+#include "Geometry/Sphere.hpp"
+#include "glm/ext/scalar_constants.hpp"
 
 decltype(Sphere::triangles_indices) Sphere::triangles_indices{{
     {4, 3, 0}, {1, 4, 0},
@@ -25,7 +25,7 @@ decltype(Sphere::uvs) Sphere::uvs{{
 }};
 
 Sphere::Sphere(float r, int detail) : SuperClass{}, r{r}{
-    std::vector<Uv3DVertex> vertices(8 * pow(4, detail) * 24);
+    std::vector<Uv3DVertex> vertices(8 * glm::pow(4, detail) * 24);
     auto it = vertices.begin();
 
     for(const auto& ti : triangles_indices){

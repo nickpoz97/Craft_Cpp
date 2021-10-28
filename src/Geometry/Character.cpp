@@ -2,8 +2,8 @@
 // Created by ultimatenick on 13/08/21.
 //
 
-#include "Character.hpp"
-#include "ext/matrix_transform.hpp"
+#include "Geometry/Character.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
 Character::Character(const glm::vec2 &position, float m, float n, char c){
     int w = c - 32;

@@ -3,9 +3,9 @@
 //
 
 #include <iostream>
-#include "Crosshair.hpp"
-#include "../Rendering/Shader.hpp"
-#include "Vertex.hpp"
+#include "Geometry/Crosshair.hpp"
+#include "Geometry/Vertex.hpp"
+#include "Rendering/Shader.hpp"
 
 Crosshair::Crosshair(int width, int height, int scale) : SuperClass(get_ends_coordinates(width, height, scale)) {};
 

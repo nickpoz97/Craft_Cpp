@@ -5,10 +5,10 @@
 #define GLFW_INCLUDE_NONE
 
 #include <iostream>
-#include "GameView.hpp"
-#include "trigonometric.hpp"
-#include "gtc/matrix_transform.hpp"
-#include "glad/glad.h"
+#include "Interaction/GameView.hpp"
+#include "glm/trigonometric.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glad/include/glad/glad.h"
 #include "GLFW/glfw3.h"
 
 int GameView::compute_scale_factor(int width, int height) {

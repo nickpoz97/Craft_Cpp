@@ -2,8 +2,8 @@
 // Created by ultimatenick on 07/10/21.
 //
 
-#include "Camera.hpp"
-#include "gtx/rotate_vector.hpp"
+#include "Interaction/Camera.hpp"
+#include "glm/gtx/rotate_vector.hpp"
 #include "Geometry/Chunk.hpp"
 #include "fmt/format.h"
 

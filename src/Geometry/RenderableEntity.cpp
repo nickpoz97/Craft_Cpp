@@ -2,7 +2,7 @@
 // Created by ultimatenick on 03/09/21.
 //
 
-#include "RenderableEntity.hpp"
+#include "Geometry/RenderableEntity.hpp"
 #include "Interaction/GameView.hpp"
 
 template<typename VertexType>

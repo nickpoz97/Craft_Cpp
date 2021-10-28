@@ -32,13 +32,8 @@ set(TEST_MAIN test/main_test.cpp)
 add_executable(catch_test ${SOURCE_FILES} ./deps/noise/noise.cpp
         ${TEST_MAIN})
 
-include_directories(deps/glad/include/)
-include_directories(deps/glfw/include/)
-include_directories(deps/glm/)
-include_directories(deps/noise/)
-include_directories(deps/stbi/)
-include_directories(deps/fmt/include/)
-include_directories(deps/catch2)
-include_directories(src)
+set(INCLUDE_DIRS deps/ include/)
+
+include_directories(${INCLUDE_DIRS})
 
 add_test(NAME catch_test COMMAND "./catch_test" WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)

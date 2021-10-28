@@ -3,8 +3,9 @@
 //
 
 #include <iostream>
-#include "GLError.hpp"
-#include "glad/glad.h"
+
+#include "Rendering/GLError.hpp"
+#include "glad/include/glad/glad.h"
 
 void _check_gl_error(const char *file, int line) {
     GLenum err (glGetError());

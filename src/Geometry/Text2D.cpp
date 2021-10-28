@@ -2,8 +2,8 @@
 // Created by ultimatenick on 13/08/21.
 //
 
-#include "Text2D.hpp"
-#include "Character.hpp"
+#include "Geometry/Text2D.hpp"
+#include "Geometry/Character.hpp"
 
 Text2D::Text2D(const glm::vec2& position, float n, std::string_view text) : SuperClass{gen_buffer(position, n, text)} {
 }

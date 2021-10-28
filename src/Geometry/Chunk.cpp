@@ -5,9 +5,9 @@
 #include <numeric>
 #include <iostream>
 #include <map>
-#include "Chunk.hpp"
-#include "noise.hpp"
-#include "CubicObject.hpp"
+#include "Geometry/Chunk.hpp"
+#include "noise/noise.hpp"
+#include "Geometry/CubicObject.hpp"
 
 Chunk::Chunk(const glm::ivec2 &pq_coordinates)
         : block_map{}, pq{pq_coordinates}, SuperClass{},

@@ -3,7 +3,7 @@
 //
 
 #include <iostream>
-#include "CameraControl.hpp"
+#include "Interaction/CameraControl.hpp"
 #include "GLFW/glfw3.h"
 
 CameraControl::CameraControl(Camera &flyingCamera, const glm::ivec2 &initialMousePos, GLFWwindow *window)

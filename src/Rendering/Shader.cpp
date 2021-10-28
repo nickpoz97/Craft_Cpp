@@ -7,12 +7,12 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include <vec3.hpp>
-#include "Shader.hpp"
-#include "gtc/type_ptr.hpp"
-#include "glad/glad.h"
+#include <glm/vec3.hpp>
+#include "Rendering/Shader.hpp"
+#include "glm/gtc/type_ptr.hpp"
+#include "glad/include/glad/glad.h"
 #include "GLFW/glfw3.h"
-#include "GLError.hpp"
+#include "Rendering/GLError.hpp"
 
 Shader::Shader(std::string_view vs_path,
                std::string_view fs_path){

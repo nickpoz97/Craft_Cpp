@@ -2,7 +2,7 @@
 // Created by ultimatenick on 07/08/21.
 //
 
-#include "TileBlock.hpp"
+#include "Geometry/TileBlock.hpp"
 
 decltype(TileBlock::tiles) TileBlock::tiles{{
     {0, 0, 0, 0, 0, 0}, // 0 - empty

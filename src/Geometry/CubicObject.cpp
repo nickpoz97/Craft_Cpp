@@ -4,13 +4,13 @@
 
 #include <numeric>
 #include <forward_list>
-#include <fmt/ostream.h>
-#include <gtx/rotate_vector.hpp>
 
-#include "vec3.hpp"
-#include "CubicObject.hpp"
-#include "map_utils.hpp"
-#include "trigonometric.hpp"
+#include "fmt/ostream.h"
+#include "glm/trigonometric.hpp"
+#include "glm/gtx/rotate_vector.hpp"
+#include "glm/vec3.hpp"
+#include "Geometry/CubicObject.hpp"
+#include "Geometry/map_utils.hpp"
 
 template<>
 const float CubicObject<6>::A = 0.0 + 1 / 2048.0;

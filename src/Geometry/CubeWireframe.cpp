@@ -2,7 +2,7 @@
 // Created by ultimatenick on 11/08/21.
 //
 
-#include "CubeWireframe.hpp"
+#include "Geometry/CubeWireframe.hpp"
 #include "Interaction/GameView.hpp"
 
 decltype(CubeWireframe::local_vertex_positions) CubeWireframe::local_vertex_positions{{

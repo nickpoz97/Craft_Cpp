@@ -4,8 +4,8 @@
 
 #include "unordered_map"
 
-#include "map_utils.hpp"
-#include "Chunk.hpp"
+#include "Geometry/map_utils.hpp"
+#include "Geometry/Chunk.hpp"
 
 
 std::size_t hash_int(int val) {

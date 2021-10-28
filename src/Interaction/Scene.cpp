@@ -7,8 +7,8 @@
 #include <iostream>
 #include <Geometry/Text2D.hpp>
 #include <fmt/format.h>
-#include "Scene.hpp"
-#include "stb_image.h"
+#include "Interaction/Scene.hpp"
+#include "stbi/stb_image.h"
 
 Scene::Scene(const GameViewSettings &gvs, const glm::vec3 &cameraPos, const glm::vec2 &cameraRotation,
              const ShaderNamesMap& snm) :

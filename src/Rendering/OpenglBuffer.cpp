@@ -2,10 +2,10 @@
 // Created by ultimatenick on 11/08/21.
 //
 
-#include "glad/glad.h"
+#include "glad/include/glad/glad.h"
 
-#include "vec3.hpp"
-#include "OpenglBuffer.hpp"
+#include "glm/vec3.hpp"
+#include "Rendering/OpenglBuffer.hpp"
 
 template<typename VertexType>
 OpenglBuffer<VertexType>::OpenglBuffer(bool openGLReady) {

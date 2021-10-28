@@ -2,10 +2,10 @@
 // Created by ultimatenick on 03/09/21.
 //
 
-#include <ext/scalar_constants.hpp>
-#include "map_utils.hpp"
-#include "Item.hpp"
-#include "CubicObject.hpp"
+#include "glm/ext/scalar_constants.hpp"
+#include "Geometry/map_utils.hpp"
+#include "Geometry/Item.hpp"
+#include "Geometry/CubicObject.hpp"
 
 Item::Item(BlockType w, const glm::vec2 &center_position) :
 SuperClass{gen_local_buffer(w, center_position)} {}
