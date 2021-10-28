@@ -11,7 +11,7 @@ static constexpr int VERTICES_FACE_COUNT = 4;
 static constexpr float N = 0.5f;
 static constexpr int RENDER_CHUNK_RADIUS = 1;
 static constexpr int CREATE_CHUNK_RADIUS = 1;
-static constexpr int DELETE_CHUNK_RADIUS = 3;
+static constexpr int DELETE_CHUNK_RADIUS = 4;
 
 static constexpr double SCROLL_TRESHOLD = 0.1;
 static constexpr int ALIGN_LEFT = 0;

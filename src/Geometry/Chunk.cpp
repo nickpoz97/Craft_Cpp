@@ -93,11 +93,9 @@ void Chunk::update_buffer() const {
 }
 
 void Chunk::generate_blockmap() {
-    const int pad = 1;
     // for each block xz position
-    for(int dx{-pad}; dx < Chunk::SIZE + pad ; dx++){
-        for(int dz{-pad}; dz < Chunk::SIZE + pad ; dz++){
-            int on_edge_flag = (dx < 0 || dz < 0 || dx >= Chunk::SIZE || dz >= Chunk::SIZE);
+    for(int dx = 0; dx < Chunk::SIZE ; dx++){
+        for(int dz = 0; dz < Chunk::SIZE ; dz++){
             int x = pq.x * Chunk::SIZE + dx;
             int z = pq.y * Chunk::SIZE + dz;
 
@@ -110,14 +108,14 @@ void Chunk::generate_blockmap() {
             if (h <= t) {
                 h = t;
                 w = BlockType::SAND;
-                set_block({x, h-1, z}, static_cast<BlockType>(w * !on_edge_flag));
+                set_block({x, h-1, z}, static_cast<BlockType>(w));
             }
             else {
                 for (int y = t - 1; y < h; y++) {
-                    set_block({x, y, z}, static_cast<BlockType>(w * !on_edge_flag));
+                    set_block({x, y, z}, static_cast<BlockType>(w));
                 }
             }
-            if(w == BlockType::GRASS && !on_edge_flag) {
+            if(w == BlockType::GRASS) {
                 if (SHOW_PLANTS) {
                     // grass
                     if (simplex2(-x * 0.1, z * 0.1, 4, 0.8, 2) > 0.6) {

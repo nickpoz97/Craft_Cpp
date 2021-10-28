@@ -43,7 +43,8 @@ TEST_CASE("Chunk instantiation with initialization", "[instantiation][chunk_init
         for (int x = c.get_min_x(); x <= c.get_max_x(); x++) {
             for (int z = c.get_min_z(); z <= c.get_max_z(); z++) {
                 bool empty_found = false;
-                for(int y = 0 ; y < Chunk::get_y_limit() ; y++) {
+                static constexpr int minHeight = 11;
+                for(int y = minHeight ; y < Chunk::get_y_limit() ; y++) {
                     if (c.is_on_border(glm::ivec3{x,y,z})) {
                         REQUIRE(c.get_block({x, 0, z}) == BlockType::EMPTY);
                         continue;

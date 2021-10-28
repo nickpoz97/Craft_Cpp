@@ -1,13 +1,16 @@
 cmake_minimum_required(VERSION 3.19)
-project(cpp)
+project(CppCraft)
+enable_testing()
 
 set(CMAKE_CXX_STANDARD 17)
 file(MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O1 -fsanitize=address -fno-omit-frame-pointer")
+set(CMAKE_CXX_FLAGS_SANITIZER "${CMAKE_CXX_FLAGS_DEBUG} -O1 -fsanitize=address -fno-omit-frame-pointer")
+set(CMAKE_EXE_LINKER_FLAGS_SANITIZER "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer")
 
-add_compile_options(-pg)
-add_link_options(-pg)
+#add_compile_options(-pg)
+#add_link_options(-pg)
+message(STATUS "Current path: ${CMAKE_CURRENT_BINARY_DIR}}")
 
 add_subdirectory(deps/glfw)
 add_subdirectory(deps/fmt)
@@ -16,31 +19,18 @@ link_libraries(${CMAKE_DL_LIBS} glfw fmt)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
 
-file(GLOB GEOMETRY_FILES src/Geometry/*.cpp)
-set(INTERACTION_FILES src/Interaction/CameraControl.cpp
-        src/Interaction/Camera.cpp
-        src/Interaction/GameView.cpp
-        src/Interaction/Scene.cpp
-)
-file(GLOB RENDERING_FILES src/Rendering/*.cpp deps/glad/src/*.c)
+file(GLOB_RECURSE INTERNAL_SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
+set(EXTERNAL_SOURCES deps/noise/noise.cpp deps/glad/src/glad.c)
+
+set(SOURCE_FILES ${INTERNAL_SOURCES} ${EXTERNAL_SOURCES})
+add_executable(app ${SOURCE_FILES})
+
 file(GLOB CATCH_TEST_FILES ${PROJECT_SOURCE_DIR}/test/*.cpp)
-file(GLOB RENDERING_TEST_FILES ${PROJECT_SOURCE_DIR}/rendering_test/*)
-set(SOURCE_FILES ${GEOMETRY_FILES} ${INTERACTION_FILES} ${RENDERING_FILES} deps/noise/noise.cpp)
-set(MAIN src/App.cpp)
-
-add_executable(app ${SOURCE_FILES} ${MAIN})
-
-#target_compile_options(chunk_rendering PUBLIC ${CMAKE_CXX_FLAGS})
-#target_link_options(chunk_rendering PUBLIC ${CMAKE_CXX_FLAGS})
 
 set(TEST_MAIN test/main_test.cpp)
 
-#add_executable(player_catch ${INTERACTION_FILES} ${RENDERING_FILES} ${GEOMETRY_FILES} ./deps/noise/noise.cpp
-#        ${TEST_MAIN} test/player_test.cpp)
-#add_executable(tileblock_test ${INTERACTION_FILES} ${RENDERING_FILES} ${GEOMETRY_FILES} ./deps/noise/noise.cpp
-#        ${TEST_MAIN} test/tileblock_test.cpp)
-add_executable(catch_test ${INTERACTION_FILES} ${RENDERING_FILES} ${GEOMETRY_FILES} ./deps/noise/noise.cpp
-        ${TEST_MAIN} test/tileblock_test.cpp test/cubic_object_test.cpp test/chunk_test.cpp)
+add_executable(catch_test ${SOURCE_FILES} ./deps/noise/noise.cpp
+        ${TEST_MAIN})
 
 include_directories(deps/glad/include/)
 include_directories(deps/glfw/include/)
@@ -51,8 +41,4 @@ include_directories(deps/fmt/include/)
 include_directories(deps/catch2)
 include_directories(src)
 
-enable_testing()
-#add_test(NAME player_catch COMMAND ./player_catch WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
-#add_test(NAME tileblock_catch COMMAND ./tileblock_test WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 add_test(NAME catch_test COMMAND "./catch_test" WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
-#add_test(NAME tileblock_catch COMMAND "./catch_test WORKING_DIRECTORY" ${PROJECT_SOURCE_DIR}/bin)
