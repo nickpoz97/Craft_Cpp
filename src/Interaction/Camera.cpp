@@ -29,7 +29,7 @@ void Camera::rotate(float yawOffset, float pitchOffset) {
             glm::sin(glm::radians(pitch)),
             glm::sin(glm::radians(yaw)) * glm::cos(glm::radians(pitch))
     });
-#ifdef PRINT_CAM_INFO
+#ifndef NDEBUG
     printCameraInfo();
 #endif
 }

@@ -17,7 +17,7 @@ Scene::Scene(const GameViewSettings &gvs, const glm::vec3 &cameraPos, const glm:
         camera{cameraPos, cameraRotation},
         cameraControl{CameraControl::setInstance(camera)} {
     glfwSetInputMode(gameView->getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-#ifdef CURSOR_ENABLED
+#ifndef NDEBUG
     glfwSetInputMode(gameView->getWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 #endif
 
@@ -80,9 +80,9 @@ void Scene::loop() {
     loadChunkNeighborhood();
     for (const auto &pair: chunkMap) {
         const Chunk &c = pair.second;
-        //if (pair.second.is_visible(viewProj)) {
+        if (pair.second.is_visible(viewProj)) {
             c.render_object();
-        //}
+        }
     }
     showInfoText();
     glfwSwapBuffers(GameView::getWindow());

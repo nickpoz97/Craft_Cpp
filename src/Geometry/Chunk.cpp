@@ -167,19 +167,24 @@ void Chunk::generate_blockmap() {
 }
 
 bool Chunk::is_visible(const glm::mat4 &viewproj) const {
-    auto isIn = [](const glm::vec4& worldPoint){
-        const glm::vec4 clipPoint = glm::abs(worldPoint) / worldPoint.w;
-        return clipPoint.x < 1 && clipPoint.z < 1;
+    // coeff: 0 == in, -1 == out, +1 == out
+    auto clip = [](const glm::vec4& worldPoint){
+        const glm::vec4 clipPoint = worldPoint / worldPoint.w;
+        return glm::ivec2{glm::sign(glm::ivec2{clipPoint.x, clipPoint.z})};
     };
 
+    glm::ivec2 sum{};
+
     for (const auto &p: xz_boundaries) {
-        glm::vec4 cornerPoint = viewproj * glm::vec4{p[0], 0, p[1], 1.0f};
-        if (isIn(cornerPoint)) {
+        glm::vec4 cornerPoint = viewproj * glm::vec4{p[0], 0.0f, p[1], 1.0f};
+        auto position = clip(cornerPoint);
+        if(glm::any(glm::equal(position, {}))){
             return true;
         }
+        sum += position;
     }
 
-    return false;
+    return glm::any(glm::equal(sum, {}));
 }
 
 std::array<glm::ivec3, 8> Chunk::get_chunk_boundaries() const {
@@ -188,10 +193,10 @@ std::array<glm::ivec3, 8> Chunk::get_chunk_boundaries() const {
 
     it = std::transform(xz_boundaries.begin(), xz_boundaries.end(), it,
         [](const glm::ivec2& v){return glm::ivec3{v[0], 0, v[1]};});
-    std::transform(xz_boundaries.begin(), xz_boundaries.end(), it,
+    it = std::transform(xz_boundaries.begin(), xz_boundaries.end(), it,
         [](const glm::ivec2& v){return glm::ivec3{v[0], Y_LIMIT, v[1]};});
 
-#ifdef NDEBUG
+#ifndef NDEBUG
     assert(it == boundaries.end());
 #endif
     return boundaries;
