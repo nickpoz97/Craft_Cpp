@@ -10,13 +10,11 @@
 namespace CraftCpp {
 Camera::Camera(const glm::vec3 &camPos, const glm::vec2 &rotation, float camSpeed) :
         pos{camPos},
-        yaw{rotation[0]},
-        pitch{rotation[1]},
         speed{camSpeed} {
+    rotate(rotation[0], rotation[1]);
 #ifndef NDEBUG
     printCameraInfo();
 #endif
-    rotate(yaw, pitch);
 }
 
 void Camera::rotate(float yawOffset, float pitchOffset) {

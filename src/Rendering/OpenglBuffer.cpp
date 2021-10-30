@@ -25,28 +25,32 @@ OpenglBuffer<VertexType>::~OpenglBuffer() {
 }
 
 template<typename VertexType>
-void OpenglBuffer<VertexType>::draw_triangles() const {
-    bind_buffer();
+void OpenglBuffer<VertexType>::drawTriangles() const {
+    if(!VBO || !VAO){
+        return;
+    }
 
-    set_vao_attributes();
-    for (int i = 0, j = 0; i < attributes_dimensions.size(); ++i) {
-        if (attributes_dimensions[i] != 0) {
+    bindBuffer();
+
+    setVaoAttributes();
+    for (int i = 0, j = 0; i < attributesDimensions.size(); ++i) {
+        if (attributesDimensions[i] != 0) {
             glEnableVertexAttribArray(j++);
         };
     }
-    glDrawArrays(GL_TRIANGLES, 0, n_indices);
-    for (int i = 0, j = 0; i < attributes_dimensions.size(); ++i) {
-        if (attributes_dimensions[i] != 0) { glDisableVertexAttribArray(j++); };
+    glDrawArrays(GL_TRIANGLES, 0, nIndices);
+    for (int i = 0, j = 0; i < attributesDimensions.size(); ++i) {
+        if (attributesDimensions[i] != 0) { glDisableVertexAttribArray(j++); };
     }
-    unbind_buffer();
+    unbindBuffer();
 }
 
 template<typename VertexType>
-void OpenglBuffer<VertexType>::set_vao_attributes() const {
+void OpenglBuffer<VertexType>::setVaoAttributes() const {
     size_t offset = 0;
     int i = 0;
 
-    for (int a_dim: attributes_dimensions) {
+    for (int a_dim: attributesDimensions) {
         if (a_dim != 0) {
             glVertexAttribPointer(i++, a_dim, GL_FLOAT, GL_FALSE, STRIDE, (GLvoid *) offset);
             offset += a_dim * sizeof(float);
@@ -55,45 +59,53 @@ void OpenglBuffer<VertexType>::set_vao_attributes() const {
 }
 
 template<typename VertexType>
-void OpenglBuffer<VertexType>::draw_lines() const {
-    bind_buffer();
-    glVertexAttribPointer(0, get_n_pos_elements<VertexType>(), GL_FLOAT, GL_FALSE, 0, 0);
+void OpenglBuffer<VertexType>::drawLines() const {
+    if(!VBO || !VAO){
+        return;
+    }
+
+    bindBuffer();
+    glVertexAttribPointer(0, getNPosElements<VertexType>(), GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(0);
-    glDrawArrays(GL_LINES, 0, n_indices);
+    glDrawArrays(GL_LINES, 0, nIndices);
     glDisableVertexAttribArray(0);
-    unbind_buffer();
+    unbindBuffer();
 }
 
 template<typename VertexType>
-void OpenglBuffer<VertexType>::store_data(const std::vector<VertexType> &buffer) const {
+void OpenglBuffer<VertexType>::storeData(const std::vector<VertexType> &buffer) const {
+    if(!VBO || !VAO){
+        return;
+    }
+
     //_store_data(sizeof(buffer), reinterpret_cast<const GLfloat*>(buffer.data()));
-    _store_data(buffer.size() * sizeof(VertexType), reinterpret_cast<const GLfloat *>(buffer.data()));
+    _storeData(buffer.size() * sizeof(VertexType), reinterpret_cast<const GLfloat *>(buffer.data()));
 
-    n_indices = buffer.size();
+    nIndices = buffer.size();
 }
 
 template<typename VertexType>
-void OpenglBuffer<VertexType>::_store_data(int size, const GLfloat *data) const {
+void OpenglBuffer<VertexType>::_storeData(int size, const GLfloat *data) const {
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind
 }
 
 template<typename VertexType>
-void OpenglBuffer<VertexType>::bind_buffer() const {
+void OpenglBuffer<VertexType>::bindBuffer() const {
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBindVertexArray(VAO);
 }
 
 template<typename VertexType>
-void OpenglBuffer<VertexType>::unbind_buffer() const {
+void OpenglBuffer<VertexType>::unbindBuffer() const {
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 template<typename VertexType>
 OpenglBuffer<VertexType>::OpenglBuffer(OpenglBuffer<VertexType> &&other) noexcept :
-        VAO{other.VAO}, VBO{other.VBO}, n_indices{other.n_indices} {
+        VAO{other.VAO}, VBO{other.VBO}, nIndices{other.nIndices} {
 
     other.VAO = 0;
     other.VBO = 0;

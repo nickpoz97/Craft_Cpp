@@ -14,7 +14,7 @@ private:
     glm::vec3 pos;
 
     float pitch{};
-    float yaw{-90};
+    float yaw{};
     glm::vec3 direction{};
     float speed;
 

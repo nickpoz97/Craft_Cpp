@@ -14,39 +14,39 @@
 
 namespace CraftCpp {
 template<typename VertexType, std::enable_if_t<std::is_base_of_v<NormalVertex, VertexType>, bool> = true>
-constexpr int get_n_normal_elements() {
+constexpr int getNNormal_elements() {
     return decltype(VertexType::normal)::length();
 }
 
 template<typename VertexType, std::enable_if_t<!std::is_base_of_v<NormalVertex, VertexType>, bool> = true>
-constexpr int get_n_normal_elements() {
+constexpr int getNNormal_elements() {
     return 0;
 }
 
 template<typename VertexType, std::enable_if_t<
         std::is_base_of_v<Uv2DVertex, VertexType> || std::is_base_of_v<Uv3DVertex, VertexType>, bool> = true>
-constexpr int get_n_uv_elements() {
+constexpr int getNUvElements() {
     return decltype(VertexType::uv)::length();
 }
 
 template<typename VertexType, std::enable_if_t<
         !std::is_base_of_v<Uv2DVertex, VertexType> && !std::is_base_of_v<Uv3DVertex, VertexType>, bool> = true>
-constexpr int get_n_uv_elements() {
+constexpr int getNUvElements() {
     return 0;
 }
 
 template<typename VertexType, std::enable_if_t<std::is_base_of_v<CubeVertex, VertexType>, bool> = true>
-constexpr int get_n_ao_elements() {
+constexpr int getNAoElements() {
     return 1;
 }
 
 template<typename VertexType, std::enable_if_t<!std::is_base_of_v<CubeVertex, VertexType>, bool> = true>
-constexpr int get_n_ao_elements() {
+constexpr int getNAoElements() {
     return 0;
 }
 
 template<typename VertexType>
-constexpr int get_n_pos_elements() {
+constexpr int getNPosElements() {
     return decltype(VertexType::position)::length();
 }
 
@@ -57,20 +57,20 @@ private:
     GLuint VAO{};
     static constexpr GLuint STRIDE = sizeof(VertexType);
 
-    void set_vao_attributes() const;
+    void setVaoAttributes() const;
 
-    void _store_data(int size, const GLfloat *data) const;
+    void _storeData(int size, const GLfloat *data) const;
 
-    void bind_buffer() const;
+    void bindBuffer() const;
 
-    void unbind_buffer() const;
+    void unbindBuffer() const;
 
-    mutable size_t n_indices{};
-    static constexpr std::array<int, 4> attributes_dimensions{
-            get_n_pos_elements<VertexType>(),
-            get_n_uv_elements<VertexType>(),
-            get_n_normal_elements<VertexType>(),
-            get_n_ao_elements<VertexType>()
+    mutable size_t nIndices{};
+    static constexpr std::array<int, 4> attributesDimensions{
+            getNPosElements<VertexType>(),
+            getNUvElements<VertexType>(),
+            getNNormal_elements<VertexType>(),
+            getNAoElements<VertexType>()
     };
 public:
     explicit OpenglBuffer(bool openGLReady);
@@ -87,11 +87,11 @@ public:
 
     ~OpenglBuffer();
 
-    void store_data(const std::vector<VertexType> &buffer) const;
+    void storeData(const std::vector<VertexType> &buffer) const;
 
-    void draw_triangles() const;
+    void drawTriangles() const;
 
-    void draw_lines() const;
+    void drawLines() const;
 };
 }
 #endif //CPP_OPENGLBUFFER_HPP

@@ -2,23 +2,32 @@
 // Created by ultimatenick on 27/09/21.
 //
 
-#include "catch.hpp"
+#include <Geometry/Chunk.hpp>
+#include "catch2/catch.hpp"
 #include "Interaction/Camera.hpp"
-#include "vec3.hpp"
-#include "vec2.hpp"
+#include "glm/vec3.hpp"
+#include "glm/vec2.hpp"
+#include "glm/trigonometric.hpp"
+#include "glm/geometric.hpp"
+#include "glm/gtc/epsilon.hpp"
 
-TEST_CASE("Player instantiation", "[instantiation]")
+TEST_CASE("Camera instantiation", "[instantiation]")
 {
     auto position{GENERATE(glm::vec3{0,20,0},glm::vec3{53,14,78})};
-    auto direction{GENERATE(glm::vec3{1,-1,1},glm::vec3{1,0,0})};
+    auto orientation{GENERATE(glm::vec2{0,0},glm::vec2{180,-30})};
 
-    SECTION("Using arbitrary position and default rotation") {
-        Camera p{position, direction, 5};
-        REQUIRE(p.getPos() == position);
-        REQUIRE(p.get_orientation_degrees() == glm::vec2{});
-        REQUIRE(p.get_camera_direction_vector() == glm::vec3{1.0, 0.0, 0.0});
+    SECTION("Using arbitrary position and rotation") {
+        const CraftCpp::Camera cam{position, orientation, 5};
+        REQUIRE(cam.getPos() == position);
+        REQUIRE(cam.getPq() == CraftCpp::Chunk::chunked(cam.getPos()));
+
+        glm::vec3 direction{glm::cos(glm::radians(orientation[0])) * glm::cos(glm::radians(orientation[1])),
+                            glm::sin(glm::radians(orientation[1])),
+                            glm::sin(glm::radians(orientation[0])) * glm::cos(glm::radians(orientation[1]))};
+        auto equality = glm::epsilonEqual(glm::normalize(direction), cam.getDirection(), 0.01f);
+        REQUIRE((equality.x && equality.y && equality.z));
     }
-    SECTION("Using arbitrary position and pointing to up-right"){
+    /*SECTION("Using arbitrary position and pointing to up-right"){
         auto orientation{GENERATE(glm::vec2{45,45}, glm::vec2{60,30}, glm::vec2{30,60})};
         Player p{"name", 0, position, orientation};
         REQUIRE(p.get_position() == position);
@@ -52,5 +61,5 @@ TEST_CASE("Player instantiation", "[instantiation]")
         Player p{"name", 0, position, orientation_pairs.first};
         REQUIRE(p.get_position() == glm::vec3{53,14,78});
         REQUIRE(p.get_orientation_degrees() == orientation_pairs.second);
-    }
+    }*/
 }

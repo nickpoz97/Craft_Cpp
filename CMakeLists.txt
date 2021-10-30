@@ -20,17 +20,19 @@ link_libraries(${CMAKE_DL_LIBS} glfw fmt)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
 
 file(GLOB_RECURSE INTERNAL_SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
+set(APP_MAIN "${PROJECT_SOURCE_DIR}/src/App.cpp")
+list(FILTER INTERNAL_SOURCES EXCLUDE REGEX "${APP_MAIN}")
+
 set(EXTERNAL_SOURCES deps/noise/noise.cpp deps/glad/src/glad.c)
 
 set(SOURCE_FILES ${INTERNAL_SOURCES} ${EXTERNAL_SOURCES})
-add_executable(app ${SOURCE_FILES})
+add_executable(app ${APP_MAIN} ${SOURCE_FILES})
 
 file(GLOB CATCH_TEST_FILES ${PROJECT_SOURCE_DIR}/test/*.cpp)
 
-set(TEST_MAIN test/main_test.cpp)
+file(GLOB_RECURSE TEST_FILES test/*.cpp)
 
-add_executable(catch_test ${SOURCE_FILES} ./deps/noise/noise.cpp
-        ${TEST_MAIN})
+add_executable(catch_test ${SOURCE_FILES} ${TEST_FILES})
 
 set(INCLUDE_DIRS deps/ include/)
 

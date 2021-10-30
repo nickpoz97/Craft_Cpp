@@ -13,23 +13,23 @@ template<typename VertexType>
 RenderableEntity<VertexType>::RenderableEntity(const std::vector<VertexType> &local_buffer) :
         RenderableEntity{} {
     if (!local_buffer.empty() && GameView::isInstantiated()) {
-        gpu_buffer.store_data(local_buffer);
+        gpu_buffer.storeData(local_buffer);
     }
 }
 
 template<typename VertexType>
 void RenderableEntity<VertexType>::render_object() const {
-    gpu_buffer.draw_triangles();
+    gpu_buffer.drawTriangles();
 }
 
 template<typename VertexType>
 void RenderableEntity<VertexType>::render_lines() const {
-    gpu_buffer.draw_lines();
+    gpu_buffer.drawLines();
 }
 
 template<typename VertexType>
 void RenderableEntity<VertexType>::update_buffer(const std::vector<VertexType> &local_buffer) const {
-    gpu_buffer.store_data(local_buffer);
+    gpu_buffer.storeData(local_buffer);
 }
 
 template<typename VertexType>

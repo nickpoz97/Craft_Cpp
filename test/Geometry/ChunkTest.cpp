@@ -4,55 +4,55 @@
 
 #include <forward_list>
 #include "Geometry/Chunk.hpp"
-#include "catch.hpp"
-#include "gtc/matrix_transform.hpp"
+#include "catch2/catch.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 
-TEST_CASE("Chunk instantiation (not initialized) and block insertion", "[instantiation]"){
+TEST_CASE("Chunk instantiation (not initialized) and block insertion"){
     auto pq_coords = GENERATE(glm::vec2{4.7,6.9}, glm::vec2{9,10});
     auto obstacle_block_pos = GENERATE(glm::ivec3{5, 4, 9}, glm::ivec3{6, 8, 9});
 
-    Chunk c{pq_coords};
+    CraftCpp::Chunk c{pq_coords};
     // empty chunk
     REQUIRE(!c.isLocalBufferReady());
-    REQUIRE(c.get_block(obstacle_block_pos) == BlockType::EMPTY);
+    REQUIRE(c.get_block(obstacle_block_pos) == CraftCpp::BlockType::EMPTY);
 
-    c.set_block(obstacle_block_pos, BlockType::SAND);
-    REQUIRE(c.get_block(obstacle_block_pos) == BlockType::SAND);
+    c.set_block(obstacle_block_pos, CraftCpp::BlockType::SAND);
+    REQUIRE(c.get_block(obstacle_block_pos) == CraftCpp::BlockType::SAND);
 
-    c.set_block(obstacle_block_pos, BlockType::EMPTY);
-    REQUIRE(c.get_block(obstacle_block_pos) == BlockType::EMPTY);
+    c.set_block(obstacle_block_pos, CraftCpp::BlockType::EMPTY);
+    REQUIRE(c.get_block(obstacle_block_pos) == CraftCpp::BlockType::EMPTY);
 
-    c.set_block(obstacle_block_pos, BlockType::STONE);
-    c.set_block(obstacle_block_pos + glm::ivec3{2,0,0}, BlockType::CLOUD);
+    c.set_block(obstacle_block_pos, CraftCpp::BlockType::STONE);
+    c.set_block(obstacle_block_pos + glm::ivec3{2,0,0}, CraftCpp::BlockType::CLOUD);
     REQUIRE(c.getHighestBlock() == obstacle_block_pos.y);
 }
 
-TEST_CASE("Chunk instantiation with initialization", "[instantiation][chunk_initialization]"){
+TEST_CASE("Chunk instantiation with initialization"){
     glm::ivec2 pq_coords{2,2};
-    std::forward_list<Chunk> chunk_list{};
+    std::forward_list<CraftCpp::Chunk> chunk_list{};
 
     for(int p_offset = 0 ; p_offset < 2 ; p_offset++){
         for(int q_offset = 0 ; q_offset < 2 ; q_offset++){
             chunk_list.emplace_front(pq_coords + glm::ivec2{p_offset, q_offset}).init_chunk();
         }
     }
-    for(const Chunk &c : chunk_list) {
+    for(const CraftCpp::Chunk &c : chunk_list) {
         c.wait_thread();
         REQUIRE(c.isLocalBufferReady());
-        REQUIRE(c.getHighestBlock() <= Chunk::get_y_limit());
+        REQUIRE(c.getHighestBlock() <= CraftCpp::Chunk::Y_LIMIT);
         for (int x = c.get_min_x(); x <= c.get_max_x(); x++) {
             for (int z = c.get_min_z(); z <= c.get_max_z(); z++) {
                 bool empty_found = false;
                 static constexpr int minHeight = 11;
-                for(int y = minHeight ; y < Chunk::get_y_limit() ; y++) {
+                for(int y = minHeight ; y < CraftCpp::Chunk::Y_LIMIT ; y++) {
                     if (c.is_on_border(glm::ivec3{x,y,z})) {
-                        REQUIRE(c.get_block({x, 0, z}) == BlockType::EMPTY);
+                        REQUIRE(c.get_block({x, 0, z}) == CraftCpp::BlockType::EMPTY);
                         continue;
                     }
-                    auto tb = TileBlock{c.get_block({x, y, z})};
+                    auto tb = CraftCpp::TileBlock{c.get_block({x, y, z})};
                     empty_found = empty_found || tb.is_empty();
                     bool assertion = (tb.is_user_buildable() && !empty_found) ||
-                        (!tb.is_user_buildable() && empty_found) || tb.getBlockType() == BlockType::LEAVES;
+                        (!tb.is_user_buildable() && empty_found) || tb.getBlockType() == CraftCpp::BlockType::LEAVES;
                     REQUIRE(assertion);
                 }
             }

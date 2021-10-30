@@ -34,8 +34,6 @@ private:
     mutable bool render_ready{false};
     mutable bool local_buffer_ready{false};
 
-    static constexpr int Y_LIMIT = 256;
-
     int count_exposed_faces() const;
 
     BufferType::iterator
@@ -54,6 +52,8 @@ private:
 
 public:
     explicit Chunk(const glm::ivec2 &pq_coordinates);
+    static constexpr int SIZE = CHUNK_SIZE;
+    static constexpr int Y_LIMIT = 256;
 
     const glm::ivec2 pq;
 
@@ -64,8 +64,6 @@ public:
     int get_max_x() const;
 
     int get_max_z() const;
-
-    static constexpr int SIZE = CHUNK_SIZE;
 
     static std::array<glm::ivec2, 4> computeXZBoundaries(const glm::ivec2 &pq);
 
