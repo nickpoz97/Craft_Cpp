@@ -34,7 +34,7 @@ private:
     mutable bool render_ready{false};
     mutable bool local_buffer_ready{false};
 
-    static constexpr int Y_SIZE = 258;
+    static constexpr int Y_LIMIT = 256;
 
     int count_exposed_faces() const;
 
@@ -72,8 +72,6 @@ public:
     static glm::ivec2 get_min_xz(const glm::ivec2 &pq);
 
     static glm::ivec2 get_max_xz(const glm::ivec2 &pq);
-
-    static constexpr auto get_y_limit = []() { return Y_SIZE - 2; };
 
     int getHighestBlock() const;
 

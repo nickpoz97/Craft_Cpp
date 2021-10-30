@@ -80,9 +80,9 @@ void Scene::loop() {
     loadChunkNeighborhood();
     for (const auto &pair: chunkMap) {
         const Chunk &c = pair.second;
-        if (pair.second.is_visible(viewProj)) {
+        //if (pair.second.is_visible(viewProj)) {
             c.render_object();
-        }
+        //}
     }
     showInfoText();
     glfwSwapBuffers(GameView::getWindow());

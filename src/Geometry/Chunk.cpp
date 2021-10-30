@@ -5,6 +5,8 @@
 #include <numeric>
 #include <iostream>
 #include <map>
+#include <algorithm>
+
 #include "Geometry/Chunk.hpp"
 #include "noise/noise.hpp"
 #include "Geometry/CubicObject.hpp"
@@ -165,15 +167,18 @@ void Chunk::generate_blockmap() {
 }
 
 bool Chunk::is_visible(const glm::mat4 &viewproj) const {
-    for (const auto &p: xz_boundaries) {
-        glm::vec4 clip_point = viewproj * glm::vec4{p[0], 0, p[1], 1};
-        clip_point = glm::abs(clip_point) / clip_point.w;
+    auto isIn = [](const glm::vec4& worldPoint){
+        const glm::vec4 clipPoint = glm::abs(worldPoint) / worldPoint.w;
+        return clipPoint.x < 1 && clipPoint.z < 1;
+    };
 
-        bool is_in = clip_point.x < 1 && clip_point.z < 1;
-        if (is_in) {
+    for (const auto &p: xz_boundaries) {
+        glm::vec4 cornerPoint = viewproj * glm::vec4{p[0], 0, p[1], 1.0f};
+        if (isIn(cornerPoint)) {
             return true;
         }
     }
+
     return false;
 }
 
@@ -181,13 +186,14 @@ std::array<glm::ivec3, 8> Chunk::get_chunk_boundaries() const {
     std::array<glm::ivec3, 8> boundaries{};
     auto it{boundaries.begin()};
 
-    for (const auto &p: xz_boundaries) {
-        *(it++) = glm::vec3{p[0], 0, p[1]};
-    }
-    for (const auto &p: xz_boundaries) {
-        *(it++) = glm::vec3{p[0], getHighestBlock(), p[1]};
-    }
+    it = std::transform(xz_boundaries.begin(), xz_boundaries.end(), it,
+        [](const glm::ivec2& v){return glm::ivec3{v[0], 0, v[1]};});
+    std::transform(xz_boundaries.begin(), xz_boundaries.end(), it,
+        [](const glm::ivec2& v){return glm::ivec3{v[0], Y_LIMIT, v[1]};});
 
+#ifdef NDEBUG
+    assert(it == boundaries.end());
+#endif
     return boundaries;
 }
 
@@ -261,13 +267,13 @@ bool Chunk::check_border(const glm::ivec3 &pos, const ::glm::ivec3 &direction) c
 
 std::array<bool, 6> Chunk::get_visible_faces(TileBlock w, const glm::ivec3 &pos) const {
     static constexpr std::array<glm::ivec3, 6> offsets{{
-                                                               {-1, 0, 0},
-                                                               {1, 0, 0},
-                                                               {0, 1, 0},
-                                                               {0, -1, 0},
-                                                               {0, 0, -1},
-                                                               {0, 0, 1},
-                                                       }};
+       {-1, 0, 0},
+       {1, 0, 0},
+       {0, 1, 0},
+       {0, -1, 0},
+       {0, 0, -1},
+       {0, 0, 1},
+}};
 
     return {
             TileBlock{get_block(pos + offsets[0])}.is_transparent(),

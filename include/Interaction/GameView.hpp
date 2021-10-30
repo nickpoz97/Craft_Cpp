@@ -26,7 +26,7 @@ private:
     float fov;
 
     static constexpr float z_near = 0.125f;
-    static constexpr float z_far = static_cast<float>(RENDER_CHUNK_RADIUS) * 32 + 64;
+    static constexpr float z_far = static_cast<float>(RENDER_CHUNK_RADIUS) * CHUNK_SIZE;
 
     static int compute_scale_factor(int width, int height);
 
