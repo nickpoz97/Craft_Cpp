@@ -7,16 +7,16 @@
 #include "Geometry/Chunk.hpp"
 #include "fmt/format.h"
 
-Camera::Camera(const glm::vec3 &camPos, const glm::vec2& rotation, float camSpeed) :
-    pos{camPos},
-    yaw{rotation[0]},
-    pitch{rotation[1]},
-    speed{camSpeed}
-    {
+namespace CraftCpp {
+Camera::Camera(const glm::vec3 &camPos, const glm::vec2 &rotation, float camSpeed) :
+        pos{camPos},
+        yaw{rotation[0]},
+        pitch{rotation[1]},
+        speed{camSpeed} {
 #ifndef NDEBUG
     printCameraInfo();
 #endif
-        rotate(yaw, pitch);
+    rotate(yaw, pitch);
 }
 
 void Camera::rotate(float yawOffset, float pitchOffset) {
@@ -34,7 +34,7 @@ void Camera::rotate(float yawOffset, float pitchOffset) {
 #endif
 }
 
-void Camera::rotate(const glm::vec2& offset){
+void Camera::rotate(const glm::vec2 &offset) {
     rotate(offset.x, offset.y);
 }
 
@@ -42,7 +42,7 @@ void Camera::shift(const glm::vec3 &offset) {
     pos += offset;
 }
 
-glm::mat4 Camera::getViewMatrix() const{
+glm::mat4 Camera::getViewMatrix() const {
     return glm::lookAt(pos, pos + getFrontVector(), up);
 }
 
@@ -59,7 +59,7 @@ void Camera::shiftFront(float weight) {
     pos += getFrontVector() * speed * weight;
 }
 
-glm::ivec2 Camera::getPq() const{
+glm::ivec2 Camera::getPq() const {
     return Chunk::chunked(pos);
 }
 
@@ -67,7 +67,7 @@ glm::vec3 Camera::getFrontVector() const {
     return direction;
 }
 
-void Camera::printCameraInfo() const{
+void Camera::printCameraInfo() const {
     fmt::print("yaw: {}, pitch: {}, direction:({},{},{})\n",
                yaw, pitch, direction.x, direction.y, direction.z);
 }
@@ -78,4 +78,5 @@ const glm::vec3 &Camera::getPos() const {
 
 const glm::vec3 &Camera::getDirection() const {
     return direction;
+}
 }

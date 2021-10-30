@@ -6,26 +6,26 @@
 static int load_texture(std::string_view path, GLint clamp_type = GL_REPEAT);
 
 int main() {
-    GameViewSettings gvs{{WINDOW_WIDTH, WINDOW_WIDTH}, INITIAL_FOV};
-    ShaderNamesMap snm{};
-    snm.emplace(ShaderName::BLOCK_SHADER, ShaderFilesPaths{
+    CraftCpp::GameViewSettings gvs{{CraftCpp::WINDOW_WIDTH, CraftCpp::WINDOW_WIDTH}, CraftCpp::INITIAL_FOV};
+    CraftCpp::ShaderNamesMap snm{};
+    snm.emplace(CraftCpp::ShaderName::BLOCK_SHADER, CraftCpp::ShaderFilesPaths{
         "../data/shaders/block_vertex.glsl","../data/shaders/block_fragment.glsl"
     });
-    snm.emplace(ShaderName::TEXT_SHADER, ShaderFilesPaths{
+    snm.emplace(CraftCpp::ShaderName::TEXT_SHADER, CraftCpp::ShaderFilesPaths{
             "../data/shaders/text_vertex.glsl","../data/shaders/text_fragment.glsl"
     });
 
-    Scene& scene{*Scene::setInstance(gvs, {0, 20, 0}, {-90,-10}, snm)};
-    if(scene.load_texture("../data/textures/texture.png", TextureName::GENERAL, 0) != 0){
+    CraftCpp::Scene& scene{*CraftCpp::Scene::setInstance(gvs, {0, 20, 0}, {-90,-10}, snm)};
+    if(scene.load_texture("../data/textures/texture.png", CraftCpp::TextureName::GENERAL, 0) != 0){
         std::cerr << "general texture not loaded";
         return -1;
     }
-    if(scene.load_texture("../data/textures/font.png", TextureName::FONT, 0) != 0){
+    if(scene.load_texture("../data/textures/font.png", CraftCpp::TextureName::FONT, 0) != 0){
         std::cerr << "font texture not loaded";
         return -1;
     }
 
-    while(!glfwWindowShouldClose(GameView::getWindow())) {
+    while(!glfwWindowShouldClose(CraftCpp::GameView::getWindow())) {
         scene.loop();
     }
     scene.clear();

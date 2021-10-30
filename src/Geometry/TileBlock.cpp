@@ -4,6 +4,7 @@
 
 #include "Geometry/TileBlock.hpp"
 
+namespace CraftCpp {
 decltype(TileBlock::tiles) TileBlock::tiles{{
     {0, 0, 0, 0, 0, 0}, // 0 - empty
     {16, 16, 32, 0, 16, 16}, // 1 - grass
@@ -71,7 +72,7 @@ decltype(TileBlock::tiles) TileBlock::tiles{{
     {207, 207, 207, 207, 207, 207}, // 63
 }};
 
-bool TileBlock::is_plant() const{
+bool TileBlock::is_plant() const {
     switch (tilecube_index) {
         case BlockType::TALL_GRASS:
         case BlockType::YELLOW_FLOWER:
@@ -86,7 +87,7 @@ bool TileBlock::is_plant() const{
     }
 }
 
-bool TileBlock::is_obstacle() const{
+bool TileBlock::is_obstacle() const {
     if (is_plant()) {
         return false;
     }
@@ -99,7 +100,7 @@ bool TileBlock::is_obstacle() const{
     }
 }
 
-bool TileBlock::is_transparent() const{
+bool TileBlock::is_transparent() const {
     if (is_plant()) {
         return true;
     }
@@ -115,7 +116,7 @@ bool TileBlock::is_transparent() const{
 
 }
 
-bool TileBlock::is_destructable() const{
+bool TileBlock::is_destructable() const {
     switch (tilecube_index) {
         case BlockType::EMPTY:
         case BlockType::CLOUD:
@@ -151,12 +152,12 @@ TileCube::Iterator TileBlock::end() const {
     return tiles[getBlockType()].end();
 }
 
-TileCube::Iterator TileCube::begin() const{
-    return {reinterpret_cast<const int*>(this)};
+TileCube::Iterator TileCube::begin() const {
+    return {reinterpret_cast<const int *>(this)};
 }
 
-TileCube::Iterator TileCube::end() const{
-    const int* begin_ref{reinterpret_cast<const int*>(this)};
+TileCube::Iterator TileCube::end() const {
+    const int *begin_ref{reinterpret_cast<const int *>(this)};
     return {begin_ref + 6};
 }
 
@@ -181,4 +182,5 @@ bool TileCube::Iterator::operator==(const TileCube::Iterator &b) {
 
 bool TileCube::Iterator::operator!=(const TileCube::Iterator &b) {
     return tile_pointer != b.tile_pointer;
+}
 }

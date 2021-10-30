@@ -10,6 +10,7 @@
 
 #include "glad/include/glad/glad.h"
 
+namespace CraftCpp {
 template<typename WrapperType>
 struct wrapper_value;
 
@@ -17,8 +18,8 @@ struct AttributesWrapper;
 struct UniformsWrapper;
 
 template<>
-struct wrapper_value<UniformsWrapper>{
-    struct Uniform{
+struct wrapper_value<UniformsWrapper> {
+    struct Uniform {
         GLuint id;
         std::string_view name;
     };
@@ -27,28 +28,35 @@ struct wrapper_value<UniformsWrapper>{
 };
 
 template<>
-struct wrapper_value<AttributesWrapper>{
+struct wrapper_value<AttributesWrapper> {
     using t = std::pair<GLuint, bool>;
 };
 
-template <class WrapperType>
+template<class WrapperType>
 class Wrapper {
 public:
     using value_type = typename wrapper_value<WrapperType>::t;
 
-    class Iterator : std::iterator<std::input_iterator_tag, value_type>{
+    class Iterator : std::iterator<std::input_iterator_tag, value_type> {
     public:
-        Iterator(value_type* actual_attribute);
-        value_type& operator*();
-        value_type* operator->();
-        Iterator& operator++();
-        bool operator==(const Iterator& b);
-        bool operator!=(const Iterator& b);
+        Iterator(value_type *actual_attribute);
+
+        value_type &operator*();
+
+        value_type *operator->();
+
+        Iterator &operator++();
+
+        bool operator==(const Iterator &b);
+
+        bool operator!=(const Iterator &b);
+
     private:
-        value_type* actual_attribute;
+        value_type *actual_attribute;
     };
 
-    Iterator begin() ;
+    Iterator begin();
+
     Iterator end();
 
 private:
@@ -62,12 +70,12 @@ struct AttributesWrapper : public Wrapper<AttributesWrapper> {
     value_type ao{};
 };
 
-struct UniformsWrapper : public Wrapper<UniformsWrapper>{
+struct UniformsWrapper : public Wrapper<UniformsWrapper> {
     value_type sampler{0, "sampler"};
     value_type camera{0, "camera_pos"};
     value_type timer{0, "timer"};
     value_type viewproj_matrix{0, "viewproj_matrix"};
     value_type PI{0, "PI"};
 };
-
+}
 #endif //CPP_WRAPPER_HPP

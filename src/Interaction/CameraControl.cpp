@@ -6,19 +6,20 @@
 #include "Interaction/CameraControl.hpp"
 #include "GLFW/glfw3.h"
 
+namespace CraftCpp {
 CameraControl::CameraControl(Camera &flyingCamera, const glm::ivec2 &initialMousePos, GLFWwindow *window)
         : flyingCamera{flyingCamera},
-          lastMousePos{initialMousePos}{
+          lastMousePos{initialMousePos} {
     glfwSetCursorPosCallback(window, mouseCallback);
 }
 
 void CameraControl::mouseCallback(GLFWwindow *window, double xpos, double ypos) {
-    if(!actualInstance){
+    if (!actualInstance) {
         std::cerr << "CameraControl not instantiated, mouseCallback not available\n";
         return;
     }
     static bool firstMouse{true};
-    if(firstMouse){
+    if (firstMouse) {
         actualInstance->lastMousePos.x = xpos;
         actualInstance->lastMousePos.y = ypos;
         firstMouse = false;
@@ -26,8 +27,8 @@ void CameraControl::mouseCallback(GLFWwindow *window, double xpos, double ypos) 
     }
 
     glm::vec2 offset{
-        xpos - actualInstance->lastMousePos.x,
-        actualInstance->lastMousePos.y - ypos
+            xpos - actualInstance->lastMousePos.x,
+            actualInstance->lastMousePos.y - ypos
     };
     offset *= mouseSensitivity;
 
@@ -37,7 +38,7 @@ void CameraControl::mouseCallback(GLFWwindow *window, double xpos, double ypos) 
 }
 
 void CameraControl::processKeyboardInput() {
-    if(!GameView::isInstantiated()){
+    if (!GameView::isInstantiated()) {
         std::cerr << "GameView not instantiated, input from keyboard does nothing\n";
         return;
     }
@@ -46,7 +47,7 @@ void CameraControl::processKeyboardInput() {
     float deltaTime = static_cast<bool>(lastFrameTime) ? static_cast<float>(actualFrameTime - lastFrameTime) : 0;
     lastFrameTime = actualFrameTime;
 
-    GLFWwindow* window{GameView::getWindow()};
+    GLFWwindow *window{GameView::getWindow()};
 
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
@@ -62,13 +63,14 @@ void CameraControl::processKeyboardInput() {
         flyingCamera.shiftRight(deltaTime);
 }
 
-CameraControl * CameraControl::setInstance(Camera &flyingCamera) {
-    if(!actualInstance && GameView::isInstantiated()) {
+CameraControl *CameraControl::setInstance(Camera &flyingCamera) {
+    if (!actualInstance && GameView::isInstantiated()) {
         glm::vec2 initialMousePos{
-                GameView::getActualInstance()->get_width()/2,
-                GameView::getActualInstance()->get_height()/2
+                GameView::getActualInstance()->get_width() / 2,
+                GameView::getActualInstance()->get_height() / 2
         };
         actualInstance.reset(new CameraControl{flyingCamera, initialMousePos, GameView::getWindow()});
     }
     return actualInstance.get();
+}
 }

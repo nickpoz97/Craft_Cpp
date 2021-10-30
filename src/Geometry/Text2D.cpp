@@ -5,7 +5,9 @@
 #include "Geometry/Text2D.hpp"
 #include "Geometry/Character.hpp"
 
-Text2D::Text2D(const glm::vec2& position, float n, std::string_view text) : SuperClass{gen_buffer(position, n, text)} {
+namespace CraftCpp {
+Text2D::Text2D(const glm::vec2 &position, float n, std::string_view text) : SuperClass{
+        gen_buffer(position, n, text)} {
 }
 
 void Text2D::render_object() const {
@@ -23,10 +25,11 @@ std::vector<Uv2DVertex> Text2D::gen_buffer(const glm::vec2 &position, float n, s
 
     glm::vec2 char_pos = position;
 
-    for(char c : text){
-        Character character{char_pos, n, n/2, c};
+    for (char c: text) {
+        Character character{char_pos, n, n / 2, c};
         buffer_it = std::copy(character.begin(), character.end(), buffer_it);
         char_pos.x += n;
     }
     return buffer;
+}
 }

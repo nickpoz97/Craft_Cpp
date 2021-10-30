@@ -11,20 +11,21 @@
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
 
-std::size_t hash_int(int val);
+namespace CraftCpp {
+std::size_t hash_coefficient(int val);
+
+struct y_coord_comparator {
+    bool operator()(const glm::vec3 &a, const glm::vec3 &b) const;
+};
+}
 
 template<>
-struct std::hash<glm::ivec3>{
-    std::size_t operator()(const glm::ivec3& v) const;
-};
-
-struct y_coord_comparator{
-    bool operator()(const glm::vec3& a, const glm::vec3& b) const;
+struct std::hash<glm::ivec3> {
+    std::size_t operator()(const glm::ivec3 &v) const;
 };
 
 template<>
-struct std::hash<glm::ivec2>{
-    std::size_t operator()(const glm::ivec2& v) const;
+struct std::hash<glm::ivec2> {
+    std::size_t operator()(const glm::ivec2 &v) const;
 };
-
 #endif //CPP_MAP_UTILS_HPP

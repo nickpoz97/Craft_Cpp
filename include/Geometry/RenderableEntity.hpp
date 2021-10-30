@@ -14,21 +14,29 @@
 #include "Rendering/OpenglBuffer.hpp"
 #include "Geometry/TileBlock.hpp"
 
+namespace CraftCpp {
 template<typename VertexType>
-class RenderableEntity{
+class RenderableEntity {
 private:
     mutable OpenglBuffer<VertexType> gpu_buffer;
 public:
     explicit RenderableEntity();
-    explicit RenderableEntity(const std::vector<VertexType>& local_buffer);
-    explicit RenderableEntity(const RenderableEntity& other) = delete;
-    RenderableEntity(RenderableEntity&& other) noexcept ;
-    RenderableEntity<VertexType>& operator= (const std::vector<VertexType>& local_buffer) = delete;
-    RenderableEntity<VertexType>& operator= (RenderableEntity&& other) noexcept ;
 
-    void update_buffer(const std::vector<VertexType>& local_buffer) const;
+    explicit RenderableEntity(const std::vector<VertexType> &local_buffer);
+
+    explicit RenderableEntity(const RenderableEntity &other) = delete;
+
+    RenderableEntity(RenderableEntity &&other) noexcept;
+
+    RenderableEntity<VertexType> &operator=(const std::vector<VertexType> &local_buffer) = delete;
+
+    RenderableEntity<VertexType> &operator=(RenderableEntity &&other) noexcept;
+
+    void update_buffer(const std::vector<VertexType> &local_buffer) const;
+
     void render_object() const;
+
     void render_lines() const;
 };
-
+}
 #endif //CPP_RENDERABLEENTITY_HPP

@@ -9,32 +9,32 @@
 #include "glm/vec2.hpp"
 #include "glm/mat4x4.hpp"
 
-struct Standard2DVertex{
+namespace CraftCpp {
+struct Standard2DVertex {
     glm::vec2 position;
 };
 
-struct Uv2DVertex : Standard2DVertex{
+struct Uv2DVertex : Standard2DVertex {
     glm::vec2 uv;
 };
 
-struct Standard3DVertex{
+struct Standard3DVertex {
     glm::vec3 position;
 };
 
-struct Uv3DVertex : Standard3DVertex{
+struct Uv3DVertex : Standard3DVertex {
     glm::vec2 uv;
 };
 
-struct NormalVertex : Uv3DVertex{
+struct NormalVertex : Uv3DVertex {
     glm::vec3 normal;
 };
 
-class CubeVertex : public NormalVertex{
+class CubeVertex : public NormalVertex {
 public:
     float ao;
     //glm::vec2 ao_light;
 };
-
-
+}
 
 #endif //CPP_VERTEX_HPP

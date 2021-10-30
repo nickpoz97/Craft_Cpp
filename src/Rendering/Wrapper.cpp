@@ -4,8 +4,9 @@
 
 #include "Rendering/Wrapper.hpp"
 
+namespace CraftCpp {
 template<typename WrapperType>
-Wrapper<WrapperType>::Iterator::Iterator(value_type* actual_attribute) : actual_attribute{actual_attribute} {}
+Wrapper<WrapperType>::Iterator::Iterator(value_type *actual_attribute) : actual_attribute{actual_attribute} {}
 
 template<typename WrapperType>
 typename Wrapper<WrapperType>::value_type &Wrapper<WrapperType>::Iterator::operator*() {
@@ -18,7 +19,7 @@ typename Wrapper<WrapperType>::value_type *Wrapper<WrapperType>::Iterator::opera
 }
 
 template<typename WrapperType>
-typename Wrapper<WrapperType>::Iterator& Wrapper<WrapperType>::Iterator::operator++() {
+typename Wrapper<WrapperType>::Iterator &Wrapper<WrapperType>::Iterator::operator++() {
     ++actual_attribute;
     return *this;
 }
@@ -34,19 +35,23 @@ bool Wrapper<WrapperType>::Iterator::operator!=(const typename Wrapper<WrapperTy
 }
 
 template<typename WrapperType>
-size_t Wrapper<WrapperType>::get_size() const{
+size_t Wrapper<WrapperType>::get_size() const {
     return sizeof(WrapperType);
 }
 
 template<typename WrapperType>
 typename Wrapper<WrapperType>::Iterator Wrapper<WrapperType>::begin() {
-    return {reinterpret_cast<value_type*>(this)};
+    return {reinterpret_cast<value_type *>(this)};
 }
 
 template<typename WrapperType>
 typename Wrapper<WrapperType>::Iterator Wrapper<WrapperType>::end() {
-    return {reinterpret_cast<value_type*>(this) + (get_size() / sizeof(value_type))};
+    return {reinterpret_cast<value_type *>(this) + (get_size() / sizeof(value_type))};
 }
 
-template class Wrapper<AttributesWrapper>;
-template class Wrapper<UniformsWrapper>;
+template
+class Wrapper<AttributesWrapper>;
+
+template
+class Wrapper<UniformsWrapper>;
+}

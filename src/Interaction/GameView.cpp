@@ -11,6 +11,7 @@
 #include "glad/include/glad/glad.h"
 #include "GLFW/glfw3.h"
 
+namespace CraftCpp {
 int GameView::compute_scale_factor(int width, int height) {
     int result = width / height;
     result = glm::max(1, result);
@@ -49,12 +50,12 @@ int GameView::get_fov() const {
 }
 
 GameView::GameView(int width, int height, float fov, int ortho, bool is_fullscreen) :
-width{width},
-height{height},
-fov{fov},
-ortho{ortho},
-scale{compute_scale_factor(width, height)}{
-    if(!glfwInit()){
+        width{width},
+        height{height},
+        fov{fov},
+        ortho{ortho},
+        scale{compute_scale_factor(width, height)} {
+    if (!glfwInit()) {
         std::cerr << "glfw not initialized" << '\n';
         return;
     }
@@ -64,7 +65,7 @@ scale{compute_scale_factor(width, height)}{
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     window = create_window(is_fullscreen);
-    if(!window){
+    if (!window) {
         std::cerr << "window not created" << '\n';
         return;
     }
@@ -73,7 +74,7 @@ scale{compute_scale_factor(width, height)}{
     //glfwSwapInterval(VSYNC);
     //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
+    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
         std::cerr << "glad not initialized" << '\n';
         return;
     }
@@ -83,7 +84,7 @@ scale{compute_scale_factor(width, height)}{
 
 GLFWwindow *GameView::create_window(bool is_fullscreen) {
     GLFWmonitor *monitor = nullptr;
-    if(is_fullscreen){
+    if (is_fullscreen) {
         int mode_count;
         monitor = glfwGetPrimaryMonitor();
         const GLFWvidmode *modes = glfwGetVideoModes(monitor, &mode_count);
@@ -103,8 +104,8 @@ glm::mat4 GameView::get_proj_matrix(GameView::ProjType pt) const {
         case ProjType::PERSP:
             return glm::perspective(glm::radians(fov), static_cast<float>(width) / (height), z_near, z_far);
         case ProjType::ORTHO_3D:
-            return glm::ortho(-ortho * get_ratio() ,ortho * get_ratio(),
-                              static_cast<float>(-ortho),static_cast<float>(+ortho),
+            return glm::ortho(-ortho * get_ratio(), ortho * get_ratio(),
+                              static_cast<float>(-ortho), static_cast<float>(+ortho),
                               -z_far, z_far);
         case ProjType::UI:
             return glm::ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height), -1.0f, 1.0f);
@@ -118,8 +119,8 @@ int GameView::get_ortho() const {
     return ortho;
 }
 
-float GameView::get_ratio() const{
-    return width/height;
+float GameView::get_ratio() const {
+    return width / height;
 }
 
 bool GameView::isInstantiated() {
@@ -139,10 +140,11 @@ GameView *GameView::getActualInstance() {
     return actualInstance.get();
 }
 
-GameView* GameView::setInstance(int width, int height, float fov, int ortho, bool is_fullscreen) {
-    if(!actualInstance){
+GameView *GameView::setInstance(int width, int height, float fov, int ortho, bool is_fullscreen) {
+    if (!actualInstance) {
         actualInstance.reset(new GameView{width, height, fov, ortho, is_fullscreen});
-        auto framebuffer_size_callback = [](GLFWwindow* window, int width, int height){actualInstance->update();};
+        auto framebuffer_size_callback = [](GLFWwindow *window, int width,
+                                            int height) { actualInstance->update(); };
         glfwSetFramebufferSizeCallback(getWindow(), framebuffer_size_callback);
     }
     return actualInstance.get();
@@ -150,4 +152,5 @@ GameView* GameView::setInstance(int width, int height, float fov, int ortho, boo
 
 void GameView::clear() {
     actualInstance.reset(nullptr);
+}
 }

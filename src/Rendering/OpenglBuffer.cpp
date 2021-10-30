@@ -7,9 +7,10 @@
 #include "glm/vec3.hpp"
 #include "Rendering/OpenglBuffer.hpp"
 
+namespace CraftCpp {
 template<typename VertexType>
 OpenglBuffer<VertexType>::OpenglBuffer(bool openGLReady) {
-    if(openGLReady) {
+    if (openGLReady) {
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);
     }
@@ -17,25 +18,25 @@ OpenglBuffer<VertexType>::OpenglBuffer(bool openGLReady) {
 
 template<typename VertexType>
 OpenglBuffer<VertexType>::~OpenglBuffer() {
-    if(VAO && VBO) {
+    if (VAO && VBO) {
         glDeleteVertexArrays(1, &VAO);
         glDeleteBuffers(1, &VBO);
     }
 }
 
 template<typename VertexType>
-void OpenglBuffer<VertexType>::draw_triangles() const{
+void OpenglBuffer<VertexType>::draw_triangles() const {
     bind_buffer();
 
     set_vao_attributes();
-    for(int i = 0, j = 0 ; i < attributes_dimensions.size() ; ++i){
-        if(attributes_dimensions[i] != 0) {
+    for (int i = 0, j = 0; i < attributes_dimensions.size(); ++i) {
+        if (attributes_dimensions[i] != 0) {
             glEnableVertexAttribArray(j++);
         };
     }
     glDrawArrays(GL_TRIANGLES, 0, n_indices);
-    for(int i = 0, j = 0 ; i < attributes_dimensions.size() ; ++i){
-        if(attributes_dimensions[i] != 0) {glDisableVertexAttribArray(j++);};
+    for (int i = 0, j = 0; i < attributes_dimensions.size(); ++i) {
+        if (attributes_dimensions[i] != 0) { glDisableVertexAttribArray(j++); };
     }
     unbind_buffer();
 }
@@ -45,16 +46,16 @@ void OpenglBuffer<VertexType>::set_vao_attributes() const {
     size_t offset = 0;
     int i = 0;
 
-    for(int a_dim : attributes_dimensions){
-        if(a_dim != 0){
-            glVertexAttribPointer(i++, a_dim , GL_FLOAT, GL_FALSE, STRIDE, (GLvoid*) offset);
+    for (int a_dim: attributes_dimensions) {
+        if (a_dim != 0) {
+            glVertexAttribPointer(i++, a_dim, GL_FLOAT, GL_FALSE, STRIDE, (GLvoid *) offset);
             offset += a_dim * sizeof(float);
         }
     }
 }
 
 template<typename VertexType>
-void OpenglBuffer<VertexType>::draw_lines() const{
+void OpenglBuffer<VertexType>::draw_lines() const {
     bind_buffer();
     glVertexAttribPointer(0, get_n_pos_elements<VertexType>(), GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(0);
@@ -64,15 +65,15 @@ void OpenglBuffer<VertexType>::draw_lines() const{
 }
 
 template<typename VertexType>
-void OpenglBuffer<VertexType>::store_data(const std::vector<VertexType> &buffer) const{
+void OpenglBuffer<VertexType>::store_data(const std::vector<VertexType> &buffer) const {
     //_store_data(sizeof(buffer), reinterpret_cast<const GLfloat*>(buffer.data()));
-    _store_data(buffer.size() * sizeof(VertexType), reinterpret_cast<const GLfloat*>(buffer.data()));
+    _store_data(buffer.size() * sizeof(VertexType), reinterpret_cast<const GLfloat *>(buffer.data()));
 
     n_indices = buffer.size();
 }
 
 template<typename VertexType>
-void OpenglBuffer<VertexType>::_store_data(int size, const GLfloat *data) const{
+void OpenglBuffer<VertexType>::_store_data(int size, const GLfloat *data) const {
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0); // unbind
@@ -92,7 +93,7 @@ void OpenglBuffer<VertexType>::unbind_buffer() const {
 
 template<typename VertexType>
 OpenglBuffer<VertexType>::OpenglBuffer(OpenglBuffer<VertexType> &&other) noexcept :
-    VAO{other.VAO}, VBO{other.VBO}, n_indices{other.n_indices}{
+        VAO{other.VAO}, VBO{other.VBO}, n_indices{other.n_indices} {
 
     other.VAO = 0;
     other.VBO = 0;
@@ -108,9 +109,21 @@ OpenglBuffer<VertexType> &OpenglBuffer<VertexType>::operator=(OpenglBuffer<Verte
     return *this;
 }
 
-template class OpenglBuffer<Standard2DVertex>;
-template class OpenglBuffer<Uv2DVertex>;
-template class OpenglBuffer<Standard3DVertex>;
-template class OpenglBuffer<NormalVertex>;
-template class OpenglBuffer<Uv3DVertex>;
-template class OpenglBuffer<CubeVertex>;
+template
+class OpenglBuffer<Standard2DVertex>;
+
+template
+class OpenglBuffer<Uv2DVertex>;
+
+template
+class OpenglBuffer<Standard3DVertex>;
+
+template
+class OpenglBuffer<NormalVertex>;
+
+template
+class OpenglBuffer<Uv3DVertex>;
+
+template
+class OpenglBuffer<CubeVertex>;
+}

@@ -7,8 +7,8 @@
 #include "Geometry/map_utils.hpp"
 #include "Geometry/Chunk.hpp"
 
-
-std::size_t hash_int(int val) {
+namespace CraftCpp {
+std::size_t hash_coefficient(int val) {
     std::size_t key = static_cast<std::size_t>(val);
     key = ~key + (key << 15);
     key = key ^ (key >> 12);
@@ -19,14 +19,15 @@ std::size_t hash_int(int val) {
     return key;
 }
 
-std::size_t std::hash<glm::ivec3>::operator()(const glm::ivec3& v) const{
-    return hash_int(v.x) ^ hash_int(v.y) ^ hash_int(v.z);
-}
-
-std::size_t std::hash<glm::ivec2>::operator()(const glm::ivec2& v) const{
-    return hash_int(v.x) ^ hash_int(v.y);
-}
-
-bool y_coord_comparator::operator()(const glm::vec3 &a, const glm::vec3 &b) const{
+bool y_coord_comparator::operator()(const glm::vec3 &a, const glm::vec3 &b) const {
     return a.y < b.y;
+}
+}
+
+std::size_t std::hash<glm::ivec3>::operator()(const glm::ivec3 &v) const {
+    return CraftCpp::hash_coefficient(v.x) ^ CraftCpp::hash_coefficient(v.y) ^ CraftCpp::hash_coefficient(v.z);
+}
+
+std::size_t std::hash<glm::ivec2>::operator()(const glm::ivec2 &v) const {
+    return CraftCpp::hash_coefficient(v.x) ^ CraftCpp::hash_coefficient(v.y);
 }
