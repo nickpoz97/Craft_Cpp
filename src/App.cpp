@@ -15,19 +15,18 @@ int main() {
             "../data/shaders/text_vertex.glsl","../data/shaders/text_fragment.glsl"
     });
 
-    CraftCpp::Scene& scene{*CraftCpp::Scene::setInstance(gvs, {0, 20, 0}, {-90,-10}, snm)};
-    if(scene.load_texture("../data/textures/texture.png", CraftCpp::TextureName::GENERAL, 0) != 0){
+    std::unique_ptr<CraftCpp::Scene> scene{CraftCpp::Scene::setInstance(gvs, {0, 20, 0}, {-90,-10}, snm)};
+    if(scene->load_texture("../data/textures/texture.png", CraftCpp::TextureName::GENERAL, 0) != 0){
         std::cerr << "general texture not loaded";
         return -1;
     }
-    if(scene.load_texture("../data/textures/font.png", CraftCpp::TextureName::FONT, 0) != 0){
+    if(scene->load_texture("../data/textures/font.png", CraftCpp::TextureName::FONT, 0) != 0){
         std::cerr << "font texture not loaded";
         return -1;
     }
 
     while(!glfwWindowShouldClose(CraftCpp::GameView::getWindow())) {
-        scene.loop();
+        scene->loop();
     }
-    scene.clear();
     return 0;
 }

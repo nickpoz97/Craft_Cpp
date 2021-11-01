@@ -90,13 +90,13 @@ void Scene::loop() {
     deleteDistantChunks();
 }
 
-Scene *
+std::unique_ptr<Scene>
 Scene::setInstance(const GameViewSettings &gvs, const glm::vec3 &cameraPos, const glm::vec2 &cameraRotation,
                    const ShaderNamesMap &snm) {
     if (!actualInstance) {
-        actualInstance.reset(new Scene{gvs, cameraPos, cameraRotation, snm});
+        actualInstance = new Scene{gvs, cameraPos, cameraRotation, snm};
     }
-    return actualInstance.get();
+    return std::unique_ptr<Scene>{actualInstance};
 }
 
 int Scene::load_texture(std::string_view path, TextureName textureName, GLint clamp_type) {
@@ -128,10 +128,9 @@ int Scene::load_texture(std::string_view path, TextureName textureName, GLint cl
     return 0;
 }
 
-void Scene::clear() {
+Scene::~Scene() {
     waitThreads();
-    actualInstance.reset(nullptr);
-    GameView::clear();
+    actualInstance = nullptr;
 }
 
 void Scene::waitThreads() const {

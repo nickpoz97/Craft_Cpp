@@ -124,10 +124,11 @@ float GameView::get_ratio() const {
 }
 
 bool GameView::isInstantiated() {
-    return actualInstance.get();
+    return actualInstance;
 }
 
 GameView::~GameView() {
+    actualInstance = nullptr;
     glfwTerminate();
 }
 
@@ -137,20 +138,16 @@ float GameView::item_box_side() const {
 }
 
 GameView *GameView::getActualInstance() {
-    return actualInstance.get();
+    return actualInstance;
 }
 
-GameView *GameView::setInstance(int width, int height, float fov, int ortho, bool is_fullscreen) {
-    if (!actualInstance) {
-        actualInstance.reset(new GameView{width, height, fov, ortho, is_fullscreen});
+std::unique_ptr<GameView> GameView::setInstance(int width, int height, float fov, int ortho, bool is_fullscreen) {
+    if (!isInstantiated()) {
+        actualInstance = new GameView{width, height, fov, ortho, is_fullscreen};
         auto framebuffer_size_callback = [](GLFWwindow *window, int width,
                                             int height) { actualInstance->update(); };
         glfwSetFramebufferSizeCallback(getWindow(), framebuffer_size_callback);
     }
-    return actualInstance.get();
-}
-
-void GameView::clear() {
-    actualInstance.reset(nullptr);
+    return std::unique_ptr<GameView>{actualInstance};
 }
 }

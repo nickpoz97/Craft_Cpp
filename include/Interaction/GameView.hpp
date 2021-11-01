@@ -16,7 +16,7 @@
 namespace CraftCpp {
 class GameView {
 private:
-    static inline std::unique_ptr<GameView> actualInstance{nullptr};
+    static inline GameView* actualInstance{nullptr};
     GLFWwindow *window;
 
     int width;
@@ -39,7 +39,7 @@ public:
         PERSP, UI, ORTHO_3D, ITEM
     };
 
-    static GameView *setInstance(int width, int height, float fov, int ortho = false, bool is_fullscreen = false);
+    static std::unique_ptr<GameView> setInstance(int width, int height, float fov, int ortho = false, bool is_fullscreen = false);
 
     [[nodiscard]] int get_width() const;
 
@@ -70,8 +70,6 @@ public:
     [[nodiscard]] glm::mat4 get_proj_matrix(ProjType pt) const;
 
     ~GameView();
-
-    static void clear();
 };
 }
 

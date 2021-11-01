@@ -10,8 +10,7 @@ TEST_CASE("Set the unique GameView instance"){
     int width{1024}, height{768};
     float fov{80.0f};
 
-    GameView* gameView = GameView::setInstance(width, height, fov);
+    std::unique_ptr<GameView> gameView = GameView::setInstance(width, height, fov);
     REQUIRE(GameView::isInstantiated());
     REQUIRE((gameView->get_width() == width && gameView->get_height() == height && gameView->get_fov() == fov));
-    GameView::clear();
 }
