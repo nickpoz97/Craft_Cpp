@@ -18,8 +18,6 @@ private:
     glm::vec3 direction{};
     float speed;
 
-    static constexpr glm::vec3 up{0, 1, 0};
-
     [[nodiscard]] glm::vec3 getFrontVector() const;
 
 public:
@@ -41,11 +39,11 @@ public:
 
     void shift(const glm::vec3 &offset);
 
-    void shiftRight(float weight);
+    void shiftRight(float weight = 1.0f);
 
-    void shift_up(float weight);
+    void shiftUp(float weight = 1.0f);
 
-    void shiftFront(float weight);
+    void shiftFront(float weight = 1.0f);
 
     [[nodiscard]] glm::mat4 getViewMatrix() const;
 
@@ -58,6 +56,13 @@ public:
     const glm::vec3 &getDirection() const;
 
     friend class Scene;
+
+    float getSpeed() const;
+
+    static constexpr glm::vec3 up{0, 1, 0};
+
+    [[nodiscard]] float getYaw() const;
+    [[nodiscard]] float getPitch() const;
 };
 }
 

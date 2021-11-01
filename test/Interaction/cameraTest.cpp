@@ -11,13 +11,13 @@
 #include "glm/geometric.hpp"
 #include "glm/gtc/epsilon.hpp"
 
-TEST_CASE("Camera instantiation", "[instantiation]")
+TEST_CASE("Camera instantiation and movement", "[instantiation]")
 {
     auto position{GENERATE(glm::vec3{0,20,0},glm::vec3{53,14,78})};
     auto orientation{GENERATE(glm::vec2{0,0},glm::vec2{180,-30})};
+    CraftCpp::Camera cam{position, orientation, 5};
 
-    SECTION("Using arbitrary position and rotation") {
-        const CraftCpp::Camera cam{position, orientation, 5};
+    SECTION("Instantiate using arbitrary position and rotation") {
         REQUIRE(cam.getPos() == position);
         REQUIRE(cam.getPq() == CraftCpp::Chunk::chunked(cam.getPos()));
 
@@ -27,39 +27,32 @@ TEST_CASE("Camera instantiation", "[instantiation]")
         auto equality = glm::epsilonEqual(glm::normalize(direction), cam.getDirection(), 0.01f);
         REQUIRE((equality.x && equality.y && equality.z));
     }
-    /*SECTION("Using arbitrary position and pointing to up-right"){
-        auto orientation{GENERATE(glm::vec2{45,45}, glm::vec2{60,30}, glm::vec2{30,60})};
-        Player p{"name", 0, position, orientation};
-        REQUIRE(p.get_position() == position);
-        REQUIRE(p.get_orientation_degrees() == orientation);
-        REQUIRE(p.get_camera_direction_vector().x < 1.0f);
-        REQUIRE(p.get_camera_direction_vector().x > 0.0f);
-        REQUIRE(p.get_camera_direction_vector().y < 1.0);
-        REQUIRE(p.get_camera_direction_vector().y > 0.0);
+    SECTION("Test Camera movement translation"){
+        glm::vec3 newPos = cam.getPos() + cam.getDirection() * cam.getSpeed();
+        cam.shiftFront();
+        REQUIRE(newPos == cam.getPos());
+
+        newPos = cam.getPos() + glm::normalize(glm::cross(cam.getDirection(), CraftCpp::Camera::up)) * cam.getSpeed();
+        cam.shiftRight();
+        REQUIRE(newPos == cam.getPos());
+
+        newPos = cam.getPos() + CraftCpp::Camera::up * cam.getSpeed();
+        cam.shiftUp();
+        REQUIRE(newPos == cam.getPos());
+
+        glm::vec3 translation{-1.0, 3.0, 0.5};
+        newPos = cam.getPos() + translation;
+        cam.shift(translation);
+        REQUIRE(newPos == cam.getPos());
     }
-    SECTION("Using arbitrary position and pointing to down-left"){
-        auto orientation{glm::vec2{200,-45}};
-        auto position{glm::vec3{20,20,20}};
-        Player p{"name", 20, position, orientation};
-        REQUIRE(p.get_position() == position);
-        REQUIRE(p.get_orientation_degrees() == orientation);
-        REQUIRE(p.get_camera_direction_vector().x > -1.0f);
-        REQUIRE(p.get_camera_direction_vector().x < 0.0f);
-        REQUIRE(p.get_camera_direction_vector().y > -1.0);
-        REQUIRE(p.get_camera_direction_vector().y < 0.0);
+    SECTION("Rotate above bounds"){
+        glm::vec2 rotation{40.0f, 180.0f};
+        float newYaw = cam.getYaw() + rotation.x;
+        newYaw = (newYaw >= 360.0f) ? newYaw - 360.0f : newYaw;
+        newYaw = (newYaw < 0.0f) ? newYaw + 360.0f : newYaw;
+
+        cam.rotate(rotation);
+        REQUIRE(cam.getPitch() == 89.0f);
+        REQUIRE(glm::epsilonEqual(newYaw, cam.getYaw(), 0.01f));
     }
-    SECTION("Using arbitrary position and rotation arguments above angle boundaries"){
-        auto orientation_pairs = (
-            std::pair{
-                glm::vec2{Player::yaw_limit, 2*Player::pitch_limit + 45},
-                glm::vec2{0, Player::pitch_limit}},
-            std::pair{
-                glm::vec2{2 * Player::yaw_limit + 10,
-                -2 * Player::pitch_limit - 15}, glm::vec2{10, -Player::pitch_limit}}
-        );
-        auto position{glm::vec3{53,14,78}};
-        Player p{"name", 0, position, orientation_pairs.first};
-        REQUIRE(p.get_position() == glm::vec3{53,14,78});
-        REQUIRE(p.get_orientation_degrees() == orientation_pairs.second);
-    }*/
 }

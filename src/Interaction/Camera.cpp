@@ -48,7 +48,7 @@ void Camera::shiftRight(float weight) {
     pos += glm::normalize(glm::cross(getFrontVector(), up)) * speed * weight;
 }
 
-void Camera::shift_up(float weight) {
+void Camera::shiftUp(float weight) {
     pos.y += speed * weight;
 }
 
@@ -76,5 +76,17 @@ const glm::vec3 &Camera::getPos() const {
 
 const glm::vec3 &Camera::getDirection() const {
     return direction;
+}
+
+float Camera::getSpeed() const {
+    return speed;
+}
+
+float Camera::getYaw() const {
+    return yaw;
+}
+
+float Camera::getPitch() const {
+    return pitch;
 }
 }
