@@ -16,10 +16,6 @@ Scene::Scene(const GameViewSettings &gvs, const glm::vec3 &cameraPos, const glm:
         gameView{GameView::setInstance(gvs.windowSize.x, gvs.windowSize.y, gvs.fov)},
         camera{cameraPos, cameraRotation},
         cameraControl{CameraControl::setInstance(camera)} {
-    glfwSetInputMode(gameView->getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-#ifndef NDEBUG
-    glfwSetInputMode(gameView->getWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-#endif
 
     glClearColor(0.1f, 0.1f, 0.5f, 1.0f);
     glEnable(GL_DEPTH_TEST);
@@ -100,10 +96,10 @@ Scene::setInstance(const GameViewSettings &gvs, const glm::vec3 &cameraPos, cons
 }
 
 int Scene::load_texture(std::string_view path, TextureName textureName, GLint clamp_type) {
-    unsigned texture_id;
+    uint texture_id;
     glGenTextures(1, &texture_id);
 
-    static unsigned texture_index = 0;
+    static uint texture_index = 0;
     glActiveTexture(GL_TEXTURE0 + texture_index);
     glBindTexture(GL_TEXTURE_2D, texture_id);
 

@@ -40,10 +40,10 @@ class Scene {
 private:
     static inline Scene* actualInstance{nullptr};
     std::unique_ptr<GameView> gameView;
-    CameraControl *cameraControl;
+    std::unique_ptr<CameraControl> cameraControl;
     Camera camera;
     std::unordered_map<ShaderName, Shader> shaders{};
-    std::array<int, 2> textureSamplers;
+    std::array<uint, 2> textureSamplers;
     ChunkMap chunkMap{};
 
     void render_text(int justify, const glm::vec2 &position, float n, std::string_view text) const;

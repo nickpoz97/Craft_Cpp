@@ -11,6 +11,12 @@ CameraControl::CameraControl(Camera &flyingCamera, const glm::ivec2 &initialMous
         : flyingCamera{flyingCamera},
           lastMousePos{initialMousePos} {
     glfwSetCursorPosCallback(window, mouseCallback);
+    glfwSetInputMode(GameView::getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    cursorInvisible = true;
+#ifndef NDEBUG
+    glfwSetInputMode(GameView::getWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    cursorInvisible = false;
+#endif
 }
 
 void CameraControl::mouseCallback(GLFWwindow *window, double xpos, double ypos) {
@@ -49,10 +55,6 @@ void CameraControl::processKeyboardInput() {
 
     GLFWwindow *window{GameView::getWindow()};
 
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, true);
-    }
-
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         flyingCamera.shiftFront(deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -63,14 +65,32 @@ void CameraControl::processKeyboardInput() {
         flyingCamera.shiftRight(deltaTime);
 }
 
-CameraControl *CameraControl::setInstance(Camera &flyingCamera) {
+std::unique_ptr<CameraControl> CameraControl::setInstance(Camera &flyingCamera) {
     if (!actualInstance && GameView::isInstantiated()) {
         glm::vec2 initialMousePos{
                 GameView::getActualInstance()->get_width() / 2,
                 GameView::getActualInstance()->get_height() / 2
         };
-        actualInstance.reset(new CameraControl{flyingCamera, initialMousePos, GameView::getWindow()});
+        actualInstance = new CameraControl{flyingCamera, initialMousePos, GameView::getWindow()};
+
+        auto keyCallback = [](GLFWwindow* window, int key, int scancode, int action, int mods){
+            if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS){
+                actualInstance->switchCursorStatus();
+            }
+        };
+
+        glfwSetKeyCallback(GameView::getWindow(), keyCallback);
     }
-    return actualInstance.get();
+    return std::unique_ptr<CameraControl>{actualInstance};
 }
+
+    void CameraControl::switchCursorStatus(){
+        cursorInvisible ?
+            (glfwSetInputMode(GameView::getWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL), cursorInvisible = false) :
+            (glfwSetInputMode(GameView::getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED), cursorInvisible = true);
+    }
+
+    CameraControl::~CameraControl() {
+        actualInstance = nullptr;
+    }
 }

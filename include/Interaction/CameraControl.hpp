@@ -15,16 +15,20 @@
 namespace CraftCpp {
 class CameraControl {
 private:
-    static inline std::unique_ptr<CameraControl> actualInstance{nullptr};
+    static inline CameraControl* actualInstance{nullptr};
     glm::vec2 lastMousePos;
     Camera &flyingCamera;
     static constexpr float mouseSensitivity{0.1};
     double lastFrameTime{};
 
+    bool cursorInvisible{true};
+    void switchCursorStatus();
+
     CameraControl(Camera &flyingCamera, const glm::ivec2 &initialMousePos, GLFWwindow *window);
 
 public:
-    static CameraControl *setInstance(Camera &flyingCamera);
+    static std::unique_ptr<CameraControl> setInstance(Camera &flyingCamera);
+    ~CameraControl();
 
     static void mouseCallback(GLFWwindow *window, double xpos, double ypos);
 

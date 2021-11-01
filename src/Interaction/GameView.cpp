@@ -96,22 +96,23 @@ GLFWwindow *GameView::create_window(bool is_fullscreen) {
 }
 
 GLFWwindow *GameView::getWindow() {
-    return actualInstance->window;
+    return actualInstance ? actualInstance->window : nullptr;
 }
 
 glm::mat4 GameView::get_proj_matrix(GameView::ProjType pt) const {
     switch (pt) {
         case ProjType::PERSP:
-            return glm::perspective(glm::radians(fov), static_cast<float>(width) / (height), z_near, z_far);
-        case ProjType::ORTHO_3D:
-            return glm::ortho(-ortho * get_ratio(), ortho * get_ratio(),
-                              static_cast<float>(-ortho), static_cast<float>(+ortho),
-                              -z_far, z_far);
+            return glm::perspective(glm::radians(fov), static_cast<float>(width) / height, z_near, z_far);
         case ProjType::UI:
             return glm::ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height), -1.0f, 1.0f);
         case ProjType::ITEM:
             return glm::ortho(-item_box_side() * get_ratio(), item_box_side() * get_ratio(),
                               -item_box_side(), item_box_side(), -1.0f, 1.0f);
+        // Ortho 3D
+        default:
+            return glm::ortho(-ortho * get_ratio(), ortho * get_ratio(),
+                              static_cast<float>(-ortho), static_cast<float>(+ortho),
+                              -z_far, z_far);
     }
 }
 
@@ -120,7 +121,7 @@ int GameView::get_ortho() const {
 }
 
 float GameView::get_ratio() const {
-    return width / height;
+    return static_cast<float>(width) / height;
 }
 
 bool GameView::isInstantiated() {
@@ -130,6 +131,9 @@ bool GameView::isInstantiated() {
 GameView::~GameView() {
     actualInstance = nullptr;
     glfwTerminate();
+#ifndef NDEBUG
+    std::cout << "GLFW terminated\n";
+#endif
 }
 
 float GameView::item_box_side() const {
@@ -144,9 +148,10 @@ GameView *GameView::getActualInstance() {
 std::unique_ptr<GameView> GameView::setInstance(int width, int height, float fov, int ortho, bool is_fullscreen) {
     if (!isInstantiated()) {
         actualInstance = new GameView{width, height, fov, ortho, is_fullscreen};
-        auto framebuffer_size_callback = [](GLFWwindow *window, int width,
-                                            int height) { actualInstance->update(); };
-        glfwSetFramebufferSizeCallback(getWindow(), framebuffer_size_callback);
+        glfwSetFramebufferSizeCallback(
+            getWindow(),
+            [](GLFWwindow *window, int width, int height) { actualInstance->update(); }
+        );
     }
     return std::unique_ptr<GameView>{actualInstance};
 }

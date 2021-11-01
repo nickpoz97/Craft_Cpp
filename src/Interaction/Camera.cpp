@@ -12,9 +12,6 @@ Camera::Camera(const glm::vec3 &camPos, const glm::vec2 &rotation, float camSpee
         pos{camPos},
         speed{camSpeed} {
     rotate(rotation[0], rotation[1]);
-#ifndef NDEBUG
-    printCameraInfo();
-#endif
 }
 
 void Camera::rotate(float yawOffset, float pitchOffset) {
@@ -27,9 +24,6 @@ void Camera::rotate(float yawOffset, float pitchOffset) {
             glm::sin(glm::radians(pitch)),
             glm::sin(glm::radians(yaw)) * glm::cos(glm::radians(pitch))
     });
-#ifndef NDEBUG
-    printCameraInfo();
-#endif
 }
 
 void Camera::rotate(const glm::vec2 &offset) {
