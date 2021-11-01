@@ -63,30 +63,35 @@ void Scene::loop() {
     cameraControl->processKeyboardInput();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    const Shader &s{shaders.at(ShaderName::BLOCK_SHADER)};
-    glm::mat4 viewProj{gameView->get_proj_matrix(GameView::PERSP) * camera.getViewMatrix()};
-    s.use();
-    s.set_viewproj(viewProj);
-    s.set_sampler(textureSamplers[static_cast<int>(TextureName::GENERAL)]);
-    s.set_camera(camera.getPos());
-    s.set_extra_uniform("fog_distance", static_cast<float>(RENDER_CHUNK_RADIUS * CHUNK_SIZE));
-
-    s.set_extra_uniform("sky_color", glm::vec3{0.2, 0.2, 0.5});
-
-    loadChunkNeighborhood();
-    for (const auto &pair: chunkMap) {
-        const Chunk &c = pair.second;
-        if (pair.second.is_visible(viewProj)) {
-            c.render_object();
-        }
-    }
+    loadAndRenderChunks();
     showInfoText();
+
     glfwSwapBuffers(GameView::getWindow());
     glfwPollEvents();
     deleteDistantChunks();
 }
 
-std::unique_ptr<Scene>
+    void Scene::loadAndRenderChunks() {
+        const Shader &s{shaders.at(ShaderName::BLOCK_SHADER)};
+        glm::mat4 viewProj{gameView->get_proj_matrix(GameView::PERSP) * camera.getViewMatrix()};
+        s.use();
+        s.set_viewproj(viewProj);
+        s.set_sampler(textureSamplers[static_cast<int>(TextureName::GENERAL)]);
+        s.set_camera(camera.getPos());
+        s.set_extra_uniform("fog_distance", static_cast<float>(RENDER_CHUNK_RADIUS * CHUNK_SIZE));
+
+        s.set_extra_uniform("sky_color", glm::vec3{0.2, 0.2, 0.5});
+
+        loadChunkNeighborhood();
+        for (const auto &pair: chunkMap) {
+            const Chunk &c = pair.second;
+            if (pair.second.is_visible(viewProj)) {
+                c.render_object();
+            }
+        }
+    }
+
+    std::unique_ptr<Scene>
 Scene::setInstance(const GameViewSettings &gvs, const glm::vec3 &cameraPos, const glm::vec2 &cameraRotation,
                    const ShaderNamesMap &snm) {
     if (!actualInstance) {

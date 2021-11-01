@@ -7,6 +7,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <Interaction/GameView.hpp>
 
 #include "glm/vec3.hpp"
 #include "Rendering/Shader.hpp"
@@ -17,6 +18,10 @@
 namespace CraftCpp {
 Shader::Shader(std::string_view vs_path,
                std::string_view fs_path) {
+    if(!GameView::isInstantiated()){
+        return;
+    }
+
     unsigned vs_id = build_shader(vs_path, shader_type::VERTEX);
     check_compile_errors(vs_id, vs_path.data());
     unsigned fs_id = build_shader(fs_path, shader_type::FRAGMENT);
@@ -38,7 +43,14 @@ GLuint Shader::get_id() const {
 }
 
 void Shader::use() const {
-    glUseProgram(id);
+    if(id != 0) {
+        glUseProgram(id);
+    }
+#ifndef NDEBUG
+    else{
+        std::cerr << "Shader not ready (check GameView status)\n";
+    }
+#endif
 }
 
 int Shader::build_shader(std::string_view path, shader_type st) {
@@ -81,7 +93,9 @@ void Shader::set_timer(float timer) const {
 
 template<typename GLtype>
 void Shader::set_extra_uniform(std::string_view uniform_name, const GLtype &value) const {
-    _set_extra_uniform(glGetUniformLocation(id, uniform_name.data()), value);
+    if(id != 0) {
+        _set_extra_uniform(glGetUniformLocation(id, uniform_name.data()), value);
+    }
 }
 
 void Shader::set_viewproj(const glm::mat4 &m) const {

@@ -19,7 +19,7 @@ private:
         VERTEX, FRAGMENT
     };
 
-    GLuint id;
+    GLuint id{};
 
     static int build_shader(std::string_view path, shader_type st);
 

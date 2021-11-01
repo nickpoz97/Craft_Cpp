@@ -68,6 +68,8 @@ public:
 
     int load_texture(std::string_view path, TextureName textureName, GLint clamp_type = GL_REPEAT);
     ~Scene();
+
+    void loadAndRenderChunks();
 };
 }
 

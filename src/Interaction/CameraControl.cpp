@@ -84,13 +84,17 @@ std::unique_ptr<CameraControl> CameraControl::setInstance(Camera &flyingCamera) 
     return std::unique_ptr<CameraControl>{actualInstance};
 }
 
-    void CameraControl::switchCursorStatus(){
-        cursorInvisible ?
-            (glfwSetInputMode(GameView::getWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL), cursorInvisible = false) :
-            (glfwSetInputMode(GameView::getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED), cursorInvisible = true);
-    }
+void CameraControl::switchCursorStatus(){
+    cursorInvisible ?
+        (glfwSetInputMode(GameView::getWindow(), GLFW_CURSOR, GLFW_CURSOR_NORMAL), cursorInvisible = false) :
+        (glfwSetInputMode(GameView::getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED), cursorInvisible = true);
+}
 
-    CameraControl::~CameraControl() {
-        actualInstance = nullptr;
-    }
+CameraControl::~CameraControl() {
+    actualInstance = nullptr;
+}
+
+bool CameraControl::isInstantiated(){
+    return actualInstance;
+}
 }

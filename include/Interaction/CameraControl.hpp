@@ -33,6 +33,7 @@ public:
     static void mouseCallback(GLFWwindow *window, double xpos, double ypos);
 
     void processKeyboardInput();
+    static bool isInstantiated();
 };
 }
 
