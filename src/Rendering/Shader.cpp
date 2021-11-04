@@ -138,6 +138,10 @@ void Shader::_set_extra_uniform(int u_location, const glm::mat4 &val) {
     glUniformMatrix4fv(u_location, 1, GL_FALSE, glm::value_ptr(val));
 }
 
+    void Shader::_set_extra_uniform(int u_location, const glm::vec2 &val) {
+        glUniform2fv(u_location, 1, glm::value_ptr(val));
+    }
+
 void Shader::set_pi() const {
     set_extra_uniform("PI", glm::pi<float>());
 }
@@ -149,4 +153,6 @@ template void Shader::set_extra_uniform<int>(std::string_view id, const int &val
 template void Shader::set_extra_uniform<glm::vec3>(std::string_view id, const glm::vec3 &value) const;
 
 template void Shader::set_extra_uniform<glm::mat4>(std::string_view id, const glm::mat4 &value) const;
+
+template void Shader::set_extra_uniform<glm::vec2>(std::string_view id, const glm::vec2 &value) const;
 }

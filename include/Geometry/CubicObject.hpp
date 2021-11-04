@@ -16,6 +16,8 @@
 #include "tunable_parameters.hpp"
 
 namespace CraftCpp {
+static constexpr int INDICES_FACE_COUNT = 6;
+
 using cube_vertex_iterator_t = typename std::vector<CubeVertex>::iterator;
 
 template<unsigned n_faces>
@@ -23,9 +25,9 @@ class CubicObject {
 private:
     cube_vertex_iterator_t begin_iterator;
     size_t n_vertices;
+    static constexpr float N = 0.5f;
 
     static glm::vec3 rotate_asy(const glm::vec3 &v, float angle_degrees);
-
 public:
     using PositionsMatrix = std::array<std::array<glm::vec3, 4>, n_faces>;
     using IndicesMatrix = std::array<std::array<int, INDICES_FACE_COUNT>, n_faces>;

@@ -3,6 +3,7 @@
 //
 
 #define STB_IMAGE_IMPLEMENTATION
+#define GLFW_INCLUDE_NONE
 
 #include <iostream>
 #include <Geometry/Text2D.hpp>
@@ -78,7 +79,7 @@ void Scene::loop() {
         s.set_viewproj(viewProj);
         s.set_sampler(textureSamplers[static_cast<int>(TextureName::GENERAL)]);
         s.set_camera(camera.getPos());
-        s.set_extra_uniform("fog_distance", static_cast<float>(RENDER_CHUNK_RADIUS * CHUNK_SIZE));
+        s.set_extra_uniform("fog_distance", static_cast<float>(RENDER_CHUNK_RADIUS * Chunk::SIZE));
 
         s.set_extra_uniform("sky_color", glm::vec3{0.2, 0.2, 0.5});
 

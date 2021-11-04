@@ -5,7 +5,7 @@
 #include "Rendering/OpenglBuffer.hpp"
 #include "catch2/catch.hpp"
 
-TEST_CASE("Instantiate buffer without opengl and glfw initialization", "[OpenglBuffer]"){
+TEST_CASE("Instantiate buffer without opengl and glfw initialization"){
     CraftCpp::OpenglBuffer<CraftCpp::Standard3DVertex> buffer{false};
     buffer.drawTriangles();
     buffer.storeData({});

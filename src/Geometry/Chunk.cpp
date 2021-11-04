@@ -130,7 +130,7 @@ void Chunk::generate_blockmap() {
                         block_map[{x, h, z}] = static_cast<BlockType>(w_f);
                     }
                 }
-                bool ok = SHOW_TREES && !(dx - 4 < 0 || dz - 4 < 0 || dx + 4 >= CHUNK_SIZE || dz + 4 >= CHUNK_SIZE);
+                bool ok = SHOW_TREES && !(dx - 4 < 0 || dz - 4 < 0 || dx + 4 >= Chunk::SIZE || dz + 4 >= Chunk::SIZE);
                 ok = ok && (simplex2(x, z, 6, 0.5, 2) > 0.84);
 
                 if (ok) {

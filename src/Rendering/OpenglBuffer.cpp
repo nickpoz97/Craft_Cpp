@@ -65,7 +65,7 @@ void OpenglBuffer<VertexType>::drawLines() const {
     }
 
     bindBuffer();
-    glVertexAttribPointer(0, getNPosElements<VertexType>(), GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(0, getPosAttributeSize<VertexType>(), GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(0);
     glDrawArrays(GL_LINES, 0, nIndices);
     glDisableVertexAttribArray(0);

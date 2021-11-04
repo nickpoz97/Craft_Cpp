@@ -2,6 +2,8 @@
 // Created by ultimatenick on 07/10/21.
 //
 
+#define GLFW_INCLUDE_NONE
+
 #include <iostream>
 #include "Interaction/CameraControl.hpp"
 #include "GLFW/glfw3.h"

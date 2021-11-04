@@ -1,6 +1,7 @@
 //
 // Created by ultimatenick on 01/11/21.
 //
+#define GLFW_INCLUDE_NONE
 
 #include "Interaction/Camera.hpp"
 #include "Interaction/CameraControl.hpp"

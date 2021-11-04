@@ -6,12 +6,8 @@
 #define CPP_COSTANTS_HPP
 
 namespace CraftCpp {
-    static constexpr int MAX_CHUNKS = 500;
     static constexpr int CHUNK_SIZE = 64;
 
-    static constexpr int INDICES_FACE_COUNT = 6;
-    static constexpr int VERTICES_FACE_COUNT = 4;
-    static constexpr float N = 0.5f;
     static constexpr int RENDER_CHUNK_RADIUS = 2;
     static constexpr int CREATE_CHUNK_RADIUS = 3;
     static constexpr int DELETE_CHUNK_RADIUS = CREATE_CHUNK_RADIUS + 3;
@@ -21,7 +17,7 @@ namespace CraftCpp {
     static constexpr int ALIGN_CENTER = 1;
     static constexpr int ALIGN_RIGHT = 2;
 
-// config
+
     static constexpr bool SHOW_LIGHT = true;
     static constexpr bool SHOW_PLANTS = true;
     static constexpr bool SHOW_TREES = true;
@@ -34,8 +30,6 @@ namespace CraftCpp {
     static constexpr bool SHOW_WIREFRAME = false;
     static constexpr bool SHOW_CROSSHAIRS = true;
     static constexpr bool SHOW_INFO_TEXT = true;
-    static constexpr bool SHOW_ITEM = true;
-    static constexpr int DAY_LENGTH = 600;
     static constexpr bool VSYNC = false;
     static constexpr float INITIAL_FOV = 45;
 }

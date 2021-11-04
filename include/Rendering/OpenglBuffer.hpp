@@ -10,45 +10,9 @@
 
 #include "glad/include/glad/glad.h"
 #include "Geometry/Vertex.hpp"
-#include "Rendering//Wrapper.hpp"
+#include "Rendering/attributesSize.hpp"
 
 namespace CraftCpp {
-template<typename VertexType, std::enable_if_t<std::is_base_of_v<NormalVertex, VertexType>, bool> = true>
-constexpr int getNNormal_elements() {
-    return decltype(VertexType::normal)::length();
-}
-
-template<typename VertexType, std::enable_if_t<!std::is_base_of_v<NormalVertex, VertexType>, bool> = true>
-constexpr int getNNormal_elements() {
-    return 0;
-}
-
-template<typename VertexType, std::enable_if_t<
-        std::is_base_of_v<Uv2DVertex, VertexType> || std::is_base_of_v<Uv3DVertex, VertexType>, bool> = true>
-constexpr int getNUvElements() {
-    return decltype(VertexType::uv)::length();
-}
-
-template<typename VertexType, std::enable_if_t<
-        !std::is_base_of_v<Uv2DVertex, VertexType> && !std::is_base_of_v<Uv3DVertex, VertexType>, bool> = true>
-constexpr int getNUvElements() {
-    return 0;
-}
-
-template<typename VertexType, std::enable_if_t<std::is_base_of_v<CubeVertex, VertexType>, bool> = true>
-constexpr int getNAoElements() {
-    return 1;
-}
-
-template<typename VertexType, std::enable_if_t<!std::is_base_of_v<CubeVertex, VertexType>, bool> = true>
-constexpr int getNAoElements() {
-    return 0;
-}
-
-template<typename VertexType>
-constexpr int getNPosElements() {
-    return decltype(VertexType::position)::length();
-}
 
 template<typename VertexType>
 class OpenglBuffer {
@@ -67,10 +31,10 @@ private:
 
     mutable size_t nIndices{};
     static constexpr std::array<int, 4> attributesDimensions{
-            getNPosElements<VertexType>(),
-            getNUvElements<VertexType>(),
-            getNNormal_elements<VertexType>(),
-            getNAoElements<VertexType>()
+        getPosAttributeSize<VertexType>(),
+        getUvAttributeSize<VertexType>(),
+        getNormalAttributeSize<VertexType>(),
+        getAoAttributeSize<VertexType>()
     };
 public:
     explicit OpenglBuffer(bool openGLReady);

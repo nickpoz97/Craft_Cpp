@@ -8,6 +8,7 @@
 #define GLFW_INCLUDE_NONE
 
 #include <memory>
+#include <Geometry/Chunk.hpp>
 
 #include "glm/mat4x4.hpp"
 #include "glfw/include/GLFW/glfw3.h"
@@ -26,7 +27,7 @@ private:
     float fov;
 
     static constexpr float z_near = 0.125f;
-    static constexpr float z_far = static_cast<float>(RENDER_CHUNK_RADIUS) * CHUNK_SIZE;
+    static constexpr float z_far = static_cast<float>(RENDER_CHUNK_RADIUS) * Chunk::SIZE;
 
     static int compute_scale_factor(int width, int height);
 
