@@ -8,7 +8,7 @@
 #include <string_view>
 #include <array>
 
-#include "glad/include/glad/glad.h"
+#include "Rendering/OpenGlExternal.hpp"
 #include "glm/vec3.hpp"
 #include "glm/mat4x4.hpp"
 

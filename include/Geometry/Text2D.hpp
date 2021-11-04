@@ -17,12 +17,12 @@ class Text2D : public RenderableEntity<Uv2DVertex> {
 private:
     using SuperClass = RenderableEntity<Uv2DVertex>;
 
-    static std::vector<Uv2DVertex> gen_buffer(const glm::vec2 &position, float n, std::string_view text);
+    static std::vector<Uv2DVertex> genBuffer(const glm::vec2 &position, float n, std::string_view text);
 
 public:
     Text2D(const glm::vec2 &position, float n, std::string_view text);
 
-    void render_object() const;
+    void renderObject() const;
 };
 }
 

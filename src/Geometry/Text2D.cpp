@@ -7,20 +7,20 @@
 
 namespace CraftCpp {
 Text2D::Text2D(const glm::vec2 &position, float n, std::string_view text) : SuperClass{
-        gen_buffer(position, n, text)} {
+        genBuffer(position, n, text)} {
 }
 
-void Text2D::render_object() const {
+void Text2D::renderObject() const {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    SuperClass::render_object();
+    SuperClass::renderObject();
 
     glDisable(GL_BLEND);
 }
 
-std::vector<Uv2DVertex> Text2D::gen_buffer(const glm::vec2 &position, float n, std::string_view text) {
-    std::vector<Uv2DVertex> buffer(text.size() * Character::get_n_vertices());
+std::vector<Uv2DVertex> Text2D::genBuffer(const glm::vec2 &position, float n, std::string_view text) {
+    std::vector<Uv2DVertex> buffer(text.size() * Character::getNVertices());
     auto buffer_it{buffer.begin()};
 
     glm::vec2 char_pos = position;

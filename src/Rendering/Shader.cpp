@@ -2,8 +2,6 @@
 // Created by ultimatenick on 11/08/21.
 //
 
-#define GLFW_INCLUDE_NONE
-
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -12,8 +10,7 @@
 #include "glm/vec3.hpp"
 #include "Rendering/Shader.hpp"
 #include "glm/gtc/type_ptr.hpp"
-#include "glad/include/glad/glad.h"
-#include "GLFW/glfw3.h"
+#include "Rendering/OpenGlExternal.hpp"
 
 namespace CraftCpp {
 Shader::Shader(std::string_view vs_path,

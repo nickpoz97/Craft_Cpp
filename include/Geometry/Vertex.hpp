@@ -33,7 +33,6 @@ struct NormalVertex : Uv3DVertex {
 class CubeVertex : public NormalVertex {
 public:
     float ao;
-    //glm::vec2 ao_light;
 };
 }
 

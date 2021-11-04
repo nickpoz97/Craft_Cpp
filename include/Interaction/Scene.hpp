@@ -25,8 +25,8 @@ enum class TextureName {
 };
 
 struct ShaderFilesPaths {
-    std::string_view vertex_code;
-    std::string_view fragment_code;
+    std::string_view vertexCode;
+    std::string_view fragmentCode;
 };
 
 struct GameViewSettings {
@@ -66,7 +66,7 @@ public:
 
     void loop();
 
-    int load_texture(std::string_view path, TextureName textureName, GLint clamp_type = GL_REPEAT);
+    int load_texture(std::string_view path, TextureName textureName, GLint clampType = GL_REPEAT);
     ~Scene();
 
     void loadAndRenderChunks();

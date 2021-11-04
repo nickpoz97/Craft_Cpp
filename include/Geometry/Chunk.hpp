@@ -14,7 +14,7 @@
 #include "Geometry/map_utils.hpp"
 #include "Geometry/RenderableEntity.hpp"
 #include "Geometry/Vertex.hpp"
-#include "tunable_parameters.hpp"
+#include "tunableParameters.hpp"
 
 namespace CraftCpp {
 class Chunk;
@@ -23,64 +23,63 @@ using ChunkMap = std::unordered_map<glm::ivec2, Chunk>;
 
 class Chunk : public RenderableEntity<CubeVertex> {
 private:
-    mutable std::thread init_chunk_thread{};
+    mutable std::thread initChunkThread{};
     using SuperClass = RenderableEntity<CubeVertex>;
     using BufferType = std::vector<CubeVertex>;
 
     using BlockMap = std::unordered_map<glm::ivec3, BlockType>;
-    mutable BufferType local_buffer;
-    BlockMap block_map{};
+    mutable BufferType localBuffer;
+    BlockMap blockMap{};
 
-    mutable bool render_ready{false};
-    mutable bool local_buffer_ready{false};
+    mutable bool renderReady{false};
+    mutable bool localBufferReady{false};
 
-    int count_exposed_faces() const;
+    int countExposedFaces() const;
 
     BufferType::iterator
-    generate_block_geometry(BufferType::iterator vertex_it, const glm::ivec3 &block_pos, TileBlock tileBlock,
-                            const std::array<bool, 6> &visible_faces) const;
+    generateBlockGeometry(BufferType::iterator vertexIt, const glm::ivec3 &blockPos, TileBlock tileBlock,
+                          const std::array<bool, 6> &visibleFaces) const;
 
-    void compute_chunk_geometry() const;
+    void computeChunkGeometry() const;
 
-    std::array<glm::ivec3, 8> get_chunk_boundaries() const;
+    std::array<glm::ivec3, 8> getChunkBoundaries() const;
 
-    const std::array<glm::ivec2, 4> xz_boundaries;
+    const std::array<glm::ivec2, 4> xzBoundaries;
 
-    bool check_border(const glm::ivec3 &pos, const ::glm::ivec3 &direction) const;
+    bool checkBorder(const glm::ivec3 &pos, const ::glm::ivec3 &direction) const;
 
-    std::array<bool, 6> get_visible_faces(TileBlock w, const glm::ivec3 &pos) const;
+    std::array<bool, 6> getVisibleFaces(TileBlock w, const glm::ivec3 &pos) const;
 
 public:
-    explicit Chunk(const glm::ivec2 &pq_coordinates);
+    explicit Chunk(const glm::ivec2 &pqCoordinates);
     static constexpr int SIZE = CHUNK_SIZE;
     static constexpr int Y_LIMIT = 256;
 
     const glm::ivec2 pq;
 
-    int get_min_x() const;
+    int getMinX() const;
 
-    int get_min_z() const;
+    int getMinZ() const;
 
-    int get_max_x() const;
+    int getMaxX() const;
 
-    int get_max_z() const;
+    int getMaxZ() const;
 
     static std::array<glm::ivec2, 4> computeXZBoundaries(const glm::ivec2 &pq);
 
-    static glm::ivec2 get_min_xz(const glm::ivec2 &pq);
+    static glm::ivec2 getMinXz(const glm::ivec2 &pq);
 
-    static glm::ivec2 get_max_xz(const glm::ivec2 &pq);
+    static glm::ivec2 getMaxXz(const glm::ivec2 &pq);
 
     int getHighestBlock() const;
 
-    BlockType get_block(const glm::ivec3 &block_pos) const;
+    BlockType getBlock(const glm::ivec3 &block_pos) const;
 
-    void set_block(const glm::ivec3 &position, BlockType w);
+    void setBlock(const glm::ivec3 &position, BlockType w);
 
-    //bool is_visible(const Frustum& frustum) const;
-    bool is_visible(const glm::mat4 &viewproj) const;
+    bool isVisible(const glm::mat4 &viewproj) const;
 
-    void update_buffer() const;
+    void updateBuffer() const;
 
     bool isLocalBufferReady() const;
 
@@ -91,21 +90,21 @@ public:
 
     static int chunked(int val);
 
-    void render_object() const;
+    void renderObject() const;
 
-    void init_chunk();
+    void initChunk();
 
-    void generate_blockmap();
+    void generateBlockmap();
 
     // first is top-left, going counterclockwise
     std::unordered_map<glm::ivec3, bool> getLightObstacles(const glm::ivec3 &blockPos) const;
 
-    void wait_thread() const;
+    void waitThread() const;
 
-    bool is_on_border(const glm::ivec3 &pos) const;
+    bool isOnBorder(const glm::ivec3 &pos) const;
 };
 
-int get_chunk_distance(const glm::ivec2 &pq1, const glm::ivec2 &pq2);
+int getChunkDistance(const glm::ivec2 &pq1, const glm::ivec2 &pq2);
 
 }
 

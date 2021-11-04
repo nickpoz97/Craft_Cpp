@@ -12,10 +12,10 @@
 #include "Geometry/CubicObject.hpp"
 
 namespace CraftCpp {
-Chunk::Chunk(const glm::ivec2 &pq_coordinates)
-        : block_map{}, pq{pq_coordinates}, SuperClass{},
-          xz_boundaries{
-                  computeXZBoundaries(pq_coordinates)
+Chunk::Chunk(const glm::ivec2 &pqCoordinates)
+        : blockMap{}, pq{pqCoordinates}, SuperClass{},
+          xzBoundaries{
+                  computeXZBoundaries(pqCoordinates)
           } {
 };
 
@@ -23,79 +23,79 @@ int Chunk::getHighestBlock() const {
     int highest_y = -1;
 
     // choose the highest block in the block_map
-    for (const auto &block: block_map) {
+    for (const auto &block: blockMap) {
         const glm::ivec3 &block_pos{block.first};
         const TileBlock block_type{block.second};
 
-        if (block_type.is_obstacle() && block_pos.y > highest_y)
+        if (block_type.isObstacle() && block_pos.y > highest_y)
             highest_y = block_pos.y;
     }
     return highest_y;
 }
 
-BlockType Chunk::get_block(const glm::ivec3 &block_pos) const {
-    auto it = block_map.find(block_pos);
-    return (it == block_map.end()) ? BlockType::EMPTY : it->second;
+BlockType Chunk::getBlock(const glm::ivec3 &block_pos) const {
+    auto it = blockMap.find(block_pos);
+    return (it == blockMap.end()) ? BlockType::EMPTY : it->second;
 }
 
-void Chunk::compute_chunk_geometry() const {
-    int n_faces = count_exposed_faces();
+void Chunk::computeChunkGeometry() const {
+    int n_faces = countExposedFaces();
     // each visible face has INDICES_FACE_COUNT indices that represent the triangle
-    local_buffer = std::vector<CubeVertex>(n_faces * INDICES_FACE_COUNT);
-    auto v_it = local_buffer.begin();
+    localBuffer = std::vector<CubeVertex>(n_faces * INDICES_FACE_COUNT);
+    auto v_it = localBuffer.begin();
 
-    for (const auto &kv: block_map) {
+    for (const auto &kv: blockMap) {
         const glm::ivec3 &block_pos{kv.first};
         const TileBlock &tileBlock{kv.second};
 
         // generate geometry of actual block (value returned by function is first free position in buffer)
-        v_it = generate_block_geometry(v_it, block_pos, tileBlock, get_visible_faces(kv.second, kv.first));
+        v_it = generateBlockGeometry(v_it, block_pos, tileBlock, getVisibleFaces(kv.second, kv.first));
     }
 #ifndef NDEBUG
     std::cout << "chunk geometry computed\n";
 #endif
-    local_buffer_ready = true;
+    localBufferReady = true;
 }
 
-int Chunk::count_exposed_faces() const {
+int Chunk::countExposedFaces() const {
     int n_faces = 0;
 
-    for (const auto &pair: block_map) {
-        const auto &visible_faces = get_visible_faces(pair.second, pair.first);
+    for (const auto &pair: blockMap) {
+        const auto &visible_faces = getVisibleFaces(pair.second, pair.first);
         n_faces += std::accumulate(visible_faces.begin(), visible_faces.end(), 0);
     }
     return n_faces;
 }
 
 Chunk::BufferType::iterator
-Chunk::generate_block_geometry(BufferType::iterator vertex_it, const glm::ivec3 &block_pos, TileBlock tileBlock,
-                               const std::array<bool, 6> &visible_faces) const {
-    if (tileBlock.is_plant()) {
+Chunk::generateBlockGeometry(BufferType::iterator vertexIt, const glm::ivec3 &blockPos, TileBlock tileBlock,
+                             const std::array<bool, 6> &visibleFaces) const {
+    if (tileBlock.isPlant()) {
         Plant plant{
                 tileBlock.getBlockType(),
-                block_pos,
-                simplex2(block_pos.x, block_pos.z, 4, 0.5, 2) * 360,
-                vertex_it,
-                getLightObstacles(block_pos),
+                blockPos,
+                simplex2(blockPos.x, blockPos.z, 4, 0.5, 2) * 360,
+                vertexIt,
+                getLightObstacles(blockPos),
         };
         return plant.end();
     }
-    if (tileBlock.is_empty() || visible_faces.empty()) {
-        return vertex_it;
+    if (tileBlock.isEmpty() || visibleFaces.empty()) {
+        return vertexIt;
     }
-    Cube cube{tileBlock.getBlockType(), visible_faces, block_pos, vertex_it, getLightObstacles(block_pos)};
+    Cube cube{tileBlock.getBlockType(), visibleFaces, blockPos, vertexIt, getLightObstacles(blockPos)};
     return cube.end();
 }
 
-void Chunk::update_buffer() const {
-    SuperClass::update_buffer(local_buffer);
-    render_ready = true;
+void Chunk::updateBuffer() const {
+    SuperClass::update_buffer(localBuffer);
+    renderReady = true;
 #ifndef NDEBUG
     std::cout << "buffer updated\n";
 #endif
 }
 
-void Chunk::generate_blockmap() {
+void Chunk::generateBlockmap() {
     // for each block xz position
     for (int dx = 0; dx < Chunk::SIZE; dx++) {
         for (int dz = 0; dz < Chunk::SIZE; dz++) {
@@ -111,23 +111,23 @@ void Chunk::generate_blockmap() {
             if (h <= t) {
                 h = t;
                 w = BlockType::SAND;
-                set_block({x, h - 1, z}, static_cast<BlockType>(w));
+                setBlock({x, h - 1, z}, static_cast<BlockType>(w));
             } else {
                 for (int y = t - 1; y < h; y++) {
-                    set_block({x, y, z}, static_cast<BlockType>(w));
+                    setBlock({x, y, z}, static_cast<BlockType>(w));
                 }
             }
             if (w == BlockType::GRASS) {
                 if (SHOW_PLANTS) {
                     // grass
                     if (simplex2(-x * 0.1, z * 0.1, 4, 0.8, 2) > 0.6) {
-                        block_map[{x, h, z}] = static_cast<BlockType>(BlockType::TALL_GRASS);
+                        blockMap[{x, h, z}] = static_cast<BlockType>(BlockType::TALL_GRASS);
                     }
                     // flowers
                     if (simplex2(x * 0.05, -z * 0.05, 4, 0.8, 2) > 0.7) {
                         // w_f max == 23
                         int w_f = 18 + simplex2(x * 0.1, z * 0.1, 4, 0.8, 2) * 7;
-                        block_map[{x, h, z}] = static_cast<BlockType>(w_f);
+                        blockMap[{x, h, z}] = static_cast<BlockType>(w_f);
                     }
                 }
                 bool ok = SHOW_TREES && !(dx - 4 < 0 || dz - 4 < 0 || dx + 4 >= Chunk::SIZE || dz + 4 >= Chunk::SIZE);
@@ -140,13 +140,13 @@ void Chunk::generate_blockmap() {
                                 int d = (ox * ox) + (oz * oz) +
                                         (y - (h + 4)) * (y - (h + 4));
                                 if (d < 11) {
-                                    block_map[{x + ox, y, z + oz}] = BlockType::LEAVES;
+                                    blockMap[{x + ox, y, z + oz}] = BlockType::LEAVES;
                                 }
                             }
                         }
                     }
                     for (int y = h; y < h + 7; y++) {
-                        block_map[{x, y, z}] = BlockType::WOOD;
+                        blockMap[{x, y, z}] = BlockType::WOOD;
                     }
                 }
             }
@@ -154,7 +154,7 @@ void Chunk::generate_blockmap() {
                 for (int y = 64; y < 72; y++) {
                     if (simplex3(
                             x * 0.01, y * 0.1, z * 0.01, 8, 0.5, 2) > 0.75) {
-                        block_map[{x, y, z}] = BlockType::CLOUD;
+                        blockMap[{x, y, z}] = BlockType::CLOUD;
                     }
                 }
             }
@@ -163,10 +163,10 @@ void Chunk::generate_blockmap() {
 #ifndef NDEBUG
     std::cout << "chunk initialized\n";
 #endif
-    compute_chunk_geometry();
+    computeChunkGeometry();
 }
 
-bool Chunk::is_visible(const glm::mat4 &viewproj) const {
+bool Chunk::isVisible(const glm::mat4 &viewproj) const {
     // coeff: 0 == in, -1 == out, +1 == out
     auto clip = [](const glm::vec4& worldPoint){
         const glm::vec4 clipPoint = worldPoint / worldPoint.w;
@@ -175,7 +175,7 @@ bool Chunk::is_visible(const glm::mat4 &viewproj) const {
 
     glm::ivec2 sum{};
 
-    for (const auto &p: xz_boundaries) {
+    for (const auto &p: xzBoundaries) {
         glm::vec4 cornerPoint = viewproj * glm::vec4{p[0], 0.0f, p[1], 1.0f};
         auto position = clip(cornerPoint);
         if(glm::any(glm::equal(position, {}))){
@@ -187,14 +187,14 @@ bool Chunk::is_visible(const glm::mat4 &viewproj) const {
     return glm::any(glm::equal(sum, {}));
 }
 
-std::array<glm::ivec3, 8> Chunk::get_chunk_boundaries() const {
+std::array<glm::ivec3, 8> Chunk::getChunkBoundaries() const {
     std::array<glm::ivec3, 8> boundaries{};
     auto it{boundaries.begin()};
 
-    it = std::transform(xz_boundaries.begin(), xz_boundaries.end(), it,
-        [](const glm::ivec2& v){return glm::ivec3{v[0], 0, v[1]};});
-    it = std::transform(xz_boundaries.begin(), xz_boundaries.end(), it,
-        [](const glm::ivec2& v){return glm::ivec3{v[0], Y_LIMIT, v[1]};});
+    it = std::transform(xzBoundaries.begin(), xzBoundaries.end(), it,
+                        [](const glm::ivec2& v){return glm::ivec3{v[0], 0, v[1]};});
+    it = std::transform(xzBoundaries.begin(), xzBoundaries.end(), it,
+                        [](const glm::ivec2& v){return glm::ivec3{v[0], Y_LIMIT, v[1]};});
 
 #ifndef NDEBUG
     assert(it == boundaries.end());
@@ -202,15 +202,15 @@ std::array<glm::ivec3, 8> Chunk::get_chunk_boundaries() const {
     return boundaries;
 }
 
-void Chunk::set_block(const glm::ivec3 &position, BlockType w) {
-    if (TileBlock(w).is_empty()) {
-        block_map.erase(position);
+void Chunk::setBlock(const glm::ivec3 &position, BlockType w) {
+    if (TileBlock(w).isEmpty()) {
+        blockMap.erase(position);
         return;
     }
-    block_map[position] = w;
+    blockMap[position] = w;
 }
 
-int get_chunk_distance(const glm::ivec2 &pq1, const glm::ivec2 &pq2) {
+int getChunkDistance(const glm::ivec2 &pq1, const glm::ivec2 &pq2) {
     glm::ivec2 delta = pq1 - pq2;
     return glm::max(glm::abs(delta.x), glm::abs(delta.y));
 }
@@ -226,51 +226,51 @@ glm::ivec2 Chunk::chunked(const glm::vec3 &position) {
     };
 }
 
-void Chunk::render_object() const {
-    if (local_buffer_ready) {
-        if (!render_ready) {
-            update_buffer();
+void Chunk::renderObject() const {
+    if (localBufferReady) {
+        if (!renderReady) {
+            updateBuffer();
         }
-        SuperClass::render_object();
+        SuperClass::renderObject();
     }
 }
 
-void Chunk::init_chunk() {
-    init_chunk_thread = std::thread(&Chunk::generate_blockmap, this);
+void Chunk::initChunk() {
+    initChunkThread = std::thread(&Chunk::generateBlockmap, this);
 }
 
-glm::ivec2 Chunk::get_min_xz(const glm::ivec2 &pq) {
+glm::ivec2 Chunk::getMinXz(const glm::ivec2 &pq) {
     return pq * SIZE - 1;
 }
 
-glm::ivec2 Chunk::get_max_xz(const glm::ivec2 &pq) {
-    return get_min_xz(pq) + SIZE + 1;
+glm::ivec2 Chunk::getMaxXz(const glm::ivec2 &pq) {
+    return getMinXz(pq) + SIZE + 1;
 }
 
-int Chunk::get_min_x() const {
-    return xz_boundaries[0][0];
+int Chunk::getMinX() const {
+    return xzBoundaries[0][0];
 }
 
-int Chunk::get_min_z() const {
-    return xz_boundaries[0][1];
+int Chunk::getMinZ() const {
+    return xzBoundaries[0][1];
 }
 
-int Chunk::get_max_x() const {
-    return xz_boundaries[3][0];
+int Chunk::getMaxX() const {
+    return xzBoundaries[3][0];
 }
 
-int Chunk::get_max_z() const {
-    return xz_boundaries[3][1];
+int Chunk::getMaxZ() const {
+    return xzBoundaries[3][1];
 }
 
-bool Chunk::check_border(const glm::ivec3 &pos, const ::glm::ivec3 &direction) const {
+bool Chunk::checkBorder(const glm::ivec3 &pos, const ::glm::ivec3 &direction) const {
     const glm::ivec3 new_pos = pos + direction;
     return
-            new_pos.x <= get_min_x() || new_pos.x >= get_max_x() || new_pos.z <= get_min_z() ||
-            new_pos.z >= get_max_z();
+            new_pos.x <= getMinX() || new_pos.x >= getMaxX() || new_pos.z <= getMinZ() ||
+            new_pos.z >= getMaxZ();
 }
 
-std::array<bool, 6> Chunk::get_visible_faces(TileBlock w, const glm::ivec3 &pos) const {
+std::array<bool, 6> Chunk::getVisibleFaces(TileBlock w, const glm::ivec3 &pos) const {
     static constexpr std::array<glm::ivec3, 6> offsets{{
        {-1, 0, 0},
        {1, 0, 0},
@@ -281,18 +281,18 @@ std::array<bool, 6> Chunk::get_visible_faces(TileBlock w, const glm::ivec3 &pos)
 }};
 
     return {
-            TileBlock{get_block(pos + offsets[0])}.is_transparent(),
-            TileBlock{get_block(pos + offsets[1])}.is_transparent(),
-            TileBlock{get_block(pos + offsets[2])}.is_transparent(),
+            TileBlock{getBlock(pos + offsets[0])}.isTransparent(),
+            TileBlock{getBlock(pos + offsets[1])}.isTransparent(),
+            TileBlock{getBlock(pos + offsets[2])}.isTransparent(),
             w == BlockType::CLOUD ||
             w == BlockType::LEAVES, //pos.y > 0 && TileBlock{get_block(pos + offsets[3])}.is_transparent(),
-            TileBlock{get_block(pos + offsets[4])}.is_transparent(),
-            TileBlock{get_block(pos + offsets[5])}.is_transparent(),
+            TileBlock{getBlock(pos + offsets[4])}.isTransparent(),
+            TileBlock{getBlock(pos + offsets[5])}.isTransparent(),
     };
 }
 
-bool Chunk::is_on_border(const glm::ivec3 &pos) const {
-    return check_border(pos, {});
+bool Chunk::isOnBorder(const glm::ivec3 &pos) const {
+    return checkBorder(pos, {});
 }
 
 std::unordered_map<glm::ivec3, bool> Chunk::getLightObstacles(const glm::ivec3 &blockPos) const {
@@ -302,7 +302,7 @@ std::unordered_map<glm::ivec3, bool> Chunk::getLightObstacles(const glm::ivec3 &
         for (int oy = -1; oy <= 1; ++oy) {
             for (int oz = -1; oz <= 1; ++oz) {
                 glm::ivec3 offset{ox, oy, oz};
-                lightObstacles.emplace(offset, !TileBlock{get_block(blockPos + offset)}.is_transparent());
+                lightObstacles.emplace(offset, !TileBlock{getBlock(blockPos + offset)}.isTransparent());
             }
         }
     }
@@ -312,16 +312,16 @@ std::unordered_map<glm::ivec3, bool> Chunk::getLightObstacles(const glm::ivec3 &
 
 bool Chunk::isLocalBufferReady() const {
     // check if thread has finished buffer modification
-    return local_buffer_ready;
+    return localBufferReady;
 }
 
-void Chunk::wait_thread() const {
-    init_chunk_thread.join();
+void Chunk::waitThread() const {
+    initChunkThread.join();
 }
 
 std::array<glm::ivec2, 4> Chunk::computeXZBoundaries(const glm::ivec2 &pq) {
-    auto min{get_min_xz(pq)};
-    auto max{get_max_xz(pq)};
+    auto min{getMinXz(pq)};
+    auto max{getMaxXz(pq)};
 
     return {{
                     {min[0], min[1]},
@@ -332,6 +332,6 @@ std::array<glm::ivec2, 4> Chunk::computeXZBoundaries(const glm::ivec2 &pq) {
 }
 
 bool Chunk::needInitCall() const {
-    return !(init_chunk_thread.joinable() || isLocalBufferReady());
+    return !(initChunkThread.joinable() || isLocalBufferReady());
 }
 }

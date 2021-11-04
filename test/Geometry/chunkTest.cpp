@@ -14,16 +14,16 @@ TEST_CASE("Chunk instantiation (not initialized) and block insertion"){
     CraftCpp::Chunk c{pq_coords};
     // empty chunk
     REQUIRE(!c.isLocalBufferReady());
-    REQUIRE(c.get_block(obstacle_block_pos) == CraftCpp::BlockType::EMPTY);
+    REQUIRE(c.getBlock(obstacle_block_pos) == CraftCpp::BlockType::EMPTY);
 
-    c.set_block(obstacle_block_pos, CraftCpp::BlockType::SAND);
-    REQUIRE(c.get_block(obstacle_block_pos) == CraftCpp::BlockType::SAND);
+    c.setBlock(obstacle_block_pos, CraftCpp::BlockType::SAND);
+    REQUIRE(c.getBlock(obstacle_block_pos) == CraftCpp::BlockType::SAND);
 
-    c.set_block(obstacle_block_pos, CraftCpp::BlockType::EMPTY);
-    REQUIRE(c.get_block(obstacle_block_pos) == CraftCpp::BlockType::EMPTY);
+    c.setBlock(obstacle_block_pos, CraftCpp::BlockType::EMPTY);
+    REQUIRE(c.getBlock(obstacle_block_pos) == CraftCpp::BlockType::EMPTY);
 
-    c.set_block(obstacle_block_pos, CraftCpp::BlockType::STONE);
-    c.set_block(obstacle_block_pos + glm::ivec3{2,0,0}, CraftCpp::BlockType::CLOUD);
+    c.setBlock(obstacle_block_pos, CraftCpp::BlockType::STONE);
+    c.setBlock(obstacle_block_pos + glm::ivec3{2, 0, 0}, CraftCpp::BlockType::CLOUD);
     REQUIRE(c.getHighestBlock() == obstacle_block_pos.y);
 }
 
@@ -33,26 +33,26 @@ TEST_CASE("Chunk instantiation with initialization"){
 
     for(int p_offset = 0 ; p_offset < 2 ; p_offset++){
         for(int q_offset = 0 ; q_offset < 2 ; q_offset++){
-            chunk_list.emplace_front(pq_coords + glm::ivec2{p_offset, q_offset}).init_chunk();
+            chunk_list.emplace_front(pq_coords + glm::ivec2{p_offset, q_offset}).initChunk();
         }
     }
     for(const CraftCpp::Chunk &c : chunk_list) {
-        c.wait_thread();
+        c.waitThread();
         REQUIRE(c.isLocalBufferReady());
         REQUIRE(c.getHighestBlock() <= CraftCpp::Chunk::Y_LIMIT);
-        for (int x = c.get_min_x(); x <= c.get_max_x(); x++) {
-            for (int z = c.get_min_z(); z <= c.get_max_z(); z++) {
+        for (int x = c.getMinX(); x <= c.getMaxX(); x++) {
+            for (int z = c.getMinZ(); z <= c.getMaxZ(); z++) {
                 bool empty_found = false;
                 static constexpr int minHeight = 11;
                 for(int y = minHeight ; y < CraftCpp::Chunk::Y_LIMIT ; y++) {
-                    if (c.is_on_border(glm::ivec3{x,y,z})) {
-                        REQUIRE(c.get_block({x, 0, z}) == CraftCpp::BlockType::EMPTY);
+                    if (c.isOnBorder(glm::ivec3{x, y, z})) {
+                        REQUIRE(c.getBlock({x, 0, z}) == CraftCpp::BlockType::EMPTY);
                         continue;
                     }
-                    auto tb = CraftCpp::TileBlock{c.get_block({x, y, z})};
-                    empty_found = empty_found || tb.is_empty();
-                    bool assertion = (tb.is_user_buildable() && !empty_found) ||
-                        (!tb.is_user_buildable() && empty_found) || tb.getBlockType() == CraftCpp::BlockType::LEAVES;
+                    auto tb = CraftCpp::TileBlock{c.getBlock({x, y, z})};
+                    empty_found = empty_found || tb.isEmpty();
+                    bool assertion = (tb.isUserBuildable() && !empty_found) ||
+                                     (!tb.isUserBuildable() && empty_found) || tb.getBlockType() == CraftCpp::BlockType::LEAVES;
                     REQUIRE(assertion);
                 }
             }

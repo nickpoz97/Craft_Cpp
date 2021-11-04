@@ -13,7 +13,7 @@ TEST_CASE("Set the unique GameView instance and check destructor"){
     {
         std::unique_ptr<GameView> gameView = GameView::setInstance(width, height, fov);
         REQUIRE(GameView::isInstantiated());
-        REQUIRE((gameView->get_width() == width && gameView->get_height() == height && gameView->get_fov() == fov));
+        REQUIRE((gameView->getWidth() == width && gameView->getHeight() == height && gameView->getFov() == fov));
     }
     REQUIRE(!GameView::isInstantiated());
 }

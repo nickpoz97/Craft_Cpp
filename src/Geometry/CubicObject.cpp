@@ -26,17 +26,17 @@ template<>
 const float CubicObject<4>::B = S;
 
 template<unsigned n_faces>
-CubicObject<n_faces>::CubicObject(const BlockType &block_type, const std::array<bool, 6> &visible_faces,
-                                  const glm::vec3 &center_position,
-                                  float asy_rotation,
+CubicObject<n_faces>::CubicObject(const BlockType &blockType, const std::array<bool, 6> &visibleFaces,
+                                  const glm::vec3 &centerPosition,
+                                  float asyRotation,
                                   const std::unordered_map<glm::ivec3, bool> &lightObstacles,
-                                  cube_vertex_iterator_t vertices_it) :
-        begin_iterator{vertices_it},
-        n_vertices{static_cast<size_t>(std::accumulate(visible_faces.begin(), visible_faces.end(), 0) *
-                                       INDICES_FACE_COUNT)} {
-    TileBlock tile_block{block_type};
+                                  CubeVertexIterator verticesIt) :
+        beginIterator{verticesIt},
+        nVertices{static_cast<size_t>(std::accumulate(visibleFaces.begin(), visibleFaces.end(), 0) *
+                                      INDICES_FACE_COUNT)} {
+    TileBlock tile_block{blockType};
 
-    auto face_v_it = local_vertex_positions.begin();
+    auto face_v_it = localVertexPositions.begin();
     auto face_uvs_it = uvs.begin();
     auto face_nrm_it = normals.begin();
     auto tile_it = tile_block.begin();
@@ -47,7 +47,7 @@ CubicObject<n_faces>::CubicObject(const BlockType &block_type, const std::array<
         ++tile_it;
     };
 
-    auto visible_faces_it = visible_faces.begin();
+    auto visible_faces_it = visibleFaces.begin();
 
     for (auto face_ind_it{indices.begin()}; face_ind_it != indices.end(); ++face_ind_it) {
         // test if face is visible
@@ -68,11 +68,11 @@ CubicObject<n_faces>::CubicObject(const BlockType &block_type, const std::array<
         const auto &face_uvs = *(face_uvs_it);
         // iterate through actual face indices
         for (int i: *face_ind_it) {
-            auto &actual_vertex = *(vertices_it++);
+            auto &actual_vertex = *(verticesIt++);
             // initialize texture coordinates
             // obtain local(cube or flower) coordinates
-            actual_vertex.position = center_position +
-                                     glm::rotateY(N * face_vertices[i], glm::radians(asy_rotation));
+            actual_vertex.position = centerPosition +
+                                     glm::rotateY(N * face_vertices[i], glm::radians(asyRotation));
             // assign normal
             actual_vertex.normal = face_normal;
             actual_vertex.uv = {
@@ -106,8 +106,8 @@ CubicObject<n_faces>::CubicObject(const BlockType &block_type, const std::array<
 }
 
 template<unsigned int n_faces>
-cube_vertex_iterator_t CubicObject<n_faces>::end() const {
-    return begin_iterator + n_vertices;
+CubeVertexIterator CubicObject<n_faces>::end() const {
+    return beginIterator + nVertices;
 }
 
 template<unsigned int n_faces>
@@ -119,9 +119,9 @@ glm::vec3 CubicObject<n_faces>::rotate_asy(const glm::vec3 &v, float angle_degre
     };
 }
 
-Cube::Cube(const BlockType &block_type, const std::array<bool, 6> &visible_faces, const glm::vec3 &position,
-           cube_vertex_iterator_t vertices_it, const std::unordered_map<glm::ivec3, bool> &lightObstacles) :
-        super(block_type, visible_faces, position, 0, lightObstacles, vertices_it) {}
+Cube::Cube(const BlockType &blockType, const std::array<bool, 6> &visibleFaces, const glm::vec3 &position,
+           CubeVertexIterator verticesIt, const std::unordered_map<glm::ivec3, bool> &lightObstacles) :
+        super(blockType, visibleFaces, position, 0, lightObstacles, verticesIt) {}
 
 template<unsigned n_faces>
 void CubicObject<n_faces>::print_vertex_info() {
@@ -134,7 +134,7 @@ void CubicObject<n_faces>::print_vertex_info() {
 }
 
 template<>
-const CubicObject<6>::PositionsMatrix CubicObject<6>::local_vertex_positions{{
+const CubicObject<6>::PositionsMatrix CubicObject<6>::localVertexPositions{{
          {{{-1, -1, -1}, {-1, -1, +1},
            {-1, +1, -1}, {-1, +1, +1}}},
          {{{+1, -1, -1}, {+1, -1, +1},
@@ -180,12 +180,12 @@ const CubicObject<6>::UvsMatrix CubicObject<6>::uvs{{
 }};
 
 template<unsigned int n_faces>
-cube_vertex_iterator_t CubicObject<n_faces>::begin() const {
-    return begin_iterator;
+CubeVertexIterator CubicObject<n_faces>::begin() const {
+    return beginIterator;
 }
 
 template<>
-const CubicObject<4>::PositionsMatrix CubicObject<4>::local_vertex_positions{{
+const CubicObject<4>::PositionsMatrix CubicObject<4>::localVertexPositions{{
          {{{0, -1, -1}, {0, -1, +1},
            {0, +1, -1}, {0, +1, +1}}},
          {{{0, -1, -1}, {0, -1, +1},
@@ -226,7 +226,7 @@ class CubicObject<6>;
 template
 class CubicObject<4>;
 
-Plant::Plant(const BlockType &block_type, const glm::vec3 &center_position, float asy_rotation,
-             cube_vertex_iterator_t vertices_it, const std::unordered_map<glm::ivec3, bool> &lightObstacles) :
-        super{block_type, {1, 1, 0, 0, 1, 1}, center_position, asy_rotation, lightObstacles, vertices_it} {}
+Plant::Plant(const BlockType &blockType, const glm::vec3 &centerPosition, float asy_rotation,
+             CubeVertexIterator verticesIt, const std::unordered_map<glm::ivec3, bool> &lightObstacles) :
+        super{blockType, {1, 1, 0, 0, 1, 1}, centerPosition, asy_rotation, lightObstacles, verticesIt} {}
 }

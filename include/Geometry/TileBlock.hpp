@@ -103,13 +103,13 @@ struct TileCube {
 
 class TileBlock {
 private:
-    BlockType tilecube_index{};
+    BlockType tileCubeIndex{};
 public:
     static const std::array<TileCube, 256> tiles;
 
     [[nodiscard]] BlockType getBlockType() const;
 
-    TileBlock(BlockType block_type);
+    TileBlock(BlockType blockType);
 
     TileBlock() = default;
 
@@ -117,17 +117,17 @@ public:
 
     TileBlock(const TileBlock &other) = default;
 
-    [[nodiscard]] bool is_plant() const;
+    [[nodiscard]] bool isPlant() const;
 
-    [[nodiscard]] bool is_obstacle() const;
+    [[nodiscard]] bool isObstacle() const;
 
-    [[nodiscard]] bool is_transparent() const;
+    [[nodiscard]] bool isTransparent() const;
 
-    [[nodiscard]] bool is_destructable() const;
+    [[nodiscard]] bool isDestroyable() const;
 
-    [[nodiscard]] bool is_empty() const;
+    [[nodiscard]] bool isEmpty() const;
 
-    [[nodiscard]] bool is_user_buildable() const;
+    [[nodiscard]] bool isUserBuildable() const;
 
     operator BlockType() const;
 

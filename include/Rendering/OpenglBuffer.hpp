@@ -8,7 +8,7 @@
 #include <vector>
 #include <array>
 
-#include "glad/include/glad/glad.h"
+#include "Rendering/OpenGlExternal.hpp"
 #include "Geometry/Vertex.hpp"
 #include "Rendering/attributesSize.hpp"
 
@@ -36,6 +36,7 @@ private:
         getNormalAttributeSize<VertexType>(),
         getAoAttributeSize<VertexType>()
     };
+
 public:
     explicit OpenglBuffer(bool openGLReady);
 

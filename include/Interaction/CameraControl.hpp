@@ -8,8 +8,8 @@
 #include <memory>
 #include <glm/vec2.hpp>
 
-#include "glfw/include/GLFW/glfw3.h"
-#include "Interaction//Camera.hpp"
+#include "Rendering/OpenGlExternal.hpp"
+#include "Interaction/Camera.hpp"
 #include "Interaction/GameView.hpp"
 
 namespace CraftCpp {

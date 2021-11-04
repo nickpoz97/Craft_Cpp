@@ -2,9 +2,7 @@
 // Created by ultimatenick on 11/08/21.
 //
 
-#include "glad/include/glad/glad.h"
-
-#include "glm/vec3.hpp"
+#include "Rendering/OpenGlExternal.hpp"
 #include "Rendering/OpenglBuffer.hpp"
 
 namespace CraftCpp {

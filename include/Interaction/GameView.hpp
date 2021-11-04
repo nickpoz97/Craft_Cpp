@@ -10,9 +10,9 @@
 #include <memory>
 #include <Geometry/Chunk.hpp>
 
+#include "Rendering/OpenGlExternal.hpp"
 #include "glm/mat4x4.hpp"
-#include "glfw/include/GLFW/glfw3.h"
-#include "tunable_parameters.hpp"
+#include "tunableParameters.hpp"
 
 namespace CraftCpp {
 class GameView {
@@ -29,32 +29,32 @@ private:
     static constexpr float z_near = 0.125f;
     static constexpr float z_far = static_cast<float>(RENDER_CHUNK_RADIUS) * Chunk::SIZE;
 
-    static int compute_scale_factor(int width, int height);
+    static int computeScaleFactor(int width, int height);
 
-    GLFWwindow *create_window(bool is_fullscreen);
+    GLFWwindow *createWindow(bool is_fullscreen);
 
-    GameView(int width, int height, float fov, int ortho = false, bool is_fullscreen = false);
+    GameView(int width, int height, float fov, int ortho = false, bool isFullscreen = false);
 
 public:
     enum ProjType {
         PERSP, UI, ORTHO_3D, ITEM
     };
 
-    static std::unique_ptr<GameView> setInstance(int width, int height, float fov, int ortho = false, bool is_fullscreen = false);
+    static std::unique_ptr<GameView> setInstance(int width, int height, float fov, int ortho = false, bool isFullscreen = false);
 
-    [[nodiscard]] int get_width() const;
+    [[nodiscard]] int getWidth() const;
 
-    [[nodiscard]] int get_height() const;
+    [[nodiscard]] int getHeight() const;
 
-    [[nodiscard]] int get_scale() const;
+    [[nodiscard]] int getScale() const;
 
-    [[nodiscard]] int get_fov() const;
+    [[nodiscard]] int getFov() const;
 
-    [[nodiscard]] int get_ortho() const;
+    [[nodiscard]] int getOrtho() const;
 
     [[nodiscard]] static GLFWwindow *getWindow();
 
-    [[nodiscard]] float get_ratio() const;
+    [[nodiscard]] float getRatio() const;
 
     [[nodiscard]] static bool isInstantiated();
 
@@ -62,13 +62,13 @@ public:
 
     [[nodiscard]] static GameView *getActualInstance();
 
-    void set_ortho(int ortho_size);
+    void setOrtho(int ortho_size);
 
-    void set_fov(int fov_degrees);
+    void setFov(int fov_degrees);
 
     void update();
 
-    [[nodiscard]] glm::mat4 get_proj_matrix(ProjType pt) const;
+    [[nodiscard]] glm::mat4 getProjMatrix(ProjType pt) const;
 
     ~GameView();
 };

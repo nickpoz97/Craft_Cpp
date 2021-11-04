@@ -72,8 +72,8 @@ decltype(TileBlock::tiles) TileBlock::tiles{{
     {207, 207, 207, 207, 207, 207}, // 63
 }};
 
-bool TileBlock::is_plant() const {
-    switch (tilecube_index) {
+bool TileBlock::isPlant() const {
+    switch (tileCubeIndex) {
         case BlockType::TALL_GRASS:
         case BlockType::YELLOW_FLOWER:
         case BlockType::RED_FLOWER:
@@ -87,11 +87,11 @@ bool TileBlock::is_plant() const {
     }
 }
 
-bool TileBlock::is_obstacle() const {
-    if (is_plant()) {
+bool TileBlock::isObstacle() const {
+    if (isPlant()) {
         return false;
     }
-    switch (tilecube_index) {
+    switch (tileCubeIndex) {
         case BlockType::EMPTY:
         case BlockType::CLOUD:
             return false;
@@ -100,11 +100,11 @@ bool TileBlock::is_obstacle() const {
     }
 }
 
-bool TileBlock::is_transparent() const {
-    if (is_plant()) {
+bool TileBlock::isTransparent() const {
+    if (isPlant()) {
         return true;
     }
-    switch (tilecube_index) {
+    switch (tileCubeIndex) {
         case BlockType::EMPTY:
         case BlockType::GLASS:
         case BlockType::LEAVES:
@@ -116,8 +116,8 @@ bool TileBlock::is_transparent() const {
 
 }
 
-bool TileBlock::is_destructable() const {
-    switch (tilecube_index) {
+bool TileBlock::isDestroyable() const {
+    switch (tileCubeIndex) {
         case BlockType::EMPTY:
         case BlockType::CLOUD:
             return false;
@@ -126,22 +126,22 @@ bool TileBlock::is_destructable() const {
     }
 }
 
-bool TileBlock::is_empty() const {
-    return tilecube_index == BlockType::EMPTY;
+bool TileBlock::isEmpty() const {
+    return tileCubeIndex == BlockType::EMPTY;
 }
 
 TileBlock::operator BlockType() const {
-    return tilecube_index;
+    return tileCubeIndex;
 }
 
 BlockType TileBlock::getBlockType() const {
-    return tilecube_index;
+    return tileCubeIndex;
 }
 
-TileBlock::TileBlock(BlockType tile_index) : tilecube_index{tile_index} {}
+TileBlock::TileBlock(BlockType blockType) : tileCubeIndex{blockType} {}
 
-bool TileBlock::is_user_buildable() const {
-    return is_destructable();
+bool TileBlock::isUserBuildable() const {
+    return isDestroyable();
 }
 
 TileCube::Iterator TileBlock::begin() const {

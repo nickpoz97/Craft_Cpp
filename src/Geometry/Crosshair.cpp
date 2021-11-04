@@ -8,9 +8,9 @@
 #include "Rendering/Shader.hpp"
 
 namespace CraftCpp {
-Crosshair::Crosshair(int width, int height, int scale) : SuperClass(get_ends_coordinates(width, height, scale)) {};
+Crosshair::Crosshair(int width, int height, int scale) : SuperClass(getEndsCoordinates(width, height, scale)) {};
 
-std::vector<Standard2DVertex> Crosshair::get_ends_coordinates(int width, int height, int scale) {
+std::vector<Standard2DVertex> Crosshair::getEndsCoordinates(int width, int height, int scale) {
     glm::ivec2 position{width / 2, height / 2};
     int p{10 * scale};
 
@@ -25,10 +25,10 @@ std::vector<Standard2DVertex> Crosshair::get_ends_coordinates(int width, int hei
     };
 }
 
-void Crosshair::render_lines() const {
+void Crosshair::renderLines() const {
     glLogicOp(GL_INVERT);
     glEnable(GL_COLOR_LOGIC_OP);
-    SuperClass::render_lines();
+    SuperClass::renderLines();
     glDisable(GL_COLOR_LOGIC_OP);
 }
 }

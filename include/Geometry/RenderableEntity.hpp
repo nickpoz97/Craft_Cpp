@@ -34,9 +34,9 @@ public:
 
     void update_buffer(const std::vector<VertexType> &local_buffer) const;
 
-    void render_object() const;
+    void renderObject() const;
 
-    void render_lines() const;
+    void renderLines() const;
 };
 }
 #endif //CPP_RENDERABLEENTITY_HPP

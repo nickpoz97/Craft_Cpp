@@ -15,14 +15,14 @@ class Crosshair : public RenderableEntity<Standard2DVertex> {
 private:
     using SuperClass = RenderableEntity<Standard2DVertex>;
 
-    static std::vector<Standard2DVertex> get_ends_coordinates(int width, int height, int scale);
+    static std::vector<Standard2DVertex> getEndsCoordinates(int width, int height, int scale);
 
 public:
     Crosshair(int width, int height, int scale);
 
-    void render_object() = delete;
+    void renderObject() = delete;
 
-    void render_lines() const;
+    void renderLines() const;
 };
 
 }

@@ -18,12 +18,12 @@ RenderableEntity<VertexType>::RenderableEntity(const std::vector<VertexType> &lo
 }
 
 template<typename VertexType>
-void RenderableEntity<VertexType>::render_object() const {
+void RenderableEntity<VertexType>::renderObject() const {
     gpu_buffer.drawTriangles();
 }
 
 template<typename VertexType>
-void RenderableEntity<VertexType>::render_lines() const {
+void RenderableEntity<VertexType>::renderLines() const {
     gpu_buffer.drawLines();
 }
 

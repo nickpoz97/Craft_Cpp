@@ -2,11 +2,9 @@
 // Created by ultimatenick on 07/10/21.
 //
 
-#define GLFW_INCLUDE_NONE
-
 #include <iostream>
 #include "Interaction/CameraControl.hpp"
-#include "GLFW/glfw3.h"
+#include "Rendering/OpenGlExternal.hpp"
 
 namespace CraftCpp {
 CameraControl::CameraControl(Camera &flyingCamera, const glm::ivec2 &initialMousePos, GLFWwindow *window)
@@ -70,8 +68,8 @@ void CameraControl::processKeyboardInput() {
 std::unique_ptr<CameraControl> CameraControl::setInstance(Camera &flyingCamera) {
     if (!actualInstance && GameView::isInstantiated()) {
         glm::vec2 initialMousePos{
-                GameView::getActualInstance()->get_width() / 2,
-                GameView::getActualInstance()->get_height() / 2
+                GameView::getActualInstance()->getWidth() / 2,
+                GameView::getActualInstance()->getHeight() / 2
         };
         actualInstance = new CameraControl{flyingCamera, initialMousePos, GameView::getWindow()};
 
