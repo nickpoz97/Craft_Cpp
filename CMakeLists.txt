@@ -8,9 +8,10 @@ file(MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 set(CMAKE_CXX_FLAGS_SANITIZER "${CMAKE_CXX_FLAGS_DEBUG} -O1 -fsanitize=address -fno-omit-frame-pointer")
 set(CMAKE_EXE_LINKER_FLAGS_SANITIZER "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer")
 
-#add_compile_options(-pg)
-#add_link_options(-pg)
-message(STATUS "Current path: ${CMAKE_CURRENT_BINARY_DIR}}")
+set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_DEBUG} -g --coverage")
+set(CMAKE_EXE_LINKER_FLAGS_COVERAGE "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -g --coverage")
+
+message(STATUS "Current build path: ${CMAKE_CURRENT}}")
 
 add_subdirectory(deps/glfw)
 add_subdirectory(deps/fmt)
@@ -38,4 +39,4 @@ set(INCLUDE_DIRS deps/ include/)
 
 include_directories(${INCLUDE_DIRS})
 
-add_test(NAME catch_test COMMAND "./catch_test" WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+add_test(NAME test_and_coverage COMMAND bash test_and_coverage.sh WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})

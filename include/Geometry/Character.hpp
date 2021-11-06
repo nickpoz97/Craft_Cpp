@@ -20,9 +20,8 @@ class Character {
     static constexpr int nVertices = 6;
     std::array<Uv2DVertex, nVertices> vertices;
 public:
-    auto begin() { return vertices.begin(); }
-
-    auto end() { return vertices.end(); }
+    decltype(vertices.begin()) begin();
+    decltype(vertices.end()) end();
 
     Character(const glm::vec2 &position, float m, float n, char c);
 

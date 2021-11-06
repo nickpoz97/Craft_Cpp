@@ -24,4 +24,13 @@ Character::Character(const glm::vec2 &position, float m, float n, char c) {
 int Character::getNVertices() {
     return nVertices;
 }
+
+decltype(Character::vertices.begin()) Character::begin() {
+    return vertices.begin();
+}
+
+decltype(Character::vertices.end()) Character::end() {
+    return vertices.end();
+}
+
 }
