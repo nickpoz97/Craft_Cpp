@@ -52,8 +52,8 @@ private:
 
 public:
     explicit Chunk(const glm::ivec2 &pqCoordinates);
-    static constexpr int SIZE = CHUNK_SIZE;
-    static constexpr int Y_LIMIT = 256;
+    static constexpr int SIZE = CHUNK_SIZE; ///< number of blocks per chunk side
+    static constexpr int Y_LIMIT = 256; ///< max vertical blocks per chunk object
 
     const glm::ivec2 pq;
 

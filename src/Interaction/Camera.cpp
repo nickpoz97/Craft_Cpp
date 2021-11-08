@@ -5,7 +5,6 @@
 #include "Interaction/Camera.hpp"
 #include "glm/gtx/rotate_vector.hpp"
 #include "Geometry/Chunk.hpp"
-#include "fmt/format.h"
 
 namespace CraftCpp {
 Camera::Camera(const glm::vec3 &camPos, const glm::vec2 &rotation, float camSpeed) :
@@ -57,11 +56,6 @@ glm::ivec2 Camera::getPq() const {
 
 glm::vec3 Camera::getFrontVector() const {
     return direction;
-}
-
-void Camera::printCameraInfo() const {
-    fmt::print("yaw: {}, pitch: {}, direction:({},{},{})\n",
-               yaw, pitch, direction.x, direction.y, direction.z);
 }
 
 const glm::vec3 &Camera::getPos() const {
