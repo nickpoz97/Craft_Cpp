@@ -15,7 +15,11 @@ if (${UNIX})
     set(CMAKE_EXE_LINKER_FLAGS_COVERAGE "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -g --coverage")
 endif()
 
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 add_subdirectory(deps/glfw)
+
 add_subdirectory(deps/fmt)
 
 link_libraries(${CMAKE_DL_LIBS} glfw fmt)
