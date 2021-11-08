@@ -5,13 +5,15 @@ enable_testing()
 set(CMAKE_CXX_STANDARD 17)
 file(MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
-set(CMAKE_CXX_FLAGS_SANITIZER "${CMAKE_CXX_FLAGS_DEBUG} -O1 -fsanitize=address -fno-omit-frame-pointer")
-set(CMAKE_EXE_LINKER_FLAGS_SANITIZER "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer")
+if (${UNIX})
+    set(CMAKE_CXX_FLAGS_SANITIZER "${CMAKE_CXX_FLAGS_DEBUG} -O1 -fsanitize=address -fno-omit-frame-pointer")
+    set(CMAKE_EXE_LINKER_FLAGS_SANITIZER "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer")
+endif()
 
-set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_DEBUG} -g --coverage")
-set(CMAKE_EXE_LINKER_FLAGS_COVERAGE "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -g --coverage")
-
-message(STATUS "Current build path: ${CMAKE_CURRENT}}")
+if (${UNIX})
+    set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_DEBUG} -g --coverage")
+    set(CMAKE_EXE_LINKER_FLAGS_COVERAGE "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -g --coverage")
+endif()
 
 add_subdirectory(deps/glfw)
 add_subdirectory(deps/fmt)
@@ -39,4 +41,10 @@ set(INCLUDE_DIRS deps/ include/)
 
 include_directories(${INCLUDE_DIRS})
 
-add_test(NAME test_and_coverage COMMAND bash test_and_coverage.sh WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+add_test(NAME test_and_coverage COMMAND catch_test WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+
+if(${UNIX})
+    find_file(COVERAGE_SCRIPT "coverage.sh" HINTS ${PROJECT_SOURCE_DIR})
+    message("Coverage script path: ${COVERAGE_SCRIPT}")
+    add_custom_target(coverage COMMAND ${COVERAGE_SCRIPT} $(PWD) ${PROJECT_SOURCE_DIR})
+endif()
