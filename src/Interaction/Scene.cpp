@@ -158,7 +158,7 @@ void Scene::showInfoText() const {
 
     const glm::ivec2 &pq{camera.getPq()};
     const glm::vec3 &pos{camera.getPos()};
-    const glm::vec3 &front{camera.getFrontVector()};
+    const glm::vec3 &front{camera.getDirection()};
 
     std::string s{fmt::format("nChunks: {} ,camPq: ({},{}) ,camPos: ({:.2f},{:.2f},{:.2f}), "
                               "front: ({:.2f},{:.2f},{:.2f})\n",

@@ -22,14 +22,12 @@ private:
     glm::vec3 direction{};
     float speed;
 
-    [[nodiscard]] glm::vec3 getFrontVector() const;
-
 public:
     /**
     * @brief Instantiate Camera with a specific status
-    * @param camPos 3D world coordinates of the camera
-    * @param rotation 2D vector consisting of 2 euler angles (yaw, pitch) that defines camera direction
-    * @param camSpeed Camera object translation speed
+    * @param[in] camPos 3D world coordinates of the camera
+    * @param[in] rotation 2D vector consisting of 2 euler angles (yaw, pitch) that defines camera direction
+    * @param[in] camSpeed Camera object translation speed
     */
     Camera(const glm::vec3 &camPos, const glm::vec2 &rotation, float camSpeed = 10);
     Camera() = delete;
@@ -72,18 +70,23 @@ public:
      /// @returns Camera object position in Chunk coordinates
      /// @note it depends on Chunk::SIZE
     [[nodiscard]] glm::ivec2 getPq() const;
+    /// @returns camera position point in 3 dimensional float coordinates
     [[nodiscard]] const glm::vec3 &getPos() const;
+    /// @returns direction vector in 3 dimensional float coordinates
     [[nodiscard]] const glm::vec3 &getDirection() const;
+    /// @returns camera speed
+    /// @note it is the value passed to constructor
     [[nodiscard]] float getSpeed() const;
+    /// @returns horizontal rotation in degrees wrt x-axis
+    /// @notes value is always in range [0, 360)
+    [[nodiscard]] float getYaw() const;
+    /// @returns vertical rotation in degrees wrt z-axis
+    /// @notes value is always in range [-89, 89]
+    [[nodiscard]] float getPitch() const;
     /**@}*/
-
-    friend class Scene;
 
     ///@brief vector representing what is the "up direction" of the 3D world
     static constexpr glm::vec3 up{0, 1, 0};
-
-    [[nodiscard]] float getYaw() const;
-    [[nodiscard]] float getPitch() const;
 };
 }
 

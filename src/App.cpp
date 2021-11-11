@@ -4,7 +4,7 @@
 static int load_texture(std::string_view path, GLint clamp_type = GL_REPEAT);
 
 int main() {
-    CraftCpp::GameViewSettings gvs{{CraftCpp::WINDOW_WIDTH, CraftCpp::WINDOW_WIDTH}, CraftCpp::INITIAL_FOV};
+    CraftCpp::GameViewSettings gvs{{CraftCpp::WINDOW_WIDTH, CraftCpp::WINDOW_HEIGHT}, CraftCpp::INITIAL_FOV};
     CraftCpp::ShaderNamesMap snm{};
     snm.emplace(CraftCpp::ShaderName::BLOCK_SHADER, CraftCpp::ShaderFilesPaths{
         "../data/shaders/block_vertex.glsl","../data/shaders/block_fragment.glsl"

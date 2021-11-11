@@ -53,8 +53,19 @@ if(${UNIX})
     add_custom_target(coverage COMMAND ${COVERAGE_SCRIPT} $(PWD) ${PROJECT_SOURCE_DIR})
 endif()
 
+if(${UNIX})
+    add_custom_target(
+    valgrind
+    COMMAND valgrind
+            --leak-check=full
+            --show-leak-kinds=all
+            --log-file=${PROJECT_SOURCE_DIR}/doc/valgrind_out.txt
+            ${PROJECT_SOURCE_DIR}/bin/app
+    )
+endif()
+
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
-    set(DOXYGEN_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/doc/doxygen ALL)
-    doxygen_add_docs(doc include)
+    set(DOXYGEN_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/doc/doxygen)
+    doxygen_add_docs(doc include ALL)
 endif()

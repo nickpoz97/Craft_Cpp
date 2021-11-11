@@ -34,11 +34,11 @@ void Camera::shift(const glm::vec3 &offset) {
 }
 
 glm::mat4 Camera::getViewMatrix() const {
-    return glm::lookAt(pos, pos + getFrontVector(), up);
+    return glm::lookAt(pos, pos + direction, up);
 }
 
 void Camera::shiftRight(float weight) {
-    pos += glm::normalize(glm::cross(getFrontVector(), up)) * speed * weight;
+    pos += glm::normalize(glm::cross(direction, up)) * speed * weight;
 }
 
 void Camera::shiftUp(float weight) {
@@ -47,15 +47,11 @@ void Camera::shiftUp(float weight) {
 
 void Camera::shiftFront(float weight) {
     // front norm is 1
-    pos += getFrontVector() * speed * weight;
+    pos += direction * speed * weight;
 }
 
 glm::ivec2 Camera::getPq() const {
     return Chunk::chunked(pos);
-}
-
-glm::vec3 Camera::getFrontVector() const {
-    return direction;
 }
 
 const glm::vec3 &Camera::getPos() const {
