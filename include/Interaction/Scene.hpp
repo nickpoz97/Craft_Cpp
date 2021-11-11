@@ -36,6 +36,7 @@ struct GameViewSettings {
 
 using ShaderNamesMap = std::unordered_map<ShaderName, ShaderFilesPaths>;
 
+/// @brief Singleton wrapper for Camera, CameraControl and GameView that handles model update and rendering
 class Scene {
 private:
     static inline Scene* actualInstance{nullptr};
@@ -60,6 +61,7 @@ private:
           const ShaderNamesMap &snm);
 
 public:
+    /// @brief set the unique
     static std::unique_ptr<Scene>
     setInstance(const GameViewSettings &gvs, const glm::vec3 &cameraPos, const glm::vec2 &cameraRotation,
                 const ShaderNamesMap &snm);

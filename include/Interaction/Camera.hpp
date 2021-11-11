@@ -1,6 +1,4 @@
-//
-// Created by ultimatenick on 07/10/21.
-//
+/// @file
 
 #ifndef CPP_CAMERA_HPP
 #define CPP_CAMERA_HPP
@@ -59,7 +57,7 @@ public:
 
     void shiftFront(float weight = 1.0f);
 
-    /** @defgroup getters Attribute Getters
+    /** @defgroup CameraGetters Camera' s Attribute Getters
      *
      * get attributes values or infos about Camera object
      * @{
@@ -78,10 +76,10 @@ public:
     /// @note it is the value passed to constructor
     [[nodiscard]] float getSpeed() const;
     /// @returns horizontal rotation in degrees wrt x-axis
-    /// @notes value is always in range [0, 360)
+    /// @note value is always in range [0, 360)
     [[nodiscard]] float getYaw() const;
     /// @returns vertical rotation in degrees wrt z-axis
-    /// @notes value is always in range [-89, 89]
+    /// @note value is always in range [-89, 89]
     [[nodiscard]] float getPitch() const;
     /**@}*/
 
