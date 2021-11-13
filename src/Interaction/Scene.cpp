@@ -96,8 +96,9 @@ Scene::setInstance(const GameViewSettings &gvs, const glm::vec3 &cameraPos, cons
                    const ShaderNamesMap &snm) {
     if (!actualInstance) {
         actualInstance = new Scene{gvs, cameraPos, cameraRotation, snm};
+        return std::unique_ptr<Scene>{actualInstance};
     }
-    return std::unique_ptr<Scene>{actualInstance};
+    return nullptr;
 }
 
 int Scene::load_texture(std::string_view path, TextureName textureName, GLint clampType) {

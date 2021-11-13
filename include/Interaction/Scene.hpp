@@ -14,26 +14,40 @@
 #include "Geometry/Chunk.hpp"
 
 namespace CraftCpp {
+
+/**
+* @brief enum representing abstract IDs for shader types
+*/
 enum class ShaderName {
     BLOCK_SHADER,
     TEXT_SHADER
 };
 
+/**
+ * @brief enum representing IDs for texture types
+ */
 enum class TextureName {
     FONT,
     GENERAL
 };
 
+/**
+ *  @brief paths of fragment and vertex code of a shader
+ */
 struct ShaderFilesPaths {
     std::string_view vertexCode;
     std::string_view fragmentCode;
 };
 
+/**
+ *  @brief settings for game view
+ */
 struct GameViewSettings {
-    glm::ivec2 windowSize;
-    float fov;
+    glm::ivec2 windowSize; ///< width and height
+    float fov; ///< field of view
 };
 
+/// @brief map where the key is the shader' s abstract ID and value is it' s code
 using ShaderNamesMap = std::unordered_map<ShaderName, ShaderFilesPaths>;
 
 /// @brief Singleton wrapper for Camera, CameraControl and GameView that handles model update and rendering
@@ -61,16 +75,43 @@ private:
           const ShaderNamesMap &snm);
 
 public:
-    /// @brief set the unique
+    /**
+     * @brief Set the unique instance of Scene
+     * @param[in] gvs settings for GameView
+     * @param[in] cameraPos camera position in 3D coordinates
+     * @param[in] cameraRotation camera rotation using yaw and pitch angles (degrees)
+     * @param[in] snm shader paths map
+     * @return reference and ownership of Scene object
+     * @note calling this method while there is an instance does nothing and return a nullptr
+     */
     static std::unique_ptr<Scene>
     setInstance(const GameViewSettings &gvs, const glm::vec3 &cameraPos, const glm::vec2 &cameraRotation,
                 const ShaderNamesMap &snm);
 
+    /**
+     * @brief rendering and Chunk loading loop
+     * @details call this to start Scene rendering loop that calls loadAndRenderChunks, removes the distant chunks and
+     * renders the UI.
+     * @note It stop when window receive a "should close" signal
+     */
     void loop();
 
+    /**
+     *
+     * @param path texture file path relative to executable path or absolute
+     * @param textureName used as unique id for texture
+     * @param clampType clamp type for outer uv coordinates
+     * @return 0 if texture is loaded, negative value if there was an error
+     */
     int load_texture(std::string_view path, TextureName textureName, GLint clampType = GL_REPEAT);
+    /**
+     * @brief waits Chunk loading threads and makes possible to set new Scene instance
+     */
     ~Scene();
 
+    /**
+     * loads chunks near the camera (see CREATE_CHUNK_RADIUS) and renders them (see RENDER_CHUNK_RADIUS)
+     */
     void loadAndRenderChunks();
 };
 }

@@ -1,11 +1,10 @@
-/// @file
-/// Boolean and Integers constants that changes performance and details of the 3d world
+// @file
+// Boolean and Integers constants that changes performance and details of the 3d world
 
 #ifndef CPP_COSTANTS_HPP
 #define CPP_COSTANTS_HPP
 
 namespace CraftCpp {
-
 
 /**
 * @brief number of block per Chunk side
@@ -31,7 +30,7 @@ static constexpr int CREATE_CHUNK_RADIUS = 3;
 static constexpr int CREATE_CHUNK_RADIUS = 0;
 #endif
 
-/// @brief number of chunks to be rendered from Camera position (see Scene::loadAndRenderChunks) at each scene loop
+/// @brief number of chunks to be rendered from Camera position (see Chunk::isVisible) at each scene loop
 /// @note for a lower value you have a stronger fog effect
 static constexpr int RENDER_CHUNK_RADIUS = (CREATE_CHUNK_RADIUS > 0) ? CREATE_CHUNK_RADIUS - 1 : 1;
 
@@ -40,24 +39,36 @@ static constexpr int RENDER_CHUNK_RADIUS = (CREATE_CHUNK_RADIUS > 0) ? CREATE_CH
 static constexpr int DELETE_CHUNK_RADIUS = CREATE_CHUNK_RADIUS + 3;
 /** @} */
 
-static constexpr double SCROLL_TRESHOLD = 0.1;
+/**
+ * @defgroup TextAlign 2D text align constants
+ * @{
+ */
 static constexpr int ALIGN_LEFT = 0;
 static constexpr int ALIGN_CENTER = 1;
 static constexpr int ALIGN_RIGHT = 2;
+/// @}
 
-
+/**
+ * @defgroup RenderingFlags Rendering Flags
+ * @{
+ */
 static constexpr bool SHOW_PLANTS = true;
 static constexpr bool SHOW_TREES = true;
 static constexpr bool SHOW_CLOUDS = true;
-
-static constexpr int WINDOW_WIDTH = 1024;
-static constexpr int WINDOW_HEIGHT = 768;
-
-static constexpr bool FULLSCREEN = false;
 static constexpr bool SHOW_CROSSHAIRS = true;
 static constexpr bool SHOW_INFO_TEXT = true;
-static constexpr bool VSYNC = false;
-static constexpr float INITIAL_FOV = 45;
+
+/// @}
+
+/**
+ * @defgroup WindowSettings Window Settings
+ * @{
+ */
+static constexpr int WINDOW_WIDTH = 1024; ///< Window width in pixels
+static constexpr int WINDOW_HEIGHT = 768; ///< Window height in pixels
+static constexpr bool VSYNC = false; ///< Vsync flag
+static constexpr float INITIAL_FOV = 45; ///< Initial fog value
+/// @}
 }
 
 #endif //CPP_COSTANTS_HPP
