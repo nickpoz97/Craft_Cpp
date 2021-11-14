@@ -35,7 +35,7 @@ Shader::Shader(std::string_view vs_path,
 
 }
 
-GLuint Shader::get_id() const {
+GLuint Shader::getId() const {
     return id;
 }
 
@@ -76,27 +76,28 @@ int Shader::build_shader(std::string_view path, shader_type st) {
     return shader_id;
 }
 
-void Shader::set_camera(const glm::vec3 &camera_pos) const {
-    set_extra_uniform("camera_pos", camera_pos);
+void Shader::setCamera(const glm::vec3 &camera_pos) const {
+    setExtraUniform("camera_pos", camera_pos);
 }
 
-void Shader::set_sampler(int sampler) const {
-    set_extra_uniform("sampler", sampler);
+void Shader::setSampler(int sampler) const {
+    setExtraUniform("sampler", sampler);
 }
 
-void Shader::set_timer(float timer) const {
-    set_extra_uniform("timer", timer);
+void Shader::setTimer(float timer) const {
+    setExtraUniform("timer", timer);
 }
 
 template<typename GLtype>
-void Shader::set_extra_uniform(std::string_view uniform_name, const GLtype &value) const {
+void Shader::setExtraUniform(std::string_view uniform_name, const GLtype &value) const {
     if(id != 0) {
-        _set_extra_uniform(glGetUniformLocation(id, uniform_name.data()), value);
+        use();
+        _setExtraUniform(glGetUniformLocation(id, uniform_name.data()), value);
     }
 }
 
-void Shader::set_viewproj(const glm::mat4 &m) const {
-    set_extra_uniform("viewproj_matrix", m);
+void Shader::setViewProj(const glm::mat4 &m) const {
+    setExtraUniform("viewproj_matrix", m);
 }
 
 void Shader::check_compile_errors(GLuint shader, std::string type) {
@@ -119,37 +120,37 @@ void Shader::check_compile_errors(GLuint shader, std::string type) {
     }
 }
 
-void Shader::_set_extra_uniform(int u_location, float val) {
+void Shader::_setExtraUniform(int u_location, float val) {
     glUniform1f(u_location, val);
 }
 
-void Shader::_set_extra_uniform(int u_location, int val) {
+void Shader::_setExtraUniform(int u_location, int val) {
     glUniform1i(u_location, val);
 }
 
-void Shader::_set_extra_uniform(int u_location, const glm::vec3 &val) {
+void Shader::_setExtraUniform(int u_location, const glm::vec3 &val) {
     glUniform3fv(u_location, 1, glm::value_ptr(val));
 }
 
-void Shader::_set_extra_uniform(int u_location, const glm::mat4 &val) {
+void Shader::_setExtraUniform(int u_location, const glm::mat4 &val) {
     glUniformMatrix4fv(u_location, 1, GL_FALSE, glm::value_ptr(val));
 }
 
-    void Shader::_set_extra_uniform(int u_location, const glm::vec2 &val) {
+    void Shader::_setExtraUniform(int u_location, const glm::vec2 &val) {
         glUniform2fv(u_location, 1, glm::value_ptr(val));
     }
 
 void Shader::set_pi() const {
-    set_extra_uniform("PI", glm::pi<float>());
+    setExtraUniform("PI", glm::pi<float>());
 }
 
-template void Shader::set_extra_uniform<float>(std::string_view id, const float &value) const;
+template void Shader::setExtraUniform<float>(std::string_view id, const float &value) const;
 
-template void Shader::set_extra_uniform<int>(std::string_view id, const int &value) const;
+template void Shader::setExtraUniform<int>(std::string_view id, const int &value) const;
 
-template void Shader::set_extra_uniform<glm::vec3>(std::string_view id, const glm::vec3 &value) const;
+template void Shader::setExtraUniform<glm::vec3>(std::string_view id, const glm::vec3 &value) const;
 
-template void Shader::set_extra_uniform<glm::mat4>(std::string_view id, const glm::mat4 &value) const;
+template void Shader::setExtraUniform<glm::mat4>(std::string_view id, const glm::mat4 &value) const;
 
-template void Shader::set_extra_uniform<glm::vec2>(std::string_view id, const glm::vec2 &value) const;
+template void Shader::setExtraUniform<glm::vec2>(std::string_view id, const glm::vec2 &value) const;
 }

@@ -80,8 +80,9 @@ std::unique_ptr<CameraControl> CameraControl::setInstance(Camera &flyingCamera) 
         };
 
         glfwSetKeyCallback(GameView::getWindow(), keyCallback);
+        return std::unique_ptr<CameraControl>{actualInstance};
     }
-    return std::unique_ptr<CameraControl>{actualInstance};
+    return nullptr;
 }
 
 void CameraControl::switchCursorStatus(){

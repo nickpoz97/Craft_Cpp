@@ -7,7 +7,7 @@
 
 namespace CraftCpp {
 template<typename VertexType>
-RenderableEntity<VertexType>::RenderableEntity() : gpu_buffer{GameView::isInstantiated()} {}
+RenderableEntity<VertexType>::RenderableEntity() : gpu_buffer{} {}
 
 template<typename VertexType>
 RenderableEntity<VertexType>::RenderableEntity(const std::vector<VertexType> &local_buffer) :
@@ -28,7 +28,7 @@ void RenderableEntity<VertexType>::renderLines() const {
 }
 
 template<typename VertexType>
-void RenderableEntity<VertexType>::update_buffer(const std::vector<VertexType> &local_buffer) const {
+void RenderableEntity<VertexType>::updateBuffer(const std::vector<VertexType> &local_buffer) const {
     gpu_buffer.storeData(local_buffer);
 }
 

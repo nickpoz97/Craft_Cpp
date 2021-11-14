@@ -144,14 +144,15 @@ GameView *GameView::getActualInstance() {
     return actualInstance;
 }
 
-std::unique_ptr<GameView> GameView::setInstance(int width, int height, float fov, int ortho, bool isFullscreen) {
+std::unique_ptr<GameView> GameView::setInstance(int width, int height, float fov) {
     if (!isInstantiated()) {
-        actualInstance = new GameView{width, height, fov, ortho, isFullscreen};
+        actualInstance = new GameView{width, height, fov, 0, false};
         glfwSetFramebufferSizeCallback(
             getWindow(),
             [](GLFWwindow *window, int width, int height) { actualInstance->update(); }
         );
+        return std::unique_ptr<GameView>{actualInstance};
     }
-    return std::unique_ptr<GameView>{actualInstance};
+    return nullptr;
 }
 }

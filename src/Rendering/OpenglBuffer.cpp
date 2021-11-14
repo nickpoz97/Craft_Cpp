@@ -2,13 +2,14 @@
 // Created by ultimatenick on 11/08/21.
 //
 
+#include "Interaction/GameView.hpp"
 #include "Rendering/OpenGlExternal.hpp"
 #include "Rendering/OpenglBuffer.hpp"
 
 namespace CraftCpp {
 template<typename VertexType>
-OpenglBuffer<VertexType>::OpenglBuffer(bool openGLReady) {
-    if (openGLReady) {
+OpenglBuffer<VertexType>::OpenglBuffer() {
+    if (GameView::isInstantiated()) {
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);
     }

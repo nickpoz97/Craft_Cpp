@@ -36,7 +36,7 @@ Sphere::Sphere(float r, int detail) : SuperClass{}, r{r} {
         it = rec_gen_sphere(detail, actual_pos, actual_uvs, it);
     }
 
-    update_buffer(vertices);
+    updateBuffer(vertices);
 }
 
 Sphere::iterator_type Sphere::rec_gen_sphere(int detail, const std::array<glm::vec3, 3> &actual_pos_triangle,

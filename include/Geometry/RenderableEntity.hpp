@@ -32,7 +32,7 @@ public:
 
     RenderableEntity<VertexType> &operator=(RenderableEntity &&other) noexcept;
 
-    void update_buffer(const std::vector<VertexType> &local_buffer) const;
+    void updateBuffer(const std::vector<VertexType> &local_buffer) const;
 
     void renderObject() const;
 

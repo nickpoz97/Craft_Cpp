@@ -75,12 +75,12 @@ void Scene::loop() {
         const Shader &s{shaders.at(ShaderName::BLOCK_SHADER)};
         glm::mat4 viewProj{gameView->getProjMatrix(GameView::PERSP) * camera.getViewMatrix()};
         s.use();
-        s.set_viewproj(viewProj);
-        s.set_sampler(textureSamplers[static_cast<int>(TextureName::GENERAL)]);
-        s.set_camera(camera.getPos());
-        s.set_extra_uniform("fog_distance", static_cast<float>(RENDER_CHUNK_RADIUS * Chunk::SIZE));
+        s.setViewProj(viewProj);
+        s.setSampler(textureSamplers[static_cast<int>(TextureName::GENERAL)]);
+        s.setCamera(camera.getPos());
+        s.setExtraUniform("fog_distance", static_cast<float>(RENDER_CHUNK_RADIUS * Chunk::SIZE));
 
-        s.set_extra_uniform("sky_color", glm::vec3{0.2, 0.2, 0.5});
+        s.setExtraUniform("sky_color", glm::vec3{0.2, 0.2, 0.5});
 
         loadChunkNeighborhood();
         for (const auto &pair: chunkMap) {
@@ -145,8 +145,8 @@ void Scene::render_text(int justify, const glm::vec2 &position, float n, std::st
     const Shader &shader = shaders.at(ShaderName::TEXT_SHADER);
 
     shader.use();
-    shader.set_viewproj(gameView->getProjMatrix(GameView::ProjType::UI));
-    shader.set_sampler(textureSamplers[static_cast<int>(TextureName::FONT)]);
+    shader.setViewProj(gameView->getProjMatrix(GameView::ProjType::UI));
+    shader.setSampler(textureSamplers[static_cast<int>(TextureName::FONT)]);
     const glm::vec2 justified_position{position - glm::vec2{n * justify * (text.size() - 1) / 2, 0}};
     Text2D text2d{justified_position, n, text};
     text2d.renderObject();

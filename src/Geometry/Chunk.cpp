@@ -88,7 +88,7 @@ Chunk::generateBlockGeometry(BufferType::iterator vertexIt, const glm::ivec3 &bl
 }
 
 void Chunk::updateBuffer() const {
-    SuperClass::update_buffer(localBuffer);
+    SuperClass::updateBuffer(localBuffer);
     renderReady = true;
 #ifndef NDEBUG
     std::cout << "buffer updated\n";
