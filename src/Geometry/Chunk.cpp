@@ -33,8 +33,8 @@ int Chunk::getHighestBlock() const {
     return highest_y;
 }
 
-BlockType Chunk::getBlock(const glm::ivec3 &block_pos) const {
-    auto it = blockMap.find(block_pos);
+BlockType Chunk::getBlock(const glm::ivec3 &blockPos) const {
+    auto it = blockMap.find(blockPos);
     return (it == blockMap.end()) ? BlockType::EMPTY : it->second;
 }
 
@@ -221,8 +221,8 @@ int Chunk::chunked(int val) {
 
 glm::ivec2 Chunk::chunked(const glm::vec3 &position) {
     return {
-            chunked(static_cast<int>(position.x)),
-            chunked(static_cast<int>(position.z))
+        chunked(static_cast<int>(position.x)),
+        chunked(static_cast<int>(position.z))
     };
 }
 
@@ -316,7 +316,8 @@ bool Chunk::isLocalBufferReady() const {
 }
 
 void Chunk::waitThread() const {
-    initChunkThread.join();
+    if(initChunkThread.joinable())
+        initChunkThread.join();
 }
 
 std::array<glm::ivec2, 4> Chunk::computeXZBoundaries(const glm::ivec2 &pq) {

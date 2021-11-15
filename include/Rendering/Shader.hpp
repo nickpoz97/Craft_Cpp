@@ -12,8 +12,9 @@
 #include "glm/vec3.hpp"
 #include "glm/mat4x4.hpp"
 
-/// @brief handler for glsl shader
 namespace CraftCpp {
+
+/// @brief handler for glsl shader
 struct Shader {
 private:
     enum class shader_type {
