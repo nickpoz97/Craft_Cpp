@@ -163,6 +163,12 @@ public:
     bool isOnBorder(const glm::ivec3 &pos) const;
 };
 
+/**
+ * @brief get the distance of 2 chunk-coordinates
+ * @param[in] pq1 first chunk-coordinate
+ * @param[in] pq2 second chunk-coordinate
+ * @return the highest of the 2 coefficients of pq1 - pq2
+ */
 int getChunkDistance(const glm::ivec2 &pq1, const glm::ivec2 &pq2);
 
 }

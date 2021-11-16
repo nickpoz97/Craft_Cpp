@@ -9,7 +9,7 @@
 
 #include "Geometry/Chunk.hpp"
 #include "noise/noise.hpp"
-#include "Geometry/CubicObject.hpp"
+#include "Geometry/BlockObject.hpp"
 
 namespace CraftCpp {
 Chunk::Chunk(const glm::ivec2 &pqCoordinates)

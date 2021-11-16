@@ -9,24 +9,24 @@
 #include "glm/trigonometric.hpp"
 #include "glm/gtx/rotate_vector.hpp"
 #include "glm/vec3.hpp"
-#include "Geometry/CubicObject.hpp"
+#include "Geometry/BlockObject.hpp"
 #include "Geometry/map_utils.hpp"
 
 namespace CraftCpp {
 template<>
-const float CubicObject<6>::A = 0.0 + 1 / 2048.0;
+const float BlockObject<6>::A = 0.0 + 1 / 2048.0;
 
 template<>
-const float CubicObject<6>::B = S - 1 / 2048.0;
+const float BlockObject<6>::B = S - 1 / 2048.0;
 
 template<>
-const float CubicObject<4>::A = 0.0;
+const float BlockObject<4>::A = 0.0;
 
 template<>
-const float CubicObject<4>::B = S;
+const float BlockObject<4>::B = S;
 
 template<unsigned n_faces>
-CubicObject<n_faces>::CubicObject(const BlockType &blockType, const std::array<bool, 6> &visibleFaces,
+BlockObject<n_faces>::BlockObject(const BlockType &blockType, const std::array<bool, 6> &visibleFaces,
                                   const glm::vec3 &centerPosition,
                                   float asyRotation,
                                   const std::unordered_map<glm::ivec3, bool> &lightObstacles,
@@ -106,12 +106,12 @@ CubicObject<n_faces>::CubicObject(const BlockType &blockType, const std::array<b
 }
 
 template<unsigned int n_faces>
-CubeVertexIterator CubicObject<n_faces>::end() const {
+CubeVertexIterator BlockObject<n_faces>::end() const {
     return beginIterator + nVertices;
 }
 
 template<unsigned int n_faces>
-glm::vec3 CubicObject<n_faces>::rotate_asy(const glm::vec3 &v, float angle_degrees) {
+glm::vec3 BlockObject<n_faces>::rotate_asy(const glm::vec3 &v, float angle_degrees) {
     return {
             glm::cos(angle_degrees) * v.x - glm::sin(angle_degrees) * v.z,
             v.y,
@@ -124,7 +124,7 @@ Cube::Cube(const BlockType &blockType, const std::array<bool, 6> &visibleFaces, 
         super(blockType, visibleFaces, position, 0, lightObstacles, verticesIt) {}
 
 template<unsigned n_faces>
-void CubicObject<n_faces>::print_vertex_info() {
+void BlockObject<n_faces>::print_vertex_info() {
     int index = 0;
     for (auto it = begin(); it != end(); ++it) {
         fmt::print("pos: ({},{},{}), face: {}, normal: ({},{},{})\n", it->position.x, it->position.y,
@@ -134,7 +134,7 @@ void CubicObject<n_faces>::print_vertex_info() {
 }
 
 template<>
-const CubicObject<6>::PositionsMatrix CubicObject<6>::localVertexPositions{{
+const BlockObject<6>::PositionsMatrix BlockObject<6>::localVertexPositions{{
          {{{-1, -1, -1}, {-1, -1, +1},
            {-1, +1, -1}, {-1, +1, +1}}},
          {{{+1, -1, -1}, {+1, -1, +1},
@@ -150,7 +150,7 @@ const CubicObject<6>::PositionsMatrix CubicObject<6>::localVertexPositions{{
  }};
 
 template<>
-const CubicObject<6>::NormalMatrix CubicObject<6>::normals{{
+const BlockObject<6>::NormalMatrix BlockObject<6>::normals{{
        {-1, 0, 0},
        {+1, 0, 0},
        {0, +1, 0},
@@ -160,7 +160,7 @@ const CubicObject<6>::NormalMatrix CubicObject<6>::normals{{
 }};
 
 template<>
-const CubicObject<6>::IndicesMatrix CubicObject<6>::indices{{
+const BlockObject<6>::IndicesMatrix BlockObject<6>::indices{{
         {0, 3, 2, 0, 1, 3},
         {0, 3, 1, 0, 2, 3},
         {0, 3, 2, 0, 1, 3},
@@ -170,7 +170,7 @@ const CubicObject<6>::IndicesMatrix CubicObject<6>::indices{{
 }};
 
 template<>
-const CubicObject<6>::UvsMatrix CubicObject<6>::uvs{{
+const BlockObject<6>::UvsMatrix BlockObject<6>::uvs{{
         {{{0, 0}, {1, 0}, {0, 1}, {1, 1}}},
         {{{1, 0}, {0, 0}, {1, 1}, {0, 1}}},
         {{{0, 1}, {0, 0}, {1, 1}, {1, 0}}},
@@ -180,12 +180,12 @@ const CubicObject<6>::UvsMatrix CubicObject<6>::uvs{{
 }};
 
 template<unsigned int n_faces>
-CubeVertexIterator CubicObject<n_faces>::begin() const {
+CubeVertexIterator BlockObject<n_faces>::begin() const {
     return beginIterator;
 }
 
 template<>
-const CubicObject<4>::PositionsMatrix CubicObject<4>::localVertexPositions{{
+const BlockObject<4>::PositionsMatrix BlockObject<4>::localVertexPositions{{
          {{{0, -1, -1}, {0, -1, +1},
            {0, +1, -1}, {0, +1, +1}}},
          {{{0, -1, -1}, {0, -1, +1},
@@ -197,7 +197,7 @@ const CubicObject<4>::PositionsMatrix CubicObject<4>::localVertexPositions{{
  }};
 
 template<>
-const CubicObject<4>::NormalMatrix CubicObject<4>::normals{{
+const BlockObject<4>::NormalMatrix BlockObject<4>::normals{{
        {-1, 0, 0},
        {+1, 0, 0},
        {0, 0, -1},
@@ -205,7 +205,7 @@ const CubicObject<4>::NormalMatrix CubicObject<4>::normals{{
 }};
 
 template<>
-const CubicObject<4>::IndicesMatrix CubicObject<4>::indices{{
+const BlockObject<4>::IndicesMatrix BlockObject<4>::indices{{
         {0, 3, 2, 0, 1, 3},
         {0, 3, 1, 0, 2, 3},
         {0, 3, 2, 0, 1, 3},
@@ -213,7 +213,7 @@ const CubicObject<4>::IndicesMatrix CubicObject<4>::indices{{
 }};
 
 template<>
-const CubicObject<4>::UvsMatrix CubicObject<4>::uvs{{
+const BlockObject<4>::UvsMatrix BlockObject<4>::uvs{{
         {{{0, 0}, {1, 0}, {0, 1}, {1, 1}}},
         {{{1, 0}, {0, 0}, {1, 1}, {0, 1}}},
         {{{0, 0}, {0, 1}, {1, 0}, {1, 1}}},
@@ -221,10 +221,10 @@ const CubicObject<4>::UvsMatrix CubicObject<4>::uvs{{
 }};
 
 template
-class CubicObject<6>;
+class BlockObject<6>;
 
 template
-class CubicObject<4>;
+class BlockObject<4>;
 
 Plant::Plant(const BlockType &blockType, const glm::vec3 &centerPosition, float asy_rotation,
              CubeVertexIterator verticesIt, const std::unordered_map<glm::ivec3, bool> &lightObstacles) :

@@ -4,9 +4,9 @@
 
 #include "catch2/catch.hpp"
 #include "Geometry/map_utils.hpp"
-#include "Geometry/CubicObject.hpp"
+#include "Geometry/BlockObject.hpp"
 
-TEST_CASE("CubicObject instantiation", "[instantiation]"){
+TEST_CASE("BlockObject instantiation"){
     SECTION("Cube instantiation, all faces"){
         std::vector<CraftCpp::CubeVertex> buffer{CraftCpp::Cube::maxIndices};
         CraftCpp::Cube c{CraftCpp::BlockType::SAND, {1, 1, 1, 1, 1, 1}, {2, 4, 5}, buffer.begin(), {}};

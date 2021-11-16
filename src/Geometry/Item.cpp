@@ -5,7 +5,7 @@
 #include "glm/ext/scalar_constants.hpp"
 #include "Geometry/map_utils.hpp"
 #include "Geometry/Item.hpp"
-#include "Geometry/CubicObject.hpp"
+#include "Geometry/BlockObject.hpp"
 
 namespace CraftCpp {
 Item::Item(BlockType w, const glm::vec2 &center_position) :
