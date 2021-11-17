@@ -30,7 +30,7 @@ struct NormalVertex : Uv3DVertex {
     glm::vec3 normal;
 };
 
-class CubeVertex : public NormalVertex {
+class BlockVertex : public NormalVertex {
 public:
     float ao;
 };

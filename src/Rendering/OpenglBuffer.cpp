@@ -136,5 +136,5 @@ template
 class OpenglBuffer<Uv3DVertex>;
 
 template
-class OpenglBuffer<CubeVertex>;
+class OpenglBuffer<BlockVertex>;
 }

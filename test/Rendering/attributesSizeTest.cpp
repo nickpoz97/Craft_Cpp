@@ -32,9 +32,9 @@ TEST_CASE("Test attributes sizes") {
     REQUIRE(CraftCpp::getUvAttributeSize<CraftCpp::Uv3DVertex>() == 2);
     REQUIRE(CraftCpp::getAoAttributeSize<CraftCpp::Uv3DVertex>() == 0);
 
-    REQUIRE(CraftCpp::getPosAttributeSize<CraftCpp::CubeVertex>() == 3);
-    REQUIRE(CraftCpp::getNormalAttributeSize<CraftCpp::CubeVertex>() == 3);
-    REQUIRE(CraftCpp::getUvAttributeSize<CraftCpp::CubeVertex>() == 2);
-    REQUIRE(CraftCpp::getAoAttributeSize<CraftCpp::CubeVertex>() == 1);
+    REQUIRE(CraftCpp::getPosAttributeSize<CraftCpp::BlockVertex>() == 3);
+    REQUIRE(CraftCpp::getNormalAttributeSize<CraftCpp::BlockVertex>() == 3);
+    REQUIRE(CraftCpp::getUvAttributeSize<CraftCpp::BlockVertex>() == 2);
+    REQUIRE(CraftCpp::getAoAttributeSize<CraftCpp::BlockVertex>() == 1);
 }
 

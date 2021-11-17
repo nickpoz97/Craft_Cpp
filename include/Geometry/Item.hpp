@@ -11,14 +11,14 @@
 #include "Interaction/GameView.hpp"
 
 namespace CraftCpp {
-class Item : public RenderableEntity<CubeVertex> {
+class Item : public RenderableEntity<BlockVertex> {
 public:
-    using SuperClass = RenderableEntity<CubeVertex>;
+    using SuperClass = RenderableEntity<BlockVertex>;
 
     explicit Item(BlockType w, const glm::vec2 &center_position);
 
 private:
-    static std::vector<CubeVertex> gen_local_buffer(BlockType w, const glm::vec2 &center_position);
+    static std::vector<BlockVertex> gen_local_buffer(BlockType w, const glm::vec2 &center_position);
 };
 }
 

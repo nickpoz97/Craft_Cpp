@@ -18,8 +18,8 @@
 
 namespace CraftCpp {
 
-/** @brief aggregation of CubicObject objects built with Perlin noise
- * @note this is an atomic entity (every CubicObject is aggregated into a unique buffer)
+/** @brief tiling of BlockObject objects built with Perlin noise
+ * @note this is an atomic entity (every BlockObject is aggregated into a unique BlockVertex buffer)
  * @note Chunk can be viewed as a box with Chunk::SIZE as length and width and CHUNK::Y_LIMIT as height
  * @note total blocks (including the empty ones): Chunk::SIZE * Chunk::SIZE * Chunk::Y_LIMIT
  */
@@ -28,11 +28,11 @@ class Chunk;
 /// @brief map where key is Chunk 's pq coordinate and value should be the Chunk in that position
 using ChunkMap = std::unordered_map<glm::ivec2, Chunk>;
 
-class Chunk : public RenderableEntity<CubeVertex> {
+class Chunk : public RenderableEntity<BlockVertex> {
 private:
     mutable std::thread initChunkThread{};
-    using SuperClass = RenderableEntity<CubeVertex>;
-    using BufferType = std::vector<CubeVertex>;
+    using SuperClass = RenderableEntity<BlockVertex>;
+    using BufferType = std::vector<BlockVertex>;
 
     using BlockMap = std::unordered_map<glm::ivec3, BlockType>;
     mutable BufferType localBuffer;

@@ -40,12 +40,12 @@ constexpr int getUvAttributeSize() {
     return 0;
 }
 
-template<typename VertexType, std::enable_if_t<std::is_base_of_v<CubeVertex, VertexType>, bool> = true>
+template<typename VertexType, std::enable_if_t<std::is_base_of_v<BlockVertex, VertexType>, bool> = true>
 constexpr int getAoAttributeSize() {
     return 1;
 }
 
-template<typename VertexType, std::enable_if_t<!std::is_base_of_v < CubeVertex, VertexType>, bool> = true>
+template<typename VertexType, std::enable_if_t<!std::is_base_of_v < BlockVertex, VertexType>, bool> = true>
 
 constexpr int getAoAttributeSize() {
     return 0;

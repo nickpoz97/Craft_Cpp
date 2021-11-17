@@ -41,7 +41,7 @@ BlockType Chunk::getBlock(const glm::ivec3 &blockPos) const {
 void Chunk::computeChunkGeometry() const {
     int n_faces = countExposedFaces();
     // each visible face has INDICES_FACE_COUNT indices that represent the triangle
-    localBuffer = std::vector<CubeVertex>(n_faces * INDICES_FACE_COUNT);
+    localBuffer = std::vector<BlockVertex>(n_faces * INDICES_FACE_COUNT);
     auto v_it = localBuffer.begin();
 
     for (const auto &kv: blockMap) {

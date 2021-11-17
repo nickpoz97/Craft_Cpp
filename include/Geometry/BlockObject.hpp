@@ -16,9 +16,14 @@
 #include "tunableParameters.hpp"
 
 namespace CraftCpp {
+/** @brief number of vertices on each BlockObject face
+* @note indices are the vertices of a face (they are called indices since a Block has max 8
+* vertices, but there are 36 indices since each face is treated independently)
+*/
 static constexpr int INDICES_FACE_COUNT = 6;
 
-using CubeVertexIterator = typename std::vector<CubeVertex>::iterator;
+/// @brief iterator of BlockVertex containers
+using BlockVertexIterator = typename std::vector<BlockVertex>::iterator;
 
 /**
  * @brief Class that builds Chunk 's blocks
@@ -30,22 +35,26 @@ using CubeVertexIterator = typename std::vector<CubeVertex>::iterator;
 template<unsigned nFaces>
 class BlockObject {
 private:
-    CubeVertexIterator beginIterator;
+    BlockVertexIterator beginIterator;
     size_t nVertices;
     static constexpr float N = 0.5f;
 
     static glm::vec3 rotate_asy(const glm::vec3 &v, float angle_degrees);
 
-    // @brief matrix of BlockObject 's local positions
-    // @note coordinate [i][j] indexes i-th face and j-th vertex-position of that face
+    // matrix of BlockObject 's local positions
+    //  coordinate [i][j] indexes i-th face and j-th vertex-position of that face
     using PositionsMatrix = std::array<std::array<glm::vec3, 4>, nFaces>;
 
     // matrix of BlockObject 's local positions
-    // coordinate [i][j] indexes i-th face and j-th uv flag of that face
-    // these flags are used to choosing between A and B coordinate offsets
+    // coordinate [i][j] indexes i-th face and j-th uv flag and position of that face
     using IndicesMatrix = std::array<std::array<int, INDICES_FACE_COUNT>, nFaces>;
 
+    // array of BlockObject' s normals
+    // every element is the normal vector of a face
     using NormalMatrix = std::array<glm::vec3, nFaces>;
+
+    // matrix of BlockObject' s uv flags
+    // these flags are used to choosing between A and B coordinate offsets
     using UvsMatrix = std::array<std::array<glm::bvec2, 4>, nFaces>;
 
     static constexpr float S = 0.0625;
@@ -57,34 +66,51 @@ private:
     static const IndicesMatrix indices;
     static const NormalMatrix normals;
 public:
+    /// @brief total number of indices for a BlockType object
     static constexpr int maxIndices = INDICES_FACE_COUNT * nFaces;
 
+    /**
+     * @brief Block with a specified type, position and rotation
+     * @param blockType type of block (texture depends on this)
+     * @param visibleFaces array  of flags for left, right, top, bottom, front, back (true if face is visible)
+     * @param centerPosition position of the point in the middle of the Block
+     * @param asyRotation rotation around the vertical axis that passes through the centre
+     * @param lightObstacles nearby opaque blocks (see Chunk::getLightObstacles)
+     * @param verticesIt starting position of container to be filled with the vertices of this block
+     * @warning every BlockObject occupies INDICES_FACE_COUNT * nFaces vertices
+     */
     BlockObject(const BlockType &blockType, const std::array<bool, 6> &visibleFaces,
                 const glm::vec3 &centerPosition,
                 float asyRotation, const std::unordered_map<glm::ivec3, bool> &lightObstacles,
-                CubeVertexIterator verticesIt);
+                BlockVertexIterator verticesIt);
 
-    [[nodiscard]] CubeVertexIterator end() const;
+    /// @return iterator position after end of BlockObject vertices
+    [[nodiscard]] BlockVertexIterator end() const;
+    /// @return iterator position of the first BlockObject vertex
+    [[nodiscard]] BlockVertexIterator begin() const;
 
-    [[nodiscard]] CubeVertexIterator begin() const;
-
-    void print_vertex_info();
+    /// @brief prints info about all vertices
+    void printVertexInfo();
 };
 
+/// @brief BlockObject with only lateral faces
 class Plant : public BlockObject<4> {
 private:
     using super = BlockObject<4>;
 public:
+    /// @brief see BlockObject() for parameters
     Plant(const BlockType &blockType, const glm::vec3 &centerPosition, float asy_rotation,
-          CubeVertexIterator verticesIt, const std::unordered_map<glm::ivec3, bool> &lightObstacles);
+          BlockVertexIterator verticesIt, const std::unordered_map<glm::ivec3, bool> &lightObstacles);
 };
 
+/// @brief BlockObject with no rotation (Cube objects can be tiled to form a Chunk)
 class Cube : public BlockObject<6> {
 private:
     using super = BlockObject<6>;
 public:
+    /// @brief see BlockObject() for parameters
     Cube(const BlockType &blockType, const std::array<bool, 6> &visibleFaces, const glm::vec3 &position,
-         CubeVertexIterator verticesIt, const std::unordered_map<glm::ivec3, bool> &lightObstacles);
+         BlockVertexIterator verticesIt, const std::unordered_map<glm::ivec3, bool> &lightObstacles);
 };
 }
 #endif //CPP_CUBICOBJECT_HPP

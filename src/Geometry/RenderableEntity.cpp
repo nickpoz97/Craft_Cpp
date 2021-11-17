@@ -52,7 +52,7 @@ template
 class RenderableEntity<NormalVertex>;
 
 template
-class RenderableEntity<CubeVertex>;
+class RenderableEntity<BlockVertex>;
 
 template
 class RenderableEntity<Standard2DVertex>;

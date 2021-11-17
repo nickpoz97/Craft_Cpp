@@ -30,7 +30,7 @@ BlockObject<n_faces>::BlockObject(const BlockType &blockType, const std::array<b
                                   const glm::vec3 &centerPosition,
                                   float asyRotation,
                                   const std::unordered_map<glm::ivec3, bool> &lightObstacles,
-                                  CubeVertexIterator verticesIt) :
+                                  BlockVertexIterator verticesIt) :
         beginIterator{verticesIt},
         nVertices{static_cast<size_t>(std::accumulate(visibleFaces.begin(), visibleFaces.end(), 0) *
                                       INDICES_FACE_COUNT)} {
@@ -106,7 +106,7 @@ BlockObject<n_faces>::BlockObject(const BlockType &blockType, const std::array<b
 }
 
 template<unsigned int n_faces>
-CubeVertexIterator BlockObject<n_faces>::end() const {
+BlockVertexIterator BlockObject<n_faces>::end() const {
     return beginIterator + nVertices;
 }
 
@@ -120,11 +120,11 @@ glm::vec3 BlockObject<n_faces>::rotate_asy(const glm::vec3 &v, float angle_degre
 }
 
 Cube::Cube(const BlockType &blockType, const std::array<bool, 6> &visibleFaces, const glm::vec3 &position,
-           CubeVertexIterator verticesIt, const std::unordered_map<glm::ivec3, bool> &lightObstacles) :
+           BlockVertexIterator verticesIt, const std::unordered_map<glm::ivec3, bool> &lightObstacles) :
         super(blockType, visibleFaces, position, 0, lightObstacles, verticesIt) {}
 
 template<unsigned n_faces>
-void BlockObject<n_faces>::print_vertex_info() {
+void BlockObject<n_faces>::printVertexInfo() {
     int index = 0;
     for (auto it = begin(); it != end(); ++it) {
         fmt::print("pos: ({},{},{}), face: {}, normal: ({},{},{})\n", it->position.x, it->position.y,
@@ -180,7 +180,7 @@ const BlockObject<6>::UvsMatrix BlockObject<6>::uvs{{
 }};
 
 template<unsigned int n_faces>
-CubeVertexIterator BlockObject<n_faces>::begin() const {
+BlockVertexIterator BlockObject<n_faces>::begin() const {
     return beginIterator;
 }
 
@@ -227,6 +227,6 @@ template
 class BlockObject<4>;
 
 Plant::Plant(const BlockType &blockType, const glm::vec3 &centerPosition, float asy_rotation,
-             CubeVertexIterator verticesIt, const std::unordered_map<glm::ivec3, bool> &lightObstacles) :
+             BlockVertexIterator verticesIt, const std::unordered_map<glm::ivec3, bool> &lightObstacles) :
         super{blockType, {1, 1, 0, 0, 1, 1}, centerPosition, asy_rotation, lightObstacles, verticesIt} {}
 }
