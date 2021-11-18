@@ -141,7 +141,7 @@ void Scene::waitThreads() const {
     }
 }
 
-void Scene::render_text(int justify, const glm::vec2 &position, float n, std::string_view text) const {
+void Scene::renderText(int justify, const glm::vec2 &position, float n, std::string_view text) const {
     const Shader &shader = shaders.at(ShaderName::TEXT_SHADER);
 
     shader.use();
@@ -153,8 +153,11 @@ void Scene::render_text(int justify, const glm::vec2 &position, float n, std::st
 }
 
 void Scene::showInfoText() const {
+    // size of Characters
     float ts = 12 * gameView->getScale();
+    // first Character position x
     float tx = ts / 2;
+    // text position y
     float ty = gameView->getHeight() - ts;
 
     const glm::ivec2 &pq{camera.getPq()};
@@ -165,6 +168,6 @@ void Scene::showInfoText() const {
                               "front: ({:.2f},{:.2f},{:.2f})\n",
                               chunkMap.size(), pq.x, pq.y, pos.x, pos.y, pos.z, front.x, front.y, front.z)};
 
-    render_text(ALIGN_LEFT, {tx, ty}, ts, s);
+    renderText(ALIGN_LEFT, {tx, ty}, ts, s);
 }
 }

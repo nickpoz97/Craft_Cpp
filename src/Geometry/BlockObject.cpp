@@ -10,7 +10,7 @@
 #include "glm/gtx/rotate_vector.hpp"
 #include "glm/vec3.hpp"
 #include "Geometry/BlockObject.hpp"
-#include "Geometry/map_utils.hpp"
+#include "Geometry/mapUtils.hpp"
 
 namespace CraftCpp {
 template<>

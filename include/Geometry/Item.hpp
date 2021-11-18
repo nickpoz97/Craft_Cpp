@@ -11,14 +11,21 @@
 #include "Interaction/GameView.hpp"
 
 namespace CraftCpp {
+
+/// @brief UI version o a BlockObject
+/// @warning never been tested
 class Item : public RenderableEntity<BlockVertex> {
-public:
-    using SuperClass = RenderableEntity<BlockVertex>;
-
-    explicit Item(BlockType w, const glm::vec2 &center_position);
-
 private:
-    static std::vector<BlockVertex> gen_local_buffer(BlockType w, const glm::vec2 &center_position);
+    static std::vector<BlockVertex> genLocalBuffer(BlockType w, const glm::vec2 &center_position);
+
+    using SuperClass = RenderableEntity<BlockVertex>;
+public:
+    /**
+     * @brief builds an Item object on the screen
+     * @param[in] w type of item
+     * @param[in] centerPosition 2D screen coordinates
+     */
+    explicit Item(BlockType w, const glm::vec2 &centerPosition);
 };
 }
 

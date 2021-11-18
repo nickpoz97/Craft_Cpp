@@ -14,6 +14,10 @@
 #include "Rendering/OpenglBuffer.hpp"
 #include "Geometry/RenderableEntity.hpp"
 
+/**
+ * @brief 3D skybox
+ * @warning this class has never been tested
+ */
 namespace CraftCpp {
 class Sphere : public RenderableEntity<Uv3DVertex> {
 private:
@@ -37,6 +41,11 @@ private:
                                     iterator_type it) const;
 
 public:
+    /**
+     * @brief creates a Sphere of a specified radius and detail
+     * @param[in] r radius of the sphere
+     * @param[in] detail number of triangles
+     */
     Sphere(float r, int detail);
 };
 }

@@ -61,7 +61,7 @@ private:
     std::array<uint, 2> textureSamplers;
     ChunkMap chunkMap{};
 
-    void render_text(int justify, const glm::vec2 &position, float n, std::string_view text) const;
+    void renderText(int justify, const glm::vec2 &position, float n, std::string_view text) const;
 
     void showInfoText() const;
 

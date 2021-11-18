@@ -4,11 +4,11 @@
 
 #include "unordered_map"
 
-#include "Geometry/map_utils.hpp"
+#include "Geometry/mapUtils.hpp"
 #include "Geometry/Chunk.hpp"
 
 namespace CraftCpp {
-std::size_t hash_coefficient(int val) {
+std::size_t hashCoefficient(int val) {
     std::size_t key = static_cast<std::size_t>(val);
     key = ~key + (key << 15);
     key = key ^ (key >> 12);
@@ -19,15 +19,15 @@ std::size_t hash_coefficient(int val) {
     return key;
 }
 
-bool y_coord_comparator::operator()(const glm::vec3 &a, const glm::vec3 &b) const {
+bool yCoordComparator::operator()(const glm::vec3 &a, const glm::vec3 &b) const {
     return a.y < b.y;
 }
 }
 
 std::size_t std::hash<glm::ivec3>::operator()(const glm::ivec3 &v) const {
-    return CraftCpp::hash_coefficient(v.x) ^ CraftCpp::hash_coefficient(v.y) ^ CraftCpp::hash_coefficient(v.z);
+    return CraftCpp::hashCoefficient(v.x) ^ CraftCpp::hashCoefficient(v.y) ^ CraftCpp::hashCoefficient(v.z);
 }
 
 std::size_t std::hash<glm::ivec2>::operator()(const glm::ivec2 &v) const {
-    return CraftCpp::hash_coefficient(v.x) ^ CraftCpp::hash_coefficient(v.y);
+    return CraftCpp::hashCoefficient(v.x) ^ CraftCpp::hashCoefficient(v.y);
 }

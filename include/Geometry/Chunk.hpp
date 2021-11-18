@@ -11,7 +11,7 @@
 #include <list>
 
 #include "glm/vec2.hpp"
-#include "Geometry/map_utils.hpp"
+#include "Geometry/mapUtils.hpp"
 #include "Geometry/RenderableEntity.hpp"
 #include "Geometry/Vertex.hpp"
 #include "tunableParameters.hpp"

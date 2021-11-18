@@ -3,15 +3,15 @@
 //
 
 #include "glm/ext/scalar_constants.hpp"
-#include "Geometry/map_utils.hpp"
+#include "Geometry/mapUtils.hpp"
 #include "Geometry/Item.hpp"
 #include "Geometry/BlockObject.hpp"
 
 namespace CraftCpp {
-Item::Item(BlockType w, const glm::vec2 &center_position) :
-        SuperClass{gen_local_buffer(w, center_position)} {}
+Item::Item(BlockType w, const glm::vec2 &centerPosition) :
+        SuperClass{genLocalBuffer(w, centerPosition)} {}
 
-std::vector<BlockVertex> Item::gen_local_buffer(BlockType w, const glm::vec2 &center_position) {
+std::vector<BlockVertex> Item::genLocalBuffer(BlockType w, const glm::vec2 &center_position) {
     if (TileBlock{w}.isPlant()) {
         std::vector<BlockVertex> local_buffer{Plant::maxIndices};
         Plant{w, {center_position, 0.0}, -glm::pi<float>() / 4, local_buffer.begin(), {}};

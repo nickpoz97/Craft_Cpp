@@ -3,7 +3,7 @@
 //
 
 #include "catch2/catch.hpp"
-#include "Geometry/map_utils.hpp"
+#include "Geometry/mapUtils.hpp"
 #include "Geometry/BlockObject.hpp"
 
 TEST_CASE("BlockObject instantiation"){
