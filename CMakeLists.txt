@@ -8,11 +8,11 @@ file(MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 if (${UNIX})
     find_package(X11 REQUIRED)
 
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g --coverage")
+    set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -g --coverage")
+
     set(CMAKE_CXX_FLAGS_SANITIZER "${CMAKE_CXX_FLAGS_DEBUG} -O1 -fsanitize=address -fno-omit-frame-pointer")
     set(CMAKE_EXE_LINKER_FLAGS_SANITIZER "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer")
-
-    set(CMAKE_CXX_FLAGS_COVERAGE "${CMAKE_CXX_FLAGS_DEBUG} -g --coverage")
-    set(CMAKE_EXE_LINKER_FLAGS_COVERAGE "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -g --coverage")
 
     add_custom_target(
             valgrind
@@ -23,7 +23,7 @@ if (${UNIX})
             ${PROJECT_SOURCE_DIR}/bin/app
     )
 
-    find_file(COVERAGE_SCRIPT "coverage.sh" HINTS ${PROJECT_SOURCE_DIR})
+    set(COVERAGE_SCRIPT "${PROJECT_SOURCE_DIR}/script/coverage.sh")
     message("Coverage script path: ${COVERAGE_SCRIPT}")
     add_custom_target(coverage COMMAND ${COVERAGE_SCRIPT} $(PWD) ${PROJECT_SOURCE_DIR})
 endif()

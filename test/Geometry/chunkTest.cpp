@@ -51,8 +51,9 @@ TEST_CASE("Chunk instantiation with initialization"){
                     }
                     auto tb = CraftCpp::TileBlock{c.getBlock({x, y, z})};
                     empty_found = empty_found || tb.isEmpty();
-                    bool assertion = (tb.isUserBuildable() && !empty_found) ||
-                                     (!tb.isUserBuildable() && empty_found) || tb.getBlockType() == CraftCpp::BlockType::LEAVES;
+                    bool assertion = (tb.isPartOfTerrain() && !empty_found) ||
+                                     (!tb.isPartOfTerrain() && empty_found) ||
+                                     tb.getBlockType() == CraftCpp::BlockType::LEAVES;
                     REQUIRE(assertion);
                 }
             }

@@ -138,6 +138,13 @@ TileCube::Iterator TileBlock::end() const {
     return tiles[getBlockType()].end();
 }
 
+bool TileBlock::isPartOfTerrain() {
+    return !(
+        tileCubeIndex == BlockType::CLOUD ||
+        tileCubeIndex == BlockType::EMPTY
+    );
+}
+
 TileCube::Iterator TileCube::begin() const {
     return {reinterpret_cast<const int *>(this)};
 }

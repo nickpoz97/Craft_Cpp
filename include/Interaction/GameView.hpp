@@ -47,8 +47,8 @@ public:
     /**
      * @brief set the unique instance of GameView
      * @param[in] width width of game window in pixels
-     * @param height[in] height of game window in pixels
-     * @param fov[in] field of view used in view space in degrees
+     * @param[in] height[in] height of game window in pixels
+     * @param[in] fov[in] field of view used in view space in degrees
      * @return reference and ownership of GameView object
      * @note calling this method while there is an instance does nothing and return a nullptr
      */

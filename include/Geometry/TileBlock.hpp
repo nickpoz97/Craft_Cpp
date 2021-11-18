@@ -171,6 +171,12 @@ public:
      */
     [[nodiscard]] bool isEmpty() const;
 
+    /**
+     * @brief Check if this a BlockType belonging to Chunk terrain
+     * @return true iff is not empty or cloud
+     */
+    [[nodiscard]] bool isPartOfTerrain();
+
     ///@brief conversion operator used to extract BlockType from this TileBlock
     operator BlockType() const;
 
