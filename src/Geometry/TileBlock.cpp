@@ -116,16 +116,6 @@ bool TileBlock::isTransparent() const {
 
 }
 
-bool TileBlock::isDestroyable() const {
-    switch (tileCubeIndex) {
-        case BlockType::EMPTY:
-        case BlockType::CLOUD:
-            return false;
-        default:
-            return true;
-    }
-}
-
 bool TileBlock::isEmpty() const {
     return tileCubeIndex == BlockType::EMPTY;
 }
@@ -139,10 +129,6 @@ BlockType TileBlock::getBlockType() const {
 }
 
 TileBlock::TileBlock(BlockType blockType) : tileCubeIndex{blockType} {}
-
-bool TileBlock::isUserBuildable() const {
-    return isDestroyable();
-}
 
 TileCube::Iterator TileBlock::begin() const {
     return tiles[getBlockType()].begin();

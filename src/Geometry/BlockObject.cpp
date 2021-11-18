@@ -34,12 +34,12 @@ BlockObject<n_faces>::BlockObject(const BlockType &blockType, const std::array<b
         beginIterator{verticesIt},
         nVertices{static_cast<size_t>(std::accumulate(visibleFaces.begin(), visibleFaces.end(), 0) *
                                       INDICES_FACE_COUNT)} {
-    TileBlock tile_block{blockType};
+    TileBlock tileBlock{blockType};
 
     auto face_v_it = localVertexPositions.begin();
     auto face_uvs_it = uvs.begin();
     auto face_nrm_it = normals.begin();
-    auto tile_it = tile_block.begin();
+    auto tile_it = tileBlock.begin();
     auto increment_geometry_iterators = [&]() {
         ++face_v_it;
         ++face_uvs_it;
@@ -59,6 +59,7 @@ BlockObject<n_faces>::BlockObject(const BlockType &blockType, const std::array<b
             }
             continue;
         }
+        // obtain first vertex du and dv
         float du = static_cast<float>(*tile_it % 16) * S;
         float dv = static_cast<float>(*tile_it / 16) * S;
 
