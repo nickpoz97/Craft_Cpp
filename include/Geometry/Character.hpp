@@ -23,6 +23,9 @@ class Character {
     static constexpr int nVertices = 6;
     std::array<Uv2DVertex, nVertices> vertices;
 public:
+    /// @brief center position of Character object
+    glm::ivec2 centerPos;
+
     /**
      * @defgroup CharacterIterator Character Iterator
      * @brief used to iterate through the vertices of Character object

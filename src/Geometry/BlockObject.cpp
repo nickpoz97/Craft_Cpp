@@ -124,15 +124,6 @@ Cube::Cube(const BlockType &blockType, const std::array<bool, 6> &visibleFaces, 
            BlockVertexIterator verticesIt, const std::unordered_map<glm::ivec3, bool> &lightObstacles) :
         super(blockType, visibleFaces, position, 0, lightObstacles, verticesIt) {}
 
-template<unsigned n_faces>
-void BlockObject<n_faces>::printVertexInfo() {
-    int index = 0;
-    for (auto it = begin(); it != end(); ++it) {
-        fmt::print("pos: ({},{},{}), face: {}, normal: ({},{},{})\n", it->position.x, it->position.y,
-                   it->position.z,
-                   (index++) / INDICES_FACE_COUNT, it->normal.x, it->normal.y, it->normal.z);
-    }
-}
 
 template<>
 const BlockObject<6>::PositionsMatrix BlockObject<6>::localVertexPositions{{

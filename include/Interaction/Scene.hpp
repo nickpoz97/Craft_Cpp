@@ -12,6 +12,7 @@
 #include "Interaction/CameraControl.hpp"
 #include "Interaction/Camera.hpp"
 #include "Geometry/Chunk.hpp"
+#include <Geometry/Crosshair.hpp>
 
 namespace CraftCpp {
 
@@ -70,6 +71,7 @@ private:
     void deleteDistantChunks();
 
     void waitThreads() const;
+    Crosshair c;
 
     Scene(const GameViewSettings &gvs, const glm::vec3 &cameraPos, const glm::vec2 &cameraRotation,
           const ShaderNamesMap &snm);

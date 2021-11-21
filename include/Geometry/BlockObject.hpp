@@ -88,9 +88,6 @@ public:
     [[nodiscard]] BlockVertexIterator end() const;
     /// @return iterator position of the first BlockObject vertex
     [[nodiscard]] BlockVertexIterator begin() const;
-
-    /// @brief prints info about all vertices
-    void printVertexInfo();
 };
 
 /// @brief BlockObject with only lateral faces

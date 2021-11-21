@@ -104,9 +104,6 @@ glm::mat4 GameView::getProjMatrix(GameView::ProjType pt) const {
             return glm::perspective(glm::radians(fov), static_cast<float>(width) / height, z_near, z_far);
         case ProjType::UI:
             return glm::ortho(0.0f, static_cast<float>(width), 0.0f, static_cast<float>(height), -1.0f, 1.0f);
-        case ProjType::ITEM:
-            return glm::ortho(-item_box_side() * getRatio(), item_box_side() * getRatio(),
-                              -item_box_side(), item_box_side(), -1.0f, 1.0f);
         // Ortho 3D
         default:
             return glm::ortho(-ortho * getRatio(), ortho * getRatio(),
@@ -133,11 +130,6 @@ GameView::~GameView() {
 #ifndef NDEBUG
     std::cout << "GLFW terminated\n";
 #endif
-}
-
-float GameView::item_box_side() const {
-    float size = 64 * scale;
-    return height / size / 2;
 }
 
 GameView *GameView::getActualInstance() {

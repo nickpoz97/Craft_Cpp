@@ -7,6 +7,7 @@
 #include <iostream>
 #include <Geometry/Text2D.hpp>
 #include <fmt/format.h>
+#include <fmt/format.h>
 #include "Interaction/Scene.hpp"
 #include "stbi/stb_image.h"
 
@@ -15,7 +16,8 @@ Scene::Scene(const GameViewSettings &gvs, const glm::vec3 &cameraPos, const glm:
              const ShaderNamesMap &snm) :
         gameView{GameView::setInstance(gvs.windowSize.x, gvs.windowSize.y, gvs.fov)},
         camera{cameraPos, cameraRotation},
-        cameraControl{CameraControl::setInstance(camera)} {
+        cameraControl{CameraControl::setInstance(camera)},
+        c{gameView->getWidth(), gameView->getHeight(), gameView->getScale()} {
 
     glClearColor(0.1f, 0.1f, 0.5f, 1.0f);
     glEnable(GL_DEPTH_TEST);
@@ -65,6 +67,10 @@ void Scene::loop() {
 
     loadAndRenderChunks();
     showInfoText();
+
+    if(SHOW_CROSSHAIRS) {
+        c.renderLines();
+    }
 
     glfwSwapBuffers(GameView::getWindow());
     glfwPollEvents();

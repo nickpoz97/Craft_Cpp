@@ -8,14 +8,15 @@
 #include "Rendering/Shader.hpp"
 
 namespace CraftCpp {
-Crosshair::Crosshair(int width, int height, int scale) : SuperClass(getEndsCoordinates(width, height, scale)) {};
+Crosshair::Crosshair(int width, int height, int scale) :
+    centerPos{width / 2, height / 2},
+    SuperClass(getEndsCoordinates(width, height, scale)) {};
 
 std::vector<Standard2DVertex> Crosshair::getEndsCoordinates(int width, int height, int scale) {
     glm::ivec2 position{width / 2, height / 2};
     int p{10 * scale};
 
     Standard2DVertex st{{2, 3}};
-    std::cerr << "updated crosshair position: \n" << position.x << ", " << position.y << '\n';
 
     return {
             Standard2DVertex{{position.x, position.y - p}},

@@ -15,7 +15,11 @@ echo "output statistics files in $OUTPUT_ROOT"
 gcov ./CMakeFiles/catch_test.dir/src/*/*.gcno
 # generating coverage info file and removing useless data
 lcov -c -b "$OUTPUT_ROOT" --no-external --directory "$COVERAGE_ROOT" -o ./coverage.info
-lcov --remove ./coverage.info "*/test/*" "*/deps/*" -o ./coverage.info
+lcov --remove ./coverage.info "*/test/*" \
+  "*/deps/*" \
+  "*/src/Geometry/Sphere.cpp" \
+  "*/src/Geometry/Item.cpp" \
+  -o ./coverage.info
 # generating html documentation
 genhtml ./coverage.info --output-directory "$OUTPUT_ROOT"/doc/coverage --prefix "$OUTPUT_ROOT"
 mkdir -p tmp_gcov_files

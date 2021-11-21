@@ -28,9 +28,6 @@ private:
     int ortho;
     float fov;
 
-    static constexpr float z_near = 0.125f;
-    static constexpr float z_far = static_cast<float>(RENDER_CHUNK_RADIUS) * Chunk::SIZE;
-
     static int computeScaleFactor(int width, int height);
 
     GLFWwindow *createWindow(bool is_fullscreen);
@@ -38,17 +35,22 @@ private:
     GameView(int width, int height, float fov, int ortho = false, bool isFullscreen = false);
 
 public:
+    /// @brief near clipping plane distance
+    static constexpr float z_near = 0.125f;
+    /// @brief far clipping plane distance
+    static constexpr float z_far = static_cast<float>(RENDER_CHUNK_RADIUS) * Chunk::SIZE;
+
     /// @brief IDs for projection types
     /// @note UI is a special type of orthogonal projection
     enum ProjType {
-        PERSP, UI, ORTHO_3D, ITEM
+        PERSP, UI, ORTHO_3D
     };
 
     /**
      * @brief set the unique instance of GameView
      * @param[in] width width of game window in pixels
-     * @param[in] height[in] height of game window in pixels
-     * @param[in] fov[in] field of view used in view space in degrees
+     * @param[in] height height of game window in pixels
+     * @param[in] fov field of view used in view space in degrees
      * @return reference and ownership of GameView object
      * @note calling this method while there is an instance does nothing and return a nullptr
      */
@@ -73,9 +75,6 @@ public:
     [[nodiscard]] glm::mat4 getProjMatrix(ProjType pt) const;
     /// @return true iff GameView singleton has already been instantiated
     [[nodiscard]] static bool isInstantiated();
-    /// @return value used in item projection
-    /// @warning not tested
-    [[nodiscard]] float item_box_side() const;
     /// @return reference to active instance
     [[nodiscard]] static GameView *getActualInstance();
     /**
