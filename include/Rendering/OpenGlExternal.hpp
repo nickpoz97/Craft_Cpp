@@ -6,7 +6,7 @@
 #define CPPCRAFT_OPENGLEXTERNAL_HPP
 
 #define GLFW_INCLUDE_NONE
-#include "glad/include/glad/glad.h"
 #include "GLFW/glfw3.h"
+#include "glad/include/glad/glad.h"
 
-#endif //CPPCRAFT_OPENGLEXTERNAL_HPP
+#endif // CPPCRAFT_OPENGLEXTERNAL_HPP

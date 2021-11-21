@@ -5,9 +5,8 @@
 #ifndef CPP_ITEM_HPP
 #define CPP_ITEM_HPP
 
-
-#include "Geometry/Vertex.hpp"
 #include "Geometry/RenderableEntity.hpp"
+#include "Geometry/Vertex.hpp"
 #include "Interaction/GameView.hpp"
 
 namespace CraftCpp {
@@ -16,17 +15,19 @@ namespace CraftCpp {
 /// @warning never been tested
 class Item : public RenderableEntity<BlockVertex> {
 private:
-    static std::vector<BlockVertex> genLocalBuffer(BlockType w, const glm::vec2 &center_position);
+  static std::vector<BlockVertex>
+  genLocalBuffer(BlockType w, const glm::vec2 &center_position);
 
-    using SuperClass = RenderableEntity<BlockVertex>;
+  using SuperClass = RenderableEntity<BlockVertex>;
+
 public:
-    /**
-     * @brief builds an Item object on the screen
-     * @param[in] w type of item
-     * @param[in] centerPosition 2D screen coordinates
-     */
-    explicit Item(BlockType w, const glm::vec2 &centerPosition);
+  /**
+   * @brief builds an Item object on the screen
+   * @param[in] w type of item
+   * @param[in] centerPosition 2D screen coordinates
+   */
+  explicit Item(BlockType w, const glm::vec2 &centerPosition);
 };
-}
+} // namespace CraftCpp
 
-#endif //CPP_ITEM_HPP
+#endif // CPP_ITEM_HPP
