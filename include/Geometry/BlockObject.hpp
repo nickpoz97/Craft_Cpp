@@ -39,8 +39,6 @@ private:
     size_t nVertices;
     static constexpr float N = 0.5f;
 
-    static glm::vec3 rotate_asy(const glm::vec3 &v, float angle_degrees);
-
     // matrix of BlockObject 's local positions
     //  coordinate [i][j] indexes i-th face and j-th vertex-position of that face
     using PositionsMatrix = std::array<std::array<glm::vec3, 4>, nFaces>;

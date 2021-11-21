@@ -6,7 +6,7 @@
 #include "Geometry/Character.hpp"
 
 namespace CraftCpp {
-Text2D::Text2D(const glm::vec2 &position, float n, std::string_view text) : SuperClass{
+Text2D::Text2D(const glm::vec2 &position, float n, std::string_view text) : initialCharPos{position}, SuperClass{
         genBuffer(position, n, text)} {
 }
 

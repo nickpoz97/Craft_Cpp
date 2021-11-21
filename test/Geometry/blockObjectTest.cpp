@@ -16,9 +16,9 @@ TEST_CASE("BlockObject instantiation"){
     }
     SECTION("Plant instantiation, all faces"){
         std::vector<CraftCpp::BlockVertex> buffer{CraftCpp::Plant::maxIndices};
-        CraftCpp::Cube c{CraftCpp::BlockType::RED_FLOWER, {1, 1, 1, 1}, {2, 4, 5}, buffer.begin(), {}};
-        REQUIRE(buffer.begin() == c.begin());
-        REQUIRE(buffer.end() == c.end());
+        CraftCpp::Plant p{CraftCpp::BlockType::RED_FLOWER, {2, 4, 5}, 40.0f, buffer.begin(), {}};
+        REQUIRE(buffer.begin() == p.begin());
+        REQUIRE(buffer.end() == p.end());
         REQUIRE(CraftCpp::Plant::maxIndices == 6 * 4);
     }
     SECTION("Cube instantiation, 2 faces"){

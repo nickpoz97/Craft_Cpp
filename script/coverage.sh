@@ -19,6 +19,7 @@ lcov --remove ./coverage.info "*/test/*" \
   "*/deps/*" \
   "*/src/Geometry/Sphere.cpp" \
   "*/src/Geometry/Item.cpp" \
+  "*/src/App.cpp" \
   -o ./coverage.info
 # generating html documentation
 genhtml ./coverage.info --output-directory "$OUTPUT_ROOT"/doc/coverage --prefix "$OUTPUT_ROOT"

@@ -7,7 +7,6 @@
 #include <iostream>
 #include <Geometry/Text2D.hpp>
 #include <fmt/format.h>
-#include <fmt/format.h>
 #include "Interaction/Scene.hpp"
 #include "stbi/stb_image.h"
 

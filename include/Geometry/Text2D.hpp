@@ -23,6 +23,9 @@ private:
     static std::vector<Uv2DVertex> genBuffer(const glm::vec2 &position, float n, std::string_view text);
 
 public:
+    /// @brief center position of initial Character
+    glm::ivec2 initialCharPos;
+
     /**
      * @brief instantiates a 2D text of a specified size in a specified position
      * @param position position in pixels of the first Character

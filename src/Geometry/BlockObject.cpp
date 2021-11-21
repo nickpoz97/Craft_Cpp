@@ -111,15 +111,6 @@ BlockVertexIterator BlockObject<n_faces>::end() const {
     return beginIterator + nVertices;
 }
 
-template<unsigned int n_faces>
-glm::vec3 BlockObject<n_faces>::rotate_asy(const glm::vec3 &v, float angle_degrees) {
-    return {
-            glm::cos(angle_degrees) * v.x - glm::sin(angle_degrees) * v.z,
-            v.y,
-            glm::sin(angle_degrees) * v.x + glm::cos(angle_degrees) * v.z,
-    };
-}
-
 Cube::Cube(const BlockType &blockType, const std::array<bool, 6> &visibleFaces, const glm::vec3 &position,
            BlockVertexIterator verticesIt, const std::unordered_map<glm::ivec3, bool> &lightObstacles) :
         super(blockType, visibleFaces, position, 0, lightObstacles, verticesIt) {}

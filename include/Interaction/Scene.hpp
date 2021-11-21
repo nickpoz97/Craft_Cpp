@@ -52,6 +52,8 @@ struct GameViewSettings {
 using ShaderNamesMap = std::unordered_map<ShaderName, ShaderFilesPaths>;
 
 /// @brief Singleton wrapper for Camera, CameraControl and GameView that handles model update and rendering
+/// @warning scene is a class used to help building main, so it cannot be tested not interactively (run
+/// app executable in debug mode to view coverage)
 class Scene {
 private:
     static inline Scene* actualInstance{nullptr};
