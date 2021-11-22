@@ -30,13 +30,13 @@ void OpenglBuffer<VertexType>::drawTriangles() const {
   bindBuffer();
 
   setVaoAttributes();
-  for (int i = 0, j = 0; i < attributesDimensions.size(); ++i) {
+  for (size_t i = 0, j = 0; i < attributesDimensions.size(); ++i) {
     if (attributesDimensions[i] != 0) {
       glEnableVertexAttribArray(j++);
     };
   }
   glDrawArrays(GL_TRIANGLES, 0, nIndices);
-  for (int i = 0, j = 0; i < attributesDimensions.size(); ++i) {
+  for (size_t i = 0, j = 0; i < attributesDimensions.size(); ++i) {
     if (attributesDimensions[i] != 0) {
       glDisableVertexAttribArray(j++);
     };

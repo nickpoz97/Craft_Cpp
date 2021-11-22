@@ -1,8 +1,6 @@
 #include <Interaction/Scene.hpp>
 #include <iostream>
 
-static int load_texture(std::string_view path, GLint clamp_type = GL_REPEAT);
-
 int main() {
   CraftCpp::GameViewSettings gvs{
       {CraftCpp::WINDOW_WIDTH, CraftCpp::WINDOW_HEIGHT}, CraftCpp::INITIAL_FOV};

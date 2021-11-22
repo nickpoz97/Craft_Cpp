@@ -17,8 +17,6 @@ Crosshair::getEndsCoordinates(int width, int height, int scale) {
   glm::ivec2 position{width / 2, height / 2};
   int p{10 * scale};
 
-  Standard2DVertex st{{2, 3}};
-
   return {Standard2DVertex{{position.x, position.y - p}},
           Standard2DVertex{{position.x, position.y + p}},
           Standard2DVertex{{position.x - p, position.y}},

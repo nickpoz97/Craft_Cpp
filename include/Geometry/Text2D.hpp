@@ -28,7 +28,7 @@ private:
 
 public:
   /// @brief center position of initial Character
-  glm::ivec2 initialCharPos;
+  glm::ivec2 initialCharPos{};
 
   /**
    * @brief instantiates a 2D text of a specified size in a specified position

@@ -6,13 +6,17 @@ set(CMAKE_CXX_STANDARD 17)
 file(MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
 if (${UNIX})
+    add_compile_options(-Wall)
     find_package(X11 REQUIRED)
 
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g --coverage")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g --coverage")
     set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -g --coverage")
 
-    set(CMAKE_CXX_FLAGS_SANITIZER "${CMAKE_CXX_FLAGS_DEBUG} -O1 -fsanitize=address -fno-omit-frame-pointer")
-    set(CMAKE_EXE_LINKER_FLAGS_SANITIZER "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer")
+    set(CMAKE_CXX_FLAGS_MEMORY_SANITIZER "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer")
+    set(CMAKE_EXE_LINKER_FLAGS_MEMORY_SANITIZER "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer")
+
+    set(CMAKE_CXX_FLAGS_UNDEFINED_SANITIZER "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=undefined -fno-omit-frame-pointer")
+    set(CMAKE_EXE_LINKER_FLAGS_UNDEFINED_SANITIZER "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=undefined -fno-omit-frame-pointer")
 
     add_custom_target(
             valgrind
@@ -25,7 +29,9 @@ if (${UNIX})
 
     set(COVERAGE_SCRIPT "${PROJECT_SOURCE_DIR}/script/coverage.sh")
     message("Coverage script path: ${COVERAGE_SCRIPT}")
-    add_custom_target(coverage COMMAND ${COVERAGE_SCRIPT} $(PWD) ${PROJECT_SOURCE_DIR})
+    set(COVERAGE_SRC_DIR "${PROJECT_BINARY_DIR}/CMakeFiles/catch_test.dir/src")
+
+    add_custom_target(coverage COMMAND ${COVERAGE_SCRIPT} ${COVERAGE_SRC_DIR} ${PROJECT_SOURCE_DIR})
 endif()
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
@@ -44,9 +50,6 @@ set(EXTERNAL_SOURCES deps/noise/noise.cpp deps/glad/src/glad.c)
 set(SOURCE_FILES ${INTERNAL_SOURCES} ${EXTERNAL_SOURCES})
 
 add_executable(app ${APP_MAIN} ${SOURCE_FILES})
-
-file(GLOB CATCH_TEST_FILES ${PROJECT_SOURCE_DIR}/test/*.cpp)
-
 file(GLOB_RECURSE TEST_FILES test/*.cpp)
 
 add_executable(catch_test ${SOURCE_FILES} ${TEST_FILES})

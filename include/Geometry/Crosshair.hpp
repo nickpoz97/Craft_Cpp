@@ -25,7 +25,7 @@ private:
 
 public:
   /// @brief 2D pixel coordinates of Crosshair center position
-  glm::ivec2 centerPos;
+  glm::ivec2 centerPos{};
 
   /**
    * @brief Constructs a renderable Crosshair in the centre of the window

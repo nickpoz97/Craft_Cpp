@@ -57,7 +57,7 @@ uint Shader::build_shader(std::string_view path, shader_type st) {
 
   const char *code_c_string = code_string.data();
 
-  unsigned shader_id;
+  unsigned shader_id{};
   switch (st) {
   case shader_type::VERTEX:
     shader_id = glCreateShader(GL_VERTEX_SHADER);

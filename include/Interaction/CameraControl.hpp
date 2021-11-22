@@ -22,7 +22,7 @@ namespace CraftCpp {
 class CameraControl {
 private:
   static inline CameraControl *actualInstance{nullptr};
-  glm::vec2 lastMousePos;
+  glm::vec2 lastMousePos{};
   Camera &flyingCamera;
   static constexpr float mouseSensitivity{0.1};
   double lastFrameTime{};
