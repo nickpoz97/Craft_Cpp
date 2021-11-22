@@ -9,7 +9,7 @@
 
 namespace CraftCpp {
 std::size_t hashCoefficient(int val) {
-  std::size_t key = static_cast<std::size_t>(val);
+  auto key = static_cast<std::size_t>(val);
   key = ~key + (key << 15);
   key = key ^ (key >> 12);
   key = key + (key << 2);
@@ -25,11 +25,13 @@ bool yCoordComparator::operator()(const glm::vec3 &a,
 }
 } // namespace CraftCpp
 
-std::size_t std::hash<glm::ivec3>::operator()(const glm::ivec3 &v) const {
+namespace std {
+size_t hash<glm::ivec3>::operator()(const glm::ivec3 &v) const {
   return CraftCpp::hashCoefficient(v.x) ^ CraftCpp::hashCoefficient(v.y) ^
          CraftCpp::hashCoefficient(v.z);
 }
 
-std::size_t std::hash<glm::ivec2>::operator()(const glm::ivec2 &v) const {
+size_t hash<glm::ivec2>::operator()(const glm::ivec2 &v) const {
   return CraftCpp::hashCoefficient(v.x) ^ CraftCpp::hashCoefficient(v.y);
 }
+} // namespace std

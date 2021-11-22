@@ -1,4 +1,10 @@
-/// @file
+/**
+ * @copyright CppCraft
+ * @author Niccolò Pozzetti
+ * @version v1.0
+ * @date November, 2021
+ * @file
+ */
 
 #ifndef CPP_CAMERA_HPP
 #define CPP_CAMERA_HPP

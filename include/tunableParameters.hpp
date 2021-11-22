@@ -1,6 +1,10 @@
-// @file
-// Boolean and Integers constants that changes performance and details of the 3d
-// world
+/**
+ * @copyright CppCraft
+ * @author Niccolò Pozzetti
+ * @version v1.0
+ * @date November, 2021
+ * @file
+ */
 
 #ifndef CPP_COSTANTS_HPP
 #define CPP_COSTANTS_HPP

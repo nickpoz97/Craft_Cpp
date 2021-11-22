@@ -1,6 +1,10 @@
-//
-// Created by ultimatenick on 11/08/21.
-//
+/**
+ * @copyright CppCraft
+ * @author Niccolò Pozzetti
+ * @version v1.0
+ * @date November, 2021
+ * @file
+ */
 
 #ifndef CPP_SHADER_HPP
 #define CPP_SHADER_HPP
@@ -21,7 +25,7 @@ private:
 
   GLuint id{};
 
-  static int build_shader(std::string_view path, shader_type st);
+  static uint build_shader(std::string_view path, shader_type st);
 
   static void _setExtraUniform(int u_location, int val);
 
@@ -33,7 +37,7 @@ private:
 
   static void _setExtraUniform(int u_location, const glm::mat4 &val);
 
-  static void check_compile_errors(GLuint shader, std::string type);
+  static void check_compile_errors(GLuint shader, const std::string &type);
 
   void set_pi() const;
 

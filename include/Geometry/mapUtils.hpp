@@ -1,6 +1,10 @@
-//
-// Created by ultimatenick on 09/08/21.
-//
+/**
+ * @copyright CppCraft
+ * @author Niccolò Pozzetti
+ * @version v1.0
+ * @date November, 2021
+ * @file
+ */
 
 #ifndef CPP_MAP_UTILS_HPP
 #define CPP_MAP_UTILS_HPP
@@ -26,17 +30,19 @@ struct yCoordComparator {
 };
 } // namespace CraftCpp
 
+namespace std {
 /**
  * @brief hash for unordered map which use ivec3 as key
  */
-template <> struct std::hash<glm::ivec3> {
-  std::size_t operator()(const glm::ivec3 &v) const;
+template <> struct hash<glm::ivec3> {
+  size_t operator()(const glm::ivec3 &v) const;
 };
 
 /**
  * @brief hash for unordered map which use ivec2 as key
  */
-template <> struct std::hash<glm::ivec2> {
-  std::size_t operator()(const glm::ivec2 &v) const;
+template <> struct hash<glm::ivec2> {
+  size_t operator()(const glm::ivec2 &v) const;
 };
+} // namespace std
 #endif // CPP_MAP_UTILS_HPP

@@ -1,6 +1,10 @@
-//
-// Created by ultimatenick on 04/11/21.
-//
+/**
+ * @copyright CppCraft
+ * @author Niccolò Pozzetti
+ * @version v1.0
+ * @date November, 2021
+ * @file
+ */
 
 #ifndef CPPCRAFT_ATTRIBUTESSIZE_HPP
 #define CPPCRAFT_ATTRIBUTESSIZE_HPP

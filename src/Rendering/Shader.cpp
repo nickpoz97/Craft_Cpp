@@ -46,7 +46,7 @@ void Shader::use() const {
 #endif
 }
 
-int Shader::build_shader(std::string_view path, shader_type st) {
+uint Shader::build_shader(std::string_view path, shader_type st) {
   std::ifstream code_file;
   std::stringstream code_stream;
 
@@ -66,7 +66,7 @@ int Shader::build_shader(std::string_view path, shader_type st) {
     shader_id = glCreateShader(GL_FRAGMENT_SHADER);
     break;
   }
-  glShaderSource(shader_id, 1, &(code_c_string), NULL);
+  glShaderSource(shader_id, 1, &(code_c_string), nullptr);
   glCompileShader(shader_id);
 
   return shader_id;
@@ -95,13 +95,13 @@ void Shader::setViewProj(const glm::mat4 &m) const {
   setExtraUniform("viewproj_matrix", m);
 }
 
-void Shader::check_compile_errors(GLuint shader, std::string type) {
+void Shader::check_compile_errors(GLuint shader, const std::string &type) {
   GLint success;
   GLchar infoLog[1024];
   if (type != "PROGRAM") {
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
     if (!success) {
-      glGetShaderInfoLog(shader, 1024, NULL, infoLog);
+      glGetShaderInfoLog(shader, 1024, nullptr, infoLog);
       std::cout
           << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n"
           << infoLog
@@ -111,7 +111,7 @@ void Shader::check_compile_errors(GLuint shader, std::string type) {
   } else {
     glGetProgramiv(shader, GL_LINK_STATUS, &success);
     if (!success) {
-      glGetProgramInfoLog(shader, 1024, NULL, infoLog);
+      glGetProgramInfoLog(shader, 1024, nullptr, infoLog);
       std::cout
           << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n"
           << infoLog

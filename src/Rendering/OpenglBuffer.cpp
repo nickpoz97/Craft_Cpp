@@ -66,7 +66,7 @@ void OpenglBuffer<VertexType>::drawLines() const {
 
   bindBuffer();
   glVertexAttribPointer(0, getPosAttributeSize<VertexType>(), GL_FLOAT,
-                        GL_FALSE, 0, 0);
+                        GL_FALSE, 0, nullptr);
   glEnableVertexAttribArray(0);
   glDrawArrays(GL_LINES, 0, nIndices);
   glDisableVertexAttribArray(0);
@@ -81,7 +81,7 @@ void OpenglBuffer<VertexType>::storeData(
   }
 
   //_store_data(sizeof(buffer), reinterpret_cast<const
-  //GLfloat*>(buffer.data()));
+  // GLfloat*>(buffer.data()));
   _storeData(buffer.size() * sizeof(VertexType),
              reinterpret_cast<const GLfloat *>(buffer.data()));
 

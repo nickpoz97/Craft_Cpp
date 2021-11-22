@@ -1,6 +1,10 @@
-//
-// Created by ultimatenick on 13/08/21.
-//
+/**
+ * @copyright CppCraft
+ * @author Niccolò Pozzetti
+ * @version v1.0
+ * @date November, 2021
+ * @file
+ */
 
 #ifndef CPP_TEXT2D_HPP
 #define CPP_TEXT2D_HPP
