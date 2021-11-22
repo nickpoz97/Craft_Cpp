@@ -87,7 +87,7 @@ public:
 
   static constexpr int SIZE = CHUNK_SIZE; ///< number of blocks per chunk side
   static constexpr int Y_LIMIT = 256; ///< max vertical blocks per chunk object
-  const glm::ivec2 pq{};                ///< Chunk coordinate
+  const glm::ivec2 pq{};              ///< Chunk coordinate
 
   /**
    * @defgroup ChunkCornersGetters Chunk corners getters
