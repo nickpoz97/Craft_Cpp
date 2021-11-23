@@ -113,10 +113,10 @@ std::unique_ptr<Scene> Scene::setInstance(const GameViewSettings &gvs,
 
 int Scene::load_texture(std::string_view path, TextureName textureName,
                         GLint clampType) {
-  uint texture_id;
+  unsigned texture_id;
   glGenTextures(1, &texture_id);
 
-  static uint texture_index = 0;
+  static unsigned texture_index = 0;
   glActiveTexture(GL_TEXTURE0 + texture_index);
   glBindTexture(GL_TEXTURE_2D, texture_id);
 

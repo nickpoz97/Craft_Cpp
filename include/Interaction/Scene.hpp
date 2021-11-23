@@ -34,8 +34,8 @@ enum class TextureName { FONT, GENERAL };
  *  @brief paths of fragment and vertex code of a shader
  */
 struct ShaderFilesPaths {
-  std::string_view vertexCode;
-  std::string_view fragmentCode;
+  const std::string vertexCode;
+  const std::string fragmentCode;
 };
 
 /**
@@ -61,7 +61,7 @@ private:
   std::unique_ptr<CameraControl> cameraControl;
   Camera camera;
   std::unordered_map<ShaderName, Shader> shaders{};
-  std::array<uint, 2> textureSamplers;
+  std::array<unsigned, 2> textureSamplers;
   ChunkMap chunkMap{};
 
   void renderText(int justify, const glm::vec2 &position, float n,

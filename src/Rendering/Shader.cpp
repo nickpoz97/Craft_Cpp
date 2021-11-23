@@ -46,7 +46,7 @@ void Shader::use() const {
 #endif
 }
 
-uint Shader::build_shader(std::string_view path, shader_type st) {
+unsigned Shader::build_shader(std::string_view path, shader_type st) {
   std::ifstream code_file;
   std::stringstream code_stream;
 

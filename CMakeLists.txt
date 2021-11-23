@@ -67,3 +67,11 @@ if(DOXYGEN_FOUND)
     set(DOXYGEN_EXTRACT_ALL YES)
     doxygen_add_docs(doc include ALL)
 endif()
+
+set(TEXTURES_DIR "${PROJECT_SOURCE_DIR}/data/textures/")
+set(SHADERS_DIR "${PROJECT_SOURCE_DIR}/data/shaders/")
+
+add_definitions( -DSHADERS_DIR=${SHADERS_DIR} )
+add_definitions( -DTEXTURES_DIR=${TEXTURES_DIR} )
+
+configure_file( ${PROJECT_SOURCE_DIR}/src/Paths.hpp.in ${PROJECT_SOURCE_DIR}/src/Paths.hpp)

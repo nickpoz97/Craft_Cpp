@@ -1,5 +1,6 @@
 #include <Interaction/Scene.hpp>
 #include <iostream>
+#include "Paths.hpp"
 
 int main() {
   CraftCpp::GameViewSettings gvs{
@@ -7,20 +8,20 @@ int main() {
   CraftCpp::ShaderNamesMap snm{};
   snm.emplace(
       CraftCpp::ShaderName::BLOCK_SHADER,
-      CraftCpp::ShaderFilesPaths{"../data/shaders/block_vertex.glsl",
-                                 "../data/shaders/block_fragment.glsl"});
+      CraftCpp::ShaderFilesPaths{shadersDirPath +"block_vertex.glsl",
+                                 shadersDirPath + "block_fragment.glsl"});
   snm.emplace(CraftCpp::ShaderName::TEXT_SHADER,
-              CraftCpp::ShaderFilesPaths{"../data/shaders/text_vertex.glsl",
-                                         "../data/shaders/text_fragment.glsl"});
+              CraftCpp::ShaderFilesPaths{shadersDirPath + "text_vertex.glsl",
+                                         shadersDirPath + "text_fragment.glsl"});
 
   std::unique_ptr<CraftCpp::Scene> scene{
       CraftCpp::Scene::setInstance(gvs, {0, 20, 0}, {-90, -10}, snm)};
-  if (scene->load_texture("../data/textures/texture.png",
+  if (scene->load_texture(texturesDirPath + "texture.png",
                           CraftCpp::TextureName::GENERAL, 0) != 0) {
     std::cerr << "general texture not loaded";
     return -1;
   }
-  if (scene->load_texture("../data/textures/font.png",
+  if (scene->load_texture(texturesDirPath + "font.png",
                           CraftCpp::TextureName::FONT, 0) != 0) {
     std::cerr << "font texture not loaded";
     return -1;

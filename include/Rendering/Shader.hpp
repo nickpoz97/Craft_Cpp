@@ -25,7 +25,7 @@ private:
 
   GLuint id{};
 
-  static uint build_shader(std::string_view path, shader_type st);
+  static unsigned build_shader(std::string_view path, shader_type st);
 
   static void _setExtraUniform(int u_location, int val);
 

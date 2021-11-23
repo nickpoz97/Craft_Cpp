@@ -1,0 +1,9 @@
+#ifndef PATHS_HPP
+#define PATHS_HPP
+
+#include <string>
+
+const std::string shadersDirPath = "@SHADERS_DIR@";
+const std::stringtexturesDirPath = "@TEXTURES_DIR@";
+
+#endif
