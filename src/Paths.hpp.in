@@ -4,6 +4,6 @@
 #include <string>
 
 const std::string shadersDirPath = "@SHADERS_DIR@";
-const std::stringtexturesDirPath = "@TEXTURES_DIR@";
+const std::string texturesDirPath = "@TEXTURES_DIR@";
 
 #endif
