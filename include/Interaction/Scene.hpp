@@ -10,11 +10,11 @@
 #define CPP_SCENE_HPP
 
 #include "Geometry/Chunk.hpp"
+#include "Geometry/Crosshair.hpp"
 #include "Interaction/Camera.hpp"
 #include "Interaction/CameraControl.hpp"
 #include "Interaction/GameView.hpp"
 #include "Rendering/Shader.hpp"
-#include "Geometry/Crosshair.hpp"
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
 #include <string>
@@ -59,8 +59,8 @@ class Scene {
 private:
   static inline Scene *actualInstance{nullptr};
   std::unique_ptr<GameView> gameView;
-  std::unique_ptr<CameraControl> cameraControl;
   Camera camera;
+  std::unique_ptr<CameraControl> cameraControl;
   std::unordered_map<ShaderName, Shader> shaders{};
   std::array<unsigned, 2> textureSamplers;
   ChunkMap chunkMap{};
@@ -75,7 +75,7 @@ private:
   void deleteDistantChunks();
 
   void waitThreads() const;
-  Crosshair c;
+  Crosshair crosshair;
 
   Scene(const GameViewSettings &gvs, const glm::vec3 &cameraPos,
         const glm::vec2 &cameraRotation, const ShaderNamesMap &snm);

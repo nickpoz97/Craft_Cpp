@@ -17,7 +17,8 @@ Scene::Scene(const GameViewSettings &gvs, const glm::vec3 &cameraPos,
                                      gvs.fov)},
       camera{cameraPos, cameraRotation},
       cameraControl{CameraControl::setInstance(camera)},
-      c{gameView->getWidth(), gameView->getHeight(), gameView->getScale()} {
+      crosshair{gameView->getWidth(), gameView->getHeight(),
+                gameView->getScale()} {
 
   glClearColor(0.1f, 0.1f, 0.5f, 1.0f);
   glEnable(GL_DEPTH_TEST);
@@ -70,7 +71,7 @@ void Scene::loop() {
   showInfoText();
 
   if (SHOW_CROSSHAIRS) {
-    c.renderLines();
+    crosshair.renderLines();
   }
 
   glfwSwapBuffers(GameView::getWindow());

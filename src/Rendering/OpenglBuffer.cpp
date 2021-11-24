@@ -110,7 +110,7 @@ void OpenglBuffer<VertexType>::unbindBuffer() const {
 template <typename VertexType>
 OpenglBuffer<VertexType>::OpenglBuffer(
     OpenglBuffer<VertexType> &&other) noexcept
-    : VAO{other.VAO}, VBO{other.VBO}, nIndices{other.nIndices} {
+    : VBO{other.VBO}, VAO{other.VAO}, nIndices{other.nIndices} {
 
   other.VAO = 0;
   other.VBO = 0;

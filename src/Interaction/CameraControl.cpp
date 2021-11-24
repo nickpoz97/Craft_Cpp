@@ -10,7 +10,7 @@ namespace CraftCpp {
 CameraControl::CameraControl(Camera &flyingCamera,
                              const glm::ivec2 &initialMousePos,
                              GLFWwindow *window)
-    : flyingCamera{flyingCamera}, lastMousePos{initialMousePos} {
+    : lastMousePos{initialMousePos}, flyingCamera{flyingCamera} {
   glfwSetCursorPosCallback(window, mouseCallback);
   glfwSetInputMode(GameView::getWindow(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   cursorInvisible = true;
@@ -20,8 +20,8 @@ CameraControl::CameraControl(Camera &flyingCamera,
 #endif
 }
 
-void CameraControl::mouseCallback(GLFWwindow *window, double xpos,
-                                  double ypos) {
+void CameraControl::mouseCallback([[maybe_unused]] GLFWwindow *window,
+                                  double xpos, double ypos) {
   if (!actualInstance) {
     std::cerr
         << "CameraControl not instantiated, mouseCallback not available\n";
@@ -77,8 +77,9 @@ CameraControl::setInstance(Camera &flyingCamera) {
     actualInstance =
         new CameraControl{flyingCamera, initialMousePos, GameView::getWindow()};
 
-    auto keyCallback = [](GLFWwindow *window, int key, int scancode, int action,
-                          int mods) {
+    auto keyCallback = []([[maybe_unused]] GLFWwindow *window, int key,
+                          [[maybe_unused]] int scancode, int action,
+                          [[maybe_unused]] int mods) {
       if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
         actualInstance->switchCursorStatus();
       }

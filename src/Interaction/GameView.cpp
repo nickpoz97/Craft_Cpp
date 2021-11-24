@@ -38,8 +38,8 @@ int GameView::getFov() const { return fov; }
 
 GameView::GameView(int width, int height, float fov, int ortho,
                    bool isFullscreen)
-    : width{width}, height{height}, fov{fov}, ortho{ortho},
-      scale{computeScaleFactor(width, height)} {
+    : width{width}, height{height}, scale{computeScaleFactor(width, height)},
+      ortho{ortho}, fov{fov} {
   if (!glfwInit()) {
     std::cerr << "glfw not initialized" << '\n';
     return;
@@ -121,9 +121,9 @@ std::unique_ptr<GameView> GameView::setInstance(int width, int height,
   if (!isInstantiated()) {
     actualInstance = new GameView{width, height, fov, 0, false};
     glfwSetFramebufferSizeCallback(
-        getWindow(), [](GLFWwindow *window, int width, int height) {
-          actualInstance->update();
-        });
+        getWindow(),
+        []([[maybe_unused]] GLFWwindow *window, [[maybe_unused]] int width,
+           [[maybe_unused]] int height) { actualInstance->update(); });
     return std::unique_ptr<GameView>{actualInstance};
   }
   return nullptr;

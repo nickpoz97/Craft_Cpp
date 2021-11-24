@@ -1,6 +1,6 @@
+#include "Paths.hpp"
 #include <Interaction/Scene.hpp>
 #include <iostream>
-#include "Paths.hpp"
 
 int main() {
   CraftCpp::GameViewSettings gvs{
@@ -8,11 +8,12 @@ int main() {
   CraftCpp::ShaderNamesMap snm{};
   snm.emplace(
       CraftCpp::ShaderName::BLOCK_SHADER,
-      CraftCpp::ShaderFilesPaths{shadersDirPath +"block_vertex.glsl",
+      CraftCpp::ShaderFilesPaths{shadersDirPath + "block_vertex.glsl",
                                  shadersDirPath + "block_fragment.glsl"});
-  snm.emplace(CraftCpp::ShaderName::TEXT_SHADER,
-              CraftCpp::ShaderFilesPaths{shadersDirPath + "text_vertex.glsl",
-                                         shadersDirPath + "text_fragment.glsl"});
+  snm.emplace(
+      CraftCpp::ShaderName::TEXT_SHADER,
+      CraftCpp::ShaderFilesPaths{shadersDirPath + "text_vertex.glsl",
+                                 shadersDirPath + "text_fragment.glsl"});
 
   std::unique_ptr<CraftCpp::Scene> scene{
       CraftCpp::Scene::setInstance(gvs, {0, 20, 0}, {-90, -10}, snm)};

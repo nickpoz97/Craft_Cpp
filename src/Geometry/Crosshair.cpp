@@ -9,8 +9,9 @@
 
 namespace CraftCpp {
 Crosshair::Crosshair(int width, int height, int scale)
-    : centerPos{width / 2, height / 2},
-      SuperClass(getEndsCoordinates(width, height, scale)){};
+    : SuperClass(getEndsCoordinates(width, height, scale)), centerPos{width / 2,
+                                                                      height /
+                                                                          2} {}
 
 std::vector<Standard2DVertex>
 Crosshair::getEndsCoordinates(int width, int height, int scale) {

@@ -13,8 +13,8 @@
 
 namespace CraftCpp {
 Chunk::Chunk(const glm::ivec2 &pqCoordinates)
-    : blockMap{}, pq{pqCoordinates}, SuperClass{},
-      xzBoundaries{computeXZBoundaries(pqCoordinates)} {};
+    : SuperClass{}, blockMap{},
+      xzBoundaries{computeXZBoundaries(pqCoordinates)}, pq{pqCoordinates} {}
 
 int Chunk::getHighestBlock() const {
   int highest_y = -1;

@@ -7,7 +7,7 @@
 
 namespace CraftCpp {
 Text2D::Text2D(const glm::vec2 &position, float n, std::string_view text)
-    : initialCharPos{position}, SuperClass{genBuffer(position, n, text)} {}
+    : SuperClass{genBuffer(position, n, text)}, initialCharPos{position} {}
 
 void Text2D::renderObject() const {
   glEnable(GL_BLEND);

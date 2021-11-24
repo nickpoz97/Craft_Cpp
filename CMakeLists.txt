@@ -5,8 +5,36 @@ enable_testing()
 set(CMAKE_CXX_STANDARD 17)
 file(MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+add_subdirectory(deps/glfw)
+add_subdirectory(deps/fmt)
+
+link_libraries(${CMAKE_DL_LIBS} glfw fmt)
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
+file(GLOB_RECURSE INTERNAL_SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
+set(APP_MAIN "${PROJECT_SOURCE_DIR}/src/App.cpp")
+list(FILTER INTERNAL_SOURCES EXCLUDE REGEX "${APP_MAIN}")
+set(EXTERNAL_SOURCES deps/noise/noise.cpp deps/glad/src/glad.c)
+set(SOURCE_FILES ${INTERNAL_SOURCES} ${EXTERNAL_SOURCES})
+
+add_executable(app ${APP_MAIN} ${SOURCE_FILES})
+file(GLOB_RECURSE TEST_FILES test/*.cpp)
+
+add_executable(catch_test ${SOURCE_FILES} ${TEST_FILES})
+
+set(INCLUDE_DIRS deps/ include/)
+include_directories(${INCLUDE_DIRS})
+
 if (${UNIX})
-    add_compile_options(-Wall)
+    set_source_files_properties(
+            ${INTERNAL_SOURCES}
+            PROPERTIES
+            COMPILE_FLAGS "-Wall -Wextra -Werror -Wpedantic"
+    )
+
     find_package(X11 REQUIRED)
 
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g --coverage")
@@ -37,30 +65,6 @@ if (${UNIX})
                 ${PROJECT_BINARY_DIR} --html-details ${COVERAGE_DIR}/coverage.html
     )
 endif()
-
-set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-add_subdirectory(deps/glfw)
-add_subdirectory(deps/fmt)
-
-link_libraries(${CMAKE_DL_LIBS} glfw fmt)
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
-file(GLOB_RECURSE INTERNAL_SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
-set(APP_MAIN "${PROJECT_SOURCE_DIR}/src/App.cpp")
-list(FILTER INTERNAL_SOURCES EXCLUDE REGEX "${APP_MAIN}")
-set(EXTERNAL_SOURCES deps/noise/noise.cpp deps/glad/src/glad.c)
-set(SOURCE_FILES ${INTERNAL_SOURCES} ${EXTERNAL_SOURCES})
-
-add_executable(app ${APP_MAIN} ${SOURCE_FILES})
-file(GLOB_RECURSE TEST_FILES test/*.cpp)
-
-add_executable(catch_test ${SOURCE_FILES} ${TEST_FILES})
-
-set(INCLUDE_DIRS deps/ include/)
-
-include_directories(${INCLUDE_DIRS})
 
 add_test(NAME test_and_coverage COMMAND catch_test WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 

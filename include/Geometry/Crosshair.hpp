@@ -19,13 +19,12 @@ namespace CraftCpp {
 class Crosshair : public RenderableEntity<Standard2DVertex> {
 private:
   using SuperClass = RenderableEntity<Standard2DVertex>;
-
   static std::vector<Standard2DVertex> getEndsCoordinates(int width, int height,
                                                           int scale);
 
 public:
   /// @brief 2D pixel coordinates of Crosshair center position
-  glm::ivec2 centerPos{};
+  glm::ivec2 centerPos;
 
   /**
    * @brief Constructs a renderable Crosshair in the centre of the window
