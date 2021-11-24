@@ -27,11 +27,15 @@ if (${UNIX})
             ${PROJECT_SOURCE_DIR}/bin/app
     )
 
-    set(COVERAGE_SCRIPT "${PROJECT_SOURCE_DIR}/script/coverage.sh")
-    message("Coverage script path: ${COVERAGE_SCRIPT}")
-    set(COVERAGE_SRC_DIR "${PROJECT_BINARY_DIR}/CMakeFiles/catch_test.dir/src")
-
-    add_custom_target(coverage COMMAND ${COVERAGE_SCRIPT} ${COVERAGE_SRC_DIR} ${PROJECT_SOURCE_DIR})
+    set(COVERAGE_DIR ${PROJECT_SOURCE_DIR}/doc/coverage)
+    add_custom_target(
+            coverage
+            COMMAND mkdir -p ${COVERAGE_DIR}
+            COMMAND gcovr -r ${PROJECT_SOURCE_DIR}/src
+                -e ${PROJECT_SOURCE_DIR}/src/App.cpp -e ${PROJECT_SOURCE_DIR}/src/Interaction/Scene.cpp
+                -e ${PROJECT_SOURCE_DIR}/src/Geometry/Sphere.cpp -e ${PROJECT_SOURCE_DIR}/src/Geometry/Item.cpp
+                ${PROJECT_BINARY_DIR} --html-details ${COVERAGE_DIR}/coverage.html
+    )
 endif()
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
