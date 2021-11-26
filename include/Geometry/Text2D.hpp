@@ -32,9 +32,9 @@ public:
 
   /**
    * @brief instantiates a 2D text of a specified size in a specified position
-   * @param position position in pixels of the first Character
-   * @param n size in pixels of each Character
-   * @param text string to be rendered
+   * @param[in] position position in pixels of the first Character
+   * @param[in] n size in pixels of each Character
+   * @param[in] text string to be rendered
    */
   Text2D(const glm::vec2 &position, float n, std::string_view text);
 

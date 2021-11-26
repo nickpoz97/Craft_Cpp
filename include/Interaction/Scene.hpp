@@ -107,9 +107,9 @@ public:
 
   /**
    *
-   * @param path texture file path relative to executable path or absolute
-   * @param textureName used as unique id for texture
-   * @param clampType clamp type for outer uv coordinates
+   * @param[in] path texture file path relative to executable path or absolute
+   * @param[in] textureName used as unique id for texture
+   * @param[in] clampType clamp type for outer uv coordinates
    * @return 0 if texture is loaded, negative value if there was an error
    */
   int load_texture(std::string_view path, TextureName textureName,

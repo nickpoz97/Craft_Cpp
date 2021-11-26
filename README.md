@@ -4,7 +4,7 @@ Procedural voxel terrain generation using Perlin noise.
 
 ![game_screen](data/screenshots/screen.jpg)
 
-- *Author:* Niccolò Pozzetti
+- *Author:* Niccolò Pozzetti (VR456924)
 *note: this is a **c++** porting from [Craft](https://github.com/fogleman/Craft)*
 
 ## Dependencies
@@ -70,6 +70,7 @@ and copies the executable *app* into *proj_root/bin/build_type/*
 - **WASD** keys are used to move the camera
 - **mouse** movement is used to change camera direction
 - **ESC** command is used to swap cursor status (visible/invisible)
+*note: in debug mode cursor is active by default*
 
 ### Report
 Report pdf is available in report directory 

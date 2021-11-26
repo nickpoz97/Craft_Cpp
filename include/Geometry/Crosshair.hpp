@@ -28,9 +28,9 @@ public:
 
   /**
    * @brief Constructs a renderable Crosshair in the centre of the window
-   * @param width width of the screen
-   * @param height height of the screen
-   * @param scale size of the crosshair (vertical and horizontal bar)
+   * @param[in] width width of the screen
+   * @param[in] height height of the screen
+   * @param[in] scale size of the crosshair (vertical and horizontal bar)
    */
   Crosshair(int width, int height, int scale);
 

@@ -58,7 +58,7 @@ public:
 
   /**
    * @brief copies a new array of vertices into gpu VBO
-   * @param local_buffer
+   * @param[in] local_buffer
    */
   void updateBuffer(const std::vector<VertexType> &local_buffer) const;
 

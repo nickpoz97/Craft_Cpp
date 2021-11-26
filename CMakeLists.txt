@@ -29,7 +29,7 @@ add_executable(app ${APP_MAIN} ${SOURCE_FILES})
 ### collect test sources and set test ###
 file(GLOB_RECURSE TEST_FILES test/*.cpp)
 add_executable(catch_test ${SOURCE_FILES} ${TEST_FILES})
-add_test(NAME test_and_coverage COMMAND catch_test WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+add_test(NAME test COMMAND catch_test WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
 
 if (${UNIX})
     ### compile internal sources with warning flags ###

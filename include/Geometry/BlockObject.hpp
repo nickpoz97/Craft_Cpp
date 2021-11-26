@@ -77,14 +77,14 @@ public:
 
   /**
    * @brief Block with a specified type, position and rotation
-   * @param blockType type of block (texture depends on this)
-   * @param visibleFaces array  of flags for left, right, top, bottom, front,
+   * @param[in] blockType type of block (texture depends on this)
+   * @param[in] visibleFaces array  of flags for left, right, top, bottom, front,
    * back (true if face is visible)
-   * @param centerPosition position of the point in the middle of the Block
-   * @param asyRotation rotation around the vertical axis that passes through
+   * @param[in] centerPosition position of the point in the middle of the Block
+   * @param[in] asyRotation rotation around the vertical axis that passes through
    * the centre
-   * @param lightObstacles nearby opaque blocks (see Chunk::getLightObstacles)
-   * @param verticesIt starting position of container to be filled with the
+   * @param[in] lightObstacles nearby opaque blocks (see Chunk::getLightObstacles)
+   * @param[in] verticesIt starting position of container to be filled with the
    * vertices of this block
    * @warning every BlockObject occupies INDICES_FACE_COUNT * nFaces vertices
    */

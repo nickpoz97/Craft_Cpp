@@ -42,10 +42,10 @@ public:
 
   /**
    * @brief Generate a printable 2D character
-   * @param position pixel coordinates
-   * @param m half of vertical size in pixel
-   * @param n half of horizontal size in pixels
-   * @param c character to be rendered
+   * @param[in] position pixel coordinates
+   * @param[in] m half of vertical size in pixel
+   * @param[in] n half of horizontal size in pixels
+   * @param[in] c character to be rendered
    */
   Character(const glm::vec2 &position, float m, float n, char c);
 
