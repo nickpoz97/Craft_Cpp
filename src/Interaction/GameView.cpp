@@ -122,7 +122,7 @@ std::unique_ptr<GameView> GameView::setInstance(int width, int height,
     actualInstance = new GameView{width, height, fov, 0, false};
     glfwSetFramebufferSizeCallback(
         getWindow(),
-        []([[maybe_unused]] GLFWwindow *window, [[maybe_unused]] int width,
+        []([[maybe_unused]] GLFWwindow *glfWwindow, [[maybe_unused]] int width,
            [[maybe_unused]] int height) { actualInstance->update(); });
     return std::unique_ptr<GameView>{actualInstance};
   }
