@@ -45,7 +45,7 @@ but launching it directly from the file system works*
   - only available for linux
 - **Undefined_Sanitizer** debug build plus undefined behavior sanitizer flags
   - only available for linux
-- other build types may be available by default, but thy shouls not be used
+- other build types may be available by default, but these should not be used
 
 ### Available executables
 - **app** interactive demo
@@ -65,6 +65,11 @@ and copies the executable *app* into *proj_root/bin/build_type/*
   - this target is only available on linux
   - this target should not be called with *Release* build
   - executing valgrind is computationally very expensive
+
+### How to play with the demo
+- **WASD** keys are used to move the camera
+- **mouse** movement is used to change camera direction
+- **ESC** command is used to swap cursor status (visible/invisible)
 
 ### Report
 Report pdf is available in report directory 
