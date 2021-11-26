@@ -46,8 +46,8 @@ if (${UNIX})
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g --coverage")
     set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -g --coverage")
 
-    set(CMAKE_CXX_FLAGS_MEMORY_SANITIZER "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer")
-    set(CMAKE_EXE_LINKER_FLAGS_MEMORY_SANITIZER "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer")
+    set(CMAKE_CXX_FLAGS_ADDRESS_SANITIZER "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer")
+    set(CMAKE_EXE_LINKER_FLAGS_ADDRESS_SANITIZER "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=address -fno-omit-frame-pointer")
 
     set(CMAKE_CXX_FLAGS_UNDEFINED_SANITIZER "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=undefined -fno-omit-frame-pointer")
     set(CMAKE_EXE_LINKER_FLAGS_UNDEFINED_SANITIZER "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=undefined -fno-omit-frame-pointer")
@@ -97,4 +97,4 @@ configure_file( ${PROJECT_SOURCE_DIR}/src/Paths.hpp.in ${PROJECT_SOURCE_DIR}/src
 install(TARGETS app CONFIGURATIONS Release RUNTIME DESTINATION ${PROJECT_SOURCE_DIR}/bin/Release)
 install(TARGETS app CONFIGURATIONS Debug RUNTIME DESTINATION ${PROJECT_SOURCE_DIR}/bin/Debug)
 install(TARGETS app CONFIGURATIONS Undefined_Sanitizer RUNTIME DESTINATION ${PROJECT_SOURCE_DIR}/bin/UndSan)
-install(TARGETS app CONFIGURATIONS Memory_Sanitizer RUNTIME DESTINATION ${PROJECT_SOURCE_DIR}/bin/MemSan)
+install(TARGETS app CONFIGURATIONS Address_Sanitizer RUNTIME DESTINATION ${PROJECT_SOURCE_DIR}/bin/AddSan)
