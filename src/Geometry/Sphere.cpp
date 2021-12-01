@@ -77,7 +77,7 @@ Sphere::fill_local_buffer(const std::array<glm::vec3, 3> &actual_pos_triangle,
 
   for (; pos_it != actual_pos_triangle.end(); ++pos_it, ++uvs_it) {
     glm::vec3 final_pos{r * (*pos_it)};
-    *(it++) = {final_pos, *uvs_it};
+    *(it++) = {{final_pos}, *uvs_it};
   }
   // next pos on buffer
   return it;
