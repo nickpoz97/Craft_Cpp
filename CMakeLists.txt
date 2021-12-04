@@ -33,7 +33,7 @@ add_test(NAME test COMMAND catch_test WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
 
 # OpenGL
 find_package(OpenGL REQUIRED)
-link_libraries(${OPENGL_LIBRARIES})
+link_libraries(OpenGL::GL)
 
 if (${UNIX})
     ### compile internal sources with warning flags ###
