@@ -10,7 +10,7 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 add_subdirectory(deps/glfw)
 add_subdirectory(deps/fmt)
-link_libraries(${CMAKE_DL_LIBS} glfw fmt)
+link_libraries(glfw fmt)
 
 ### collect list of source files ###
 file(GLOB_RECURSE INTERNAL_SOURCES "${PROJECT_SOURCE_DIR}/src/*.cpp")
@@ -30,6 +30,10 @@ add_executable(app ${APP_MAIN} ${SOURCE_FILES})
 file(GLOB_RECURSE TEST_FILES test/*.cpp)
 add_executable(catch_test ${SOURCE_FILES} ${TEST_FILES})
 add_test(NAME test COMMAND catch_test WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+
+# OpenGL
+find_package(OpenGL REQUIRED)
+link_libraries(${OPENGL_LIBRARIES})
 
 if (${UNIX})
     ### compile internal sources with warning flags ###
