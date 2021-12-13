@@ -24,6 +24,7 @@ Procedural voxel terrain generation using Perlin noise.
 build tool configuration files
 2. tell cmake to generate build tool configuration files into that
 directory
+	* **IMPORTANT** do not move repo directory after this step, because it would break absolute paths generated in this step
 3. *optional* indicate what type of build you want
 4. launch your build tool 
 5. *optional* if you want executable into *bin* directory launch **install** target
