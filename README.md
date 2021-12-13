@@ -26,6 +26,7 @@ build tool configuration files
 directory
 3. *optional* indicate what type of build you want
 4. launch your build tool 
+5. *optional* if you want executable into *bin* directory launch **install** target
 
 Bash example using makefile for Release build type (assuming your current working
 directory is the one where there is the *CMakeLists.txt* file of this project):
