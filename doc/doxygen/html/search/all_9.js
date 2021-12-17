@@ -1,0 +1,19 @@
+var searchData=
+[
+  ['indices_5fface_5fcount_0',['INDICES_FACE_COUNT',['../namespaceCraftCpp.html#a4f464e126a6b61bed1367f873c4d43ca',1,'CraftCpp']]],
+  ['initchunk_1',['initChunk',['../classCraftCpp_1_1Chunk.html#a673b7ac23a5f8d866620da5462ac910a',1,'CraftCpp::Chunk']]],
+  ['initial_5ffov_2',['INITIAL_FOV',['../group__WindowSettings.html#ga74017785e89e402b1f2e2d2f5bb68ce0',1,'CraftCpp']]],
+  ['initialcharpos_3',['initialCharPos',['../classCraftCpp_1_1Text2D.html#a8af7a883d84700f7df145a54656cf3a6',1,'CraftCpp::Text2D']]],
+  ['isempty_4',['isEmpty',['../classCraftCpp_1_1TileBlock.html#a3a9bf478bb114e2c4bce245e1d2b431a',1,'CraftCpp::TileBlock']]],
+  ['isinstantiated_5',['isInstantiated',['../classCraftCpp_1_1CameraControl.html#a122dbef1f1246397b8aeb9c1b3c5aa72',1,'CraftCpp::CameraControl::isInstantiated()'],['../classCraftCpp_1_1GameView.html#af279f682305a2b8cef11f798b419d46b',1,'CraftCpp::GameView::isInstantiated()']]],
+  ['islocalbufferready_6',['isLocalBufferReady',['../classCraftCpp_1_1Chunk.html#a36d5266845febb7201f0450cfc2c37f6',1,'CraftCpp::Chunk']]],
+  ['isobstacle_7',['isObstacle',['../classCraftCpp_1_1TileBlock.html#a8e488aefd2d360f4cc1048a8b8cb29f5',1,'CraftCpp::TileBlock']]],
+  ['isonborder_8',['isOnBorder',['../classCraftCpp_1_1Chunk.html#aa88022c123615fbaa9e5ffbba3c1dd3e',1,'CraftCpp::Chunk']]],
+  ['ispartofterrain_9',['isPartOfTerrain',['../classCraftCpp_1_1TileBlock.html#a01b1a113ac9ac2011a5c00c8809b5767',1,'CraftCpp::TileBlock']]],
+  ['isplant_10',['isPlant',['../classCraftCpp_1_1TileBlock.html#af988f55de3024ce20d9cd722dea36eb7',1,'CraftCpp::TileBlock']]],
+  ['istransparent_11',['isTransparent',['../classCraftCpp_1_1TileBlock.html#a7861815928666699d2601d19a44deecd',1,'CraftCpp::TileBlock']]],
+  ['isvisible_12',['isVisible',['../classCraftCpp_1_1Chunk.html#ad1de3a1d57565646183d2a8f02648475',1,'CraftCpp::Chunk']]],
+  ['item_13',['Item',['../classCraftCpp_1_1Item.html',1,'CraftCpp::Item'],['../classCraftCpp_1_1Item.html#a0ae22d27e20c51ca53779b815e1f6196',1,'CraftCpp::Item::Item()']]],
+  ['item_2ehpp_14',['Item.hpp',['../Item_8hpp.html',1,'']]],
+  ['iterator_15',['Iterator',['../classCraftCpp_1_1TileCube_1_1Iterator.html',1,'CraftCpp::TileCube::Iterator'],['../classCraftCpp_1_1TileCube_1_1Iterator.html#a7d563ea90ed41e785ef86655c4cb45b4',1,'CraftCpp::TileCube::Iterator::Iterator()']]]
+];
